@@ -1,11 +1,11 @@
 import streamlit
 import streamlit as st
 import hashlib
-from BeyondChaosRandomizer.BeyondChaos.options import ALL_MODES, ALL_FLAGS, NORMAL_CODES, MAKEOVER_MODIFIER_CODES
+from BeyondChaosRandomizer.BeyondChaos.options import ALL_MODES, ALL_FLAGS, NORMAL_FLAGS, MAKEOVER_MODIFIER_FLAGS
 from BeyondChaosRandomizer.BeyondChaos.utils import WELL_KNOWN_ROM_HASHES
 
 VERSION = "4.2.0 CE"
-SORTED_CODES = sorted(NORMAL_CODES + MAKEOVER_MODIFIER_CODES, key=lambda x: (x.inputtype, x.name))
+SORTED_CODES = sorted(NORMAL_FLAGS + MAKEOVER_MODIFIER_FLAGS, key=lambda x: (x.inputtype, x.name))
 
 selected_flags = []
 generation_text = ""
@@ -57,7 +57,7 @@ def main():
     with st.expander("Flag Selection", True):
         flag_categories = ["Flags"]
 
-        for code in NORMAL_CODES + MAKEOVER_MODIFIER_CODES:
+        for code in NORMAL_FLAGS + MAKEOVER_MODIFIER_FLAGS:
             if str.title(code.category) not in flag_categories:
                 flag_categories.append(str.title(code.category))
 
