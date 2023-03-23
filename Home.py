@@ -1,50 +1,97 @@
-import streamlit
+import io
+
 import streamlit as sl
 import hashlib
-from BeyondChaosRandomizer.BeyondChaos.options import ALL_MODES, ALL_FLAGS, NORMAL_FLAGS, MAKEOVER_MODIFIER_FLAGS
+import zipfile
+import sys
+
+from streamlit.runtime.scriptrunner.script_run_context import get_script_run_ctx, add_script_run_ctx
+
+sys.path.append("BeyondChaosRandomizer/BeyondChaos")
+
+from multiprocessing import Pipe, Process
+from BeyondChaosRandomizer.BeyondChaos.customthreadpool import NonDaemonPool
+from BeyondChaosRandomizer.BeyondChaos.randomizer import randomize_web
+from BeyondChaosRandomizer.BeyondChaos.options import ALL_MODES, NORMAL_FLAGS, MAKEOVER_MODIFIER_FLAGS
 from BeyondChaosRandomizer.BeyondChaos.utils import WELL_KNOWN_ROM_HASHES
 
 VERSION = "4.2.1 CE"
 SORTED_FLAGS = sorted(NORMAL_FLAGS + MAKEOVER_MODIFIER_FLAGS, key=lambda x: x.name)
 
+flag_categories = []
 selected_flags = []
-generation_text = ""
-uploaded_rom_data = None
+input_rom_data = None
+output_rom_data = None
+output_spoiler_log = None
+output_seed = None
 
 
 def update_active_flags():
+    global flag_categories
     global selected_flags
     selected_flags = []
 
-    for code in SORTED_FLAGS:
-        if code.inputtype == "checkbox" and \
-                code.name in sl.session_state and \
-                sl.session_state[code.name]:
-            selected_flags.append(str(code.name))
-        elif code.inputtype == "combobox" and \
-                code.name in sl.session_state and not \
-                str(sl.session_state[code.name]) == code.default_value:
-            selected_flags.append(str(code.name) + ":" + str(sl.session_state[code.name]))
-        elif code.inputtype == "integer" and \
-                code.name in sl.session_state and not \
-                str(int(sl.session_state[code.name])) == code.default_value:
-            selected_flags.append(str(code.name) + ":" + str(int(sl.session_state[code.name])))
-        elif code.inputtype == "float2" and \
-                code.name in sl.session_state:
-            float_value = '{0:.2f}'.format(sl.session_state[code.name])
-            if not float_value == code.default_value:
-                selected_flags.append(str(code.name) + ":" + '{0:.2f}'.format(sl.session_state[code.name]))
+    for category in flag_categories:
+        for code in SORTED_FLAGS:
+            if code.category == category.lower():
+                if code.inputtype == "checkbox" and \
+                        code.name in sl.session_state and \
+                        sl.session_state[code.name]:
+                    selected_flags.append(str(code.name))
+                elif code.inputtype == "combobox" and \
+                        code.name in sl.session_state and not \
+                        str(sl.session_state[code.name]) == code.default_value:
+                    selected_flags.append(str(code.name) + ":" + str(sl.session_state[code.name]))
+                elif code.inputtype == "integer" and \
+                        code.name in sl.session_state and not \
+                        str(int(sl.session_state[code.name])) == code.default_value:
+                    selected_flags.append(str(code.name) + ":" + str(int(sl.session_state[code.name])))
+                elif code.inputtype == "float2" and \
+                        code.name in sl.session_state:
+                    float_value = '{0:.2f}'.format(sl.session_state[code.name])
+                    if not float_value == code.default_value:
+                        selected_flags.append(str(code.name) + ":" + '{0:.2f}'.format(sl.session_state[code.name]))
 
 
 def generate_game():
-    global generation_text
-    generation_text = "Generating..."
-    bundle = f"{VERSION}|" + sl.session_state["gamemode"] + "|" + str.lower(" ".join(selected_flags)) + \
-             "|" + str(sl.session_state["seed"])
-    # kwargs = {
-    #     "sourcefile": "",
-    #     "seed": bundle,
-    # }
+    global input_rom_data
+    global output_rom_data
+    global output_spoiler_log
+    global output_seed
+
+    bundle = f"{VERSION}" + "|" + \
+             str.lower(sl.session_state["gamemode"]) + "|" + \
+             str.lower(" ".join(selected_flags)) + "|" + \
+             str(sl.session_state["seed"])
+    parent_connection, child_connection = Pipe()
+    kwargs = {
+        "input_file": input_rom_data,
+        "seed": bundle
+    }
+    child = Process(
+        target=randomize_web,
+        args=(child_connection,),
+        kwargs=kwargs
+    )
+    child.start()
+    sl.session_state["status"] = "Beginning randomization."
+    sl.session_state["status_control"].text(sl.session_state["status"])
+    while True:
+        try:
+            item = parent_connection.recv()
+            if isinstance(item, str):
+                # Status update
+                sl.session_state["status"] += "\n" + item
+                sl.session_state["status_control"].text(sl.session_state["status"])
+            elif isinstance(item, dict):
+                # Return values
+                output_rom_data = item["ord"]
+                output_seed = item["os"]
+                output_spoiler_log = item["osl"]
+                break
+        except EOFError:
+            break
+    child.join()
 
 
 def main():
@@ -52,6 +99,7 @@ def main():
     sl.title("Beyond Chaos " + VERSION)
 
     with sl.expander("Flag Selection", True):
+        global flag_categories
         flag_categories = ["Flags"]
 
         for code in NORMAL_FLAGS + MAKEOVER_MODIFIER_FLAGS:
@@ -63,7 +111,7 @@ def main():
         for i, tab in enumerate(flag_categories):
             for code in SORTED_FLAGS:
                 if str.lower(code.category) == str.lower(tab):
-                    if code.inputtype == "checkbox":
+                    if code.inputtype == "checkbox" and not code.name in ["remonsterate", "bingoboingo"]:
                         tabs[i].checkbox(label=code.name + " - " + code.long_description,
                                          on_change=update_active_flags(),
                                          key=code.name)
@@ -89,16 +137,13 @@ def main():
                                              key=code.name)
 
     with sl.expander("Input and Output", True):
-        data = sl.file_uploader(label="ROM File", key="romfile")
+        global input_rom_data
+        input_rom_data = sl.file_uploader(label="ROM File", key="input_romfile")
 
-        global uploaded_rom_data
-        if data:
-            uploaded_rom_data = data.getvalue()
-
+        if input_rom_data:
             # ROM file's session state gets an object with attributes: id, name, type, size
-            rom_filename = sl.session_state["romfile"]
-            rom_hash = hashlib.md5(data.getbuffer()).hexdigest()
-            if not str.endswith(rom_filename.name, ".smc"):
+            rom_hash = hashlib.md5(input_rom_data.getbuffer()).hexdigest()
+            if not str.endswith(input_rom_data.name, ".smc"):
                 file_upload_message = ":red[The uploaded file has an invalid extension. " \
                                       "SNES ROM files should have the extension '.smc'.]"
                 valid_rom_file = False
@@ -109,10 +154,9 @@ def main():
             else:
                 file_upload_message = ":green[Valid FF3/FF6 1.0 ROM detected!]"
                 valid_rom_file = True
-
         else:
             file_upload_message = ""
-            uploaded_rom_data = None
+            input_rom_data = None
             valid_rom_file = False
 
         sl.markdown(file_upload_message)
@@ -124,7 +168,7 @@ def main():
         for mode in ALL_MODES:
             if str.title(mode.name) not in modes:
                 modes.append(str.title(mode.name))
-        streamlit.selectbox(label="Game Mode",
+        sl.selectbox(label="Game Mode",
                             options=modes,
                             key="gamemode")
 
@@ -137,8 +181,29 @@ def main():
                      key="generate_button"):
             generate_game()
 
-        global generation_text
-        sl.text(generation_text)
+        if "status" in sl.session_state.keys():
+            sl.session_state["status_control"] = sl.text(sl.session_state["status"])
+        else:
+            sl.session_state["status_control"] = sl.text("")
+
+        global output_rom_data
+        global output_spoiler_log
+        if output_rom_data:
+            with io.BytesIO() as buffer:
+                with zipfile.ZipFile(buffer, "w") as output_zip:
+                    output_zip.writestr(input_rom_data.name[:input_rom_data.name.index(".")] +
+                                        "-" + str(output_seed) + ".smc",
+                                        output_rom_data.getvalue())
+                    if output_spoiler_log:
+                        output_zip.writestr(input_rom_data.name[:input_rom_data.name.index(".")] +
+                                            "-" + str(output_seed) + ".txt",
+                                            output_spoiler_log)
+                sl.download_button(label="Download Randomized ROM(s)",
+                                   data=buffer,
+                                   file_name=input_rom_data.name[:input_rom_data.name.index(".")] +
+                                   "-" + str(output_seed) + ".zip",
+                                   mime="application/zip",
+                                   key="output_romfile")
 
 
 if __name__ == "__main__":
