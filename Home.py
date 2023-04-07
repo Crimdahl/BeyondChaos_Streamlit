@@ -7,9 +7,11 @@ import sys
 sys.path.append("BeyondChaosRandomizer/BeyondChaos")
 
 from multiprocessing import Pipe, Process
-from BeyondChaosRandomizer.BeyondChaos.randomizer import randomize_web
+from BeyondChaosRandomizer.BeyondChaos.randomizer import randomize
 from BeyondChaosRandomizer.BeyondChaos.options import ALL_MODES, NORMAL_FLAGS, MAKEOVER_MODIFIER_FLAGS
 from BeyondChaosRandomizer.BeyondChaos.utils import WELL_KNOWN_ROM_HASHES
+from streamlit.elements.utils import _shown_default_value_warning
+_shown_default_value_warning = False
 
 VERSION = "4.2.1 CE"
 SORTED_FLAGS = sorted(NORMAL_FLAGS + MAKEOVER_MODIFIER_FLAGS, key=lambda x: x.name)
@@ -58,6 +60,43 @@ input_rom_data = None
 output_rom_data = None
 output_spoiler_log = None
 output_seed = None
+
+
+def set_stylesheet():
+    # Streamlit doesn't currently allow the addition of HTML IDs or additional classes to elements.
+    #   This fact makes it difficult to customize the site extensively with CSS without hackery.
+    # To make the drop-down label and the contents side-by-side, the label needs to have the CSS of
+    #   display: inline - block;
+    #   vertical - align: middle;
+    #   margin: auto;
+    # and the drop-down itself needs to have the CSS of
+    #   display: inline-block;
+    #   width: 90%;
+    #   margin-left: 50px;
+    sl.markdown(
+        '<style>'
+            # stApp contains all of the content for the app. Probably use it like the HTML element.
+            '.stApp {'
+                'background-color: white;'
+            '}'
+            # Setting the expander header text style
+            '.streamlit-expanderHeader:first-child:first-child p{'
+                'font-size: 18px;'
+                'font-weight: bold;'
+            '}'
+            # Setting overflow on the status box
+            '.streamlit-expanderContent div:nth-child(8) div:first-child{'
+                'max-height: 300px;'
+                'overflow-y: auto;'
+                'overflow-x: hidden;'
+                'white-space: pre-line;'
+                # These two attributes keep the scroll area anchored to the bottom as new content comes in.
+                'flex-direction: column-reverse;' 
+                'display: flex;'
+            '}'
+        '</style>',
+        unsafe_allow_html=True
+    )
 
 
 def clear_selected_flags(clear_preset=False):
@@ -152,66 +191,86 @@ def generate_game():
         starting_seed = int(time())
     sl.session_state["output_files"] = []
 
-    for iteration in range(batch_count):
-        sl.session_state["status"] = ""
-        bundle = f"{VERSION}" + "|" + \
-                 str.lower(sl.session_state["gamemode"]) + "|" + \
-                 str.lower(" ".join(sl.session_state["selected_flags"])) + "|" + \
-                 str(starting_seed + iteration)
-        parent_connection, child_connection = Pipe()
-        kwargs = {
-            "infile_buffer": io.BytesIO(input_rom_data.getvalue()),
-            "outfile_buffer": io.BytesIO(input_rom_data.getvalue()),
-            "seed": bundle
-        }
-        child = Process(
-            target=randomize_web,
-            args=(child_connection,),
-            kwargs=kwargs
-        )
-        child.start()
-        sl.session_state["status"] = "Beginning randomization of ROM number " + str(iteration + 1) + \
-                                     " of " + str(batch_count) + ". Please don't touch any controls until the" \
-                                     " randomization completes or things will explode."
+    try:
+        for iteration in range(batch_count):
+            sl.session_state["status"] = ""
+            bundle = f"{VERSION}" + "|" + \
+                     str.lower(sl.session_state["gamemode"]) + "|" + \
+                     str.lower(" ".join(sl.session_state["selected_flags"])) + "|" + \
+                     str(starting_seed + iteration)
+            parent_connection, child_connection = Pipe()
+            kwargs = {
+                "source": "web",
+                "infile_rom_buffer": io.BytesIO(input_rom_data.getvalue()),
+                "outfile_rom_buffer": io.BytesIO(input_rom_data.getvalue()),
+                "seed": bundle
+            }
+            child = Process(
+                target=randomize,
+                args=(child_connection,),
+                kwargs=kwargs
+            )
+            child.start()
+            sl.session_state["status"] = "Beginning randomization of ROM number " + str(iteration + 1) + \
+                                         " of " + str(batch_count)
+            sl.session_state["status_control"].text(sl.session_state["status"])
+            while True:
+                try:
+                    if not child.is_alive():
+                        sl.session_state["status"] += "\n" + "ERROR: The thread that was handling randomization died."
+                        sl.session_state["status_control"].text(sl.session_state["status"])
+                        break
+                    if parent_connection.poll(timeout=5):
+                        item = parent_connection.recv()
+                    else:
+                        item = None
+                    if item:
+                        if isinstance(item, str):
+                            # Status update
+                            sl.session_state["status"] += "\n" + item
+                            sl.session_state["status_control"].text(sl.session_state["status"])
+                        elif isinstance(item, dict):
+                            # Return values
+                            sl.session_state["output_files"].append({
+                                "output_rom_data": item["ord"],
+                                "output_seed": item["os"],
+                                "output_spoiler_log": item["osl"]
+                            })
+                            break
+                except EOFError:
+                    break
+            child.join()
+        sl.session_state["status"] = "Randomization Complete"
         sl.session_state["status_control"].text(sl.session_state["status"])
-        while True:
-            try:
-                item = parent_connection.recv()
-                if isinstance(item, str):
-                    # Status update
-                    sl.session_state["status"] += "\n" + item
-                    sl.session_state["status_control"].text(sl.session_state["status"])
-                elif isinstance(item, dict):
-                    # Return values
-                    sl.session_state["output_files"].append({
-                        "output_rom_data": item["ord"],
-                        "output_seed": item["os"],
-                        "output_spoiler_log": item["osl"]
-                    })
-                    break
-                elif not item:
-                    break
-            except EOFError:
-                break
-        child.join()
+    finally:
+        sl.session_state["lock"] = False
+
+
+def lock_gui():
+    sl.session_state["lock"] = True
 
 
 def main():
     sl.set_page_config(layout="wide")
-    sl.title("Beyond Chaos " + VERSION)
+    set_stylesheet()
+    sl.title("Beyond Chaos: Web Edition")
+    sl.markdown('<p style="font-size: 14px; margin-top: -20px;">Based on Beyond Chaos ' + VERSION + '</p>',
+                unsafe_allow_html=True)
 
-    with sl.expander("Flag Selection", True):
+    with sl.expander(label="Flag Selection", expanded=False):
         sl.selectbox(
             label="Flag Presets",
             options=DEFAULT_PRESETS.keys(),
             on_change=apply_flag_preset,
-            key="preset"
+            key="preset",
+            disabled="lock" in sl.session_state.keys() and sl.session_state["lock"]
         )
 
         sl.button(
             label="Clear Flags",
             on_click=clear_selected_flags,
-            args=(True,)
+            args=(True,),
+            disabled="lock" in sl.session_state.keys() and sl.session_state["lock"]
         )
 
         global flag_categories
@@ -229,31 +288,38 @@ def main():
                     if flag.inputtype == "boolean" and not flag.name in ["remonsterate", "bingoboingo"]:
                         tabs[i].checkbox(label=flag.name + " - " + flag.long_description,
                                          on_change=update_active_flags,
-                                         key=flag.name)
+                                         key=flag.name,
+                                         disabled="lock" in sl.session_state.keys() and sl.session_state["lock"])
                     elif flag.inputtype == "combobox":
                         tabs[i].selectbox(label=flag.name + " - " + flag.long_description,
                                           options=flag.choices,
                                           index=int(flag.default_index),
                                           on_change=update_active_flags,
-                                          key=flag.name)
+                                          key=flag.name,
+                                          disabled="lock" in sl.session_state.keys() and sl.session_state["lock"])
                     elif flag.inputtype == "float2":
                         tabs[i].number_input(label=flag.name + " - " + flag.long_description,
                                              min_value=0.00,
                                              value=1.00,
                                              step=0.01,
                                              on_change=update_active_flags,
-                                             key=flag.name)
+                                             key=flag.name,
+                                             disabled="lock" in sl.session_state.keys() and sl.session_state["lock"])
                     elif flag.inputtype == "integer":
                         tabs[i].number_input(label=flag.name + " - " + flag.long_description,
                                              min_value=0,
                                              step=1,
                                              value=int(flag.default_value),
                                              on_change=update_active_flags,
-                                             key=flag.name)
+                                             key=flag.name,
+                                             disabled="lock" in sl.session_state.keys() and sl.session_state["lock"])
 
-    with sl.expander("Input and Output", True):
+    with sl.expander(label="Input and Output", expanded=False):
         global input_rom_data
-        input_rom_data = sl.file_uploader(label="ROM File", key="input_romfile")
+        input_rom_data = sl.file_uploader(
+            label="ROM File",
+            key="input_romfile",
+        )
 
         if input_rom_data:
             # ROM file's session state gets an object with attributes: id, name, type, size
@@ -279,21 +345,24 @@ def main():
         sl.number_input(label="Seed Number (0 = random)",
                         min_value=0,
                         step=1,
-                        key="seed")
+                        key="seed",
+                        disabled="lock" in sl.session_state.keys() and sl.session_state["lock"])
 
         sl.number_input(label="Number of randomized ROMs to create",
                         min_value=0,
                         step=1,
                         value=1,
-                        key="batch")
+                        key="batch",
+                        disabled="lock" in sl.session_state.keys() and sl.session_state["lock"])
 
         modes = []
         for mode in ALL_MODES:
             if str.title(mode.name) not in modes:
                 modes.append(str.title(mode.name))
         sl.selectbox(label="Game Mode",
-                            options=modes,
-                            key="gamemode")
+                     options=modes,
+                     key="gamemode",
+                     disabled="lock" in sl.session_state.keys() and sl.session_state["lock"])
 
         if "selected_flags" not in sl.session_state.keys():
             sl.session_state["selected_flags"] = []
@@ -304,19 +373,41 @@ def main():
         sl.text_area("Active Flags",
                      value=str.lower(", ".join(sl.session_state["selected_flags"])),
                      on_change=apply_flagstring,
-                     key="flagstring")
+                     key="flagstring",
+                     disabled="lock" in sl.session_state.keys() and sl.session_state["lock"])
 
         # Creates a button and causes it to generate a game when clicked
         # The button is disabled until a valid rom file is supplied and some flags are selected
         sl.button(label="Generate!",
-                  on_click=generate_game,
-                  disabled=not (len(sl.session_state["selected_flags"]) > 0 and valid_rom_file),
+                  on_click=lock_gui,
+                  disabled=("lock" in sl.session_state.keys() and sl.session_state["lock"])
+                  or not (len(sl.session_state["selected_flags"]) > 0 and valid_rom_file),
                   key="generate_button")
 
         if "status" in sl.session_state.keys():
             sl.session_state["status_control"] = sl.text(sl.session_state["status"])
         else:
             sl.session_state["status_control"] = sl.text("")
+
+        if "lock" not in sl.session_state.keys():
+            sl.session_state["lock"] = False
+        elif sl.session_state["lock"]:
+            # Hide the file uploader. We cannot disable that without losing the file.
+            sl.markdown(
+                '<style>'
+                # stApp contains all of the content for the app. Probably use it like the HTML element.
+                'div [data-testid="stFileUploader"] {'
+                    'display:none;'
+                '}'
+                'div [data-testid="stMarkdownContainer"] p:first-child span:first-child{'
+                    'display:none;'
+                '}'
+                '</style>',
+                unsafe_allow_html=True
+            )
+            generate_game()
+            # Reload the controls to unlock them
+            sl._rerun()
 
         global output_rom_data
         global output_spoiler_log
