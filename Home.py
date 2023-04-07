@@ -1,56 +1,142 @@
 import io
-
 import streamlit as sl
 import hashlib
 import zipfile
 import sys
 
-from streamlit.runtime.scriptrunner.script_run_context import get_script_run_ctx, add_script_run_ctx
-
 sys.path.append("BeyondChaosRandomizer/BeyondChaos")
 
 from multiprocessing import Pipe, Process
-from BeyondChaosRandomizer.BeyondChaos.customthreadpool import NonDaemonPool
 from BeyondChaosRandomizer.BeyondChaos.randomizer import randomize_web
 from BeyondChaosRandomizer.BeyondChaos.options import ALL_MODES, NORMAL_FLAGS, MAKEOVER_MODIFIER_FLAGS
 from BeyondChaosRandomizer.BeyondChaos.utils import WELL_KNOWN_ROM_HASHES
 
 VERSION = "4.2.1 CE"
 SORTED_FLAGS = sorted(NORMAL_FLAGS + MAKEOVER_MODIFIER_FLAGS, key=lambda x: x.name)
+DEFAULT_PRESETS = {
+    'None': [],
+    'New Player': [
+        "b", "c", "e", "f", "g", "i", "n", "o", "p", "q", "r", "s", "t", "w", "y", "z",
+        "alasdraco", "capslockoff", "partyparty", "makeover", "johnnydmad",
+        "questionablecontent", "dancelessons", "swdtechspeed:faster"
+    ],
+    'Intermediate Player':[
+        "b", "c", "d", "e", "f", "g", "i", "j", "k", "m", "n", "o", "p", "q", "r", "s", "t", "u", "w", "y", "z",
+        "alasdraco", "capslockoff", "partyparty", "makeover", "johnnydmad", "notawaiter", "mimetime",
+        "electricboogaloo", "questionablecontent", "dancelessons", "remonsterate", "swdtechspeed:random"
+    ],
+    'Advanced Player':[
+        "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "m", "n", "o", "p", "q", "r", "s", "t", "u", "w", "y", "z",
+        "alasdraco", "capslockoff", "partyparty", "makeover", "johnnydmad", "notawaiter", "dancingmaduin", "bsiab",
+        "mimetime", "randombosses", "electricboogaloo", "questionablecontent", "dancelessons", "remonsterate",
+        "swdtechspeed:random"
+    ],
+    'Chaotic Player':[
+        "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "m", "n", "o", "p", "q", "r", "s", "t", "u", "w", "y", "z",
+        "alasdraco", "capslockoff", "partyparty", "makeover", "johnnyachaotic", "notawaiter", "dancingmaduin", "bsiab",
+        "mimetime", "randombosses", "electricboogaloo", "questionablecontent", "dancelessons", "remonsterate",
+        "swdtechspeed:random", "masseffect", "allcombos", "supernatural", "randomboost:2", "thescenarionottaken"
+    ],
+    'KAN Race - Easy':[
+        "b", "c", "d", "e", "f", "g", "i", "j", "k", "m", "n", "o", "p", "q", "r", "s", "t", "w", "y", "z",
+        "capslockoff", "partyparty", "makeover", "johnnydmad", "notawaiter", "madworld"
+    ],
+    'KAN Race - Medium':[
+        "b", "c", "d", "e", "f", "g", "i", "j", "k", "m", "n", "o", "p", "q", "r", "s", "t", "u", "w", "y", "z",
+        "capslockoff", "partyparty", "makeover", "johnnydmad", "notawaiter", "madworld", "randombosses",
+        "electricboogaloo"
+    ],
+    'KAN Race - Insane':[
+        "b", "c", "d", "e", "f", "g", "i", "j", "k", "m", "n", "o", "p", "q", "r", "s", "t", "u", "w", "y", "z",
+        "capslockoff", "partyparty", "makeover", "johnnydmad", "notawaiter", "madworld", "randombosses",
+        "electricboogaloo", "darkworld", "bsiab"
+    ]
+}
 
 flag_categories = []
-selected_flags = []
 input_rom_data = None
 output_rom_data = None
 output_spoiler_log = None
 output_seed = None
 
 
-def update_active_flags():
-    global flag_categories
-    global selected_flags
-    selected_flags = []
+def clear_selected_flags(clear_preset=False):
+    for code in NORMAL_FLAGS + MAKEOVER_MODIFIER_FLAGS:
+        if code.name in sl.session_state.keys():
+            if code.inputtype == "boolean":
+                sl.session_state[code.name] = False
+            elif code.inputtype == "combobox":
+                sl.session_state[code.name] = code.default_value
+            elif code.inputtype == "integer":
+                sl.session_state[code.name] = int(code.default_value)
+            elif code.inputtype == "float2":
+                sl.session_state[code.name] = float(code.default_value)
+    sl.session_state["selected_flags"] = []
+    sl.session_state["flagstring"] = ""
+    if clear_preset:
+        sl.session_state["preset"] = "None"
 
-    for category in flag_categories:
-        for code in SORTED_FLAGS:
-            if code.category == category.lower():
-                if code.inputtype == "checkbox" and \
-                        code.name in sl.session_state and \
-                        sl.session_state[code.name]:
-                    selected_flags.append(str(code.name))
-                elif code.inputtype == "combobox" and \
-                        code.name in sl.session_state and not \
-                        str(sl.session_state[code.name]) == code.default_value:
-                    selected_flags.append(str(code.name) + ":" + str(sl.session_state[code.name]))
-                elif code.inputtype == "integer" and \
-                        code.name in sl.session_state and not \
-                        str(int(sl.session_state[code.name])) == code.default_value:
-                    selected_flags.append(str(code.name) + ":" + str(int(sl.session_state[code.name])))
-                elif code.inputtype == "float2" and \
-                        code.name in sl.session_state:
-                    float_value = '{0:.2f}'.format(sl.session_state[code.name])
-                    if not float_value == code.default_value:
-                        selected_flags.append(str(code.name) + ":" + '{0:.2f}'.format(sl.session_state[code.name]))
+
+def update_active_flags():
+    if "selected_flags" in sl.session_state.keys():
+        global flag_categories
+        sl.session_state["selected_flags"] = []
+
+        for category in flag_categories:
+            for flag in SORTED_FLAGS:
+                if flag.category == category.lower():
+                    if flag.inputtype == "boolean" and \
+                            flag.name in sl.session_state and \
+                            sl.session_state[flag.name]:
+                        sl.session_state["selected_flags"].append(str(flag.name))
+                    elif flag.inputtype == "combobox" and \
+                            flag.name in sl.session_state and not \
+                            str(sl.session_state[flag.name]) == flag.default_value:
+                        sl.session_state["selected_flags"].append(str(flag.name) + ":" +
+                                                                  str(sl.session_state[flag.name]))
+                    elif flag.inputtype == "integer" and \
+                            flag.name in sl.session_state and not \
+                            str(int(sl.session_state[flag.name])) == flag.default_value:
+                        sl.session_state["selected_flags"].append(str(flag.name) + ":" +
+                                                                  str(sl.session_state[flag.name]))
+                    elif flag.inputtype == "float2" and \
+                            flag.name in sl.session_state:
+                        float_value = '{0:.2f}'.format(float(sl.session_state[flag.name]))
+                        if not float_value == flag.default_value:
+                            sl.session_state["selected_flags"].append(str(flag.name) + ":" +
+                                                                      str(sl.session_state[flag.name]))
+        sl.session_state["flagstring"] = str.lower(", ".join(sl.session_state["selected_flags"]))
+
+
+def apply_flag_preset(flagset=None):
+    if flagset:
+        selected_presets = flagset
+    elif not sl.session_state["preset"] == "None":
+        selected_presets = DEFAULT_PRESETS[sl.session_state["preset"]]
+    else:
+        clear_selected_flags()
+        return
+
+    clear_selected_flags()
+
+    for preset_flag in selected_presets:
+        for flag in SORTED_FLAGS:
+            try:
+                preset_flag_name = preset_flag[:str(preset_flag).index(":")]
+            except ValueError:
+                preset_flag_name = preset_flag
+            if flag.name == preset_flag_name:
+                if ":" in preset_flag:
+                    sl.session_state[flag.name] = str(preset_flag[str(preset_flag).index(":") + 1:]).title()
+                else:
+                    sl.session_state[flag.name] = True
+                continue
+
+    update_active_flags()
+
+
+def apply_flagstring():
+    apply_flag_preset(sl.session_state["flagstring"].replace(" ", "").split(","))
 
 
 def generate_game():
@@ -61,11 +147,12 @@ def generate_game():
 
     bundle = f"{VERSION}" + "|" + \
              str.lower(sl.session_state["gamemode"]) + "|" + \
-             str.lower(" ".join(selected_flags)) + "|" + \
+             str.lower(" ".join(sl.session_state["selected_flags"])) + "|" + \
              str(sl.session_state["seed"])
     parent_connection, child_connection = Pipe()
     kwargs = {
-        "input_file": input_rom_data,
+        "infile_buffer": io.BytesIO(input_rom_data.getvalue()),
+        "outfile_buffer": io.BytesIO(input_rom_data.getvalue()),
         "seed": bundle
     }
     child = Process(
@@ -89,6 +176,8 @@ def generate_game():
                 output_seed = item["os"]
                 output_spoiler_log = item["osl"]
                 break
+            elif not item:
+                break
         except EOFError:
             break
     child.join()
@@ -99,42 +188,55 @@ def main():
     sl.title("Beyond Chaos " + VERSION)
 
     with sl.expander("Flag Selection", True):
+        sl.selectbox(
+            label="Flag Presets",
+            options=DEFAULT_PRESETS.keys(),
+            on_change=apply_flag_preset,
+            key="preset"
+        )
+
+        sl.button(
+            label="Clear Flags",
+            on_click=clear_selected_flags,
+            args=(True,)
+        )
+
         global flag_categories
         flag_categories = ["Flags"]
 
-        for code in NORMAL_FLAGS + MAKEOVER_MODIFIER_FLAGS:
-            if str.title(code.category) not in flag_categories:
-                flag_categories.append(str.title(code.category))
+        for flag in NORMAL_FLAGS + MAKEOVER_MODIFIER_FLAGS:
+            if str.title(flag.category) not in flag_categories:
+                flag_categories.append(str.title(flag.category))
 
         tabs = sl.tabs(flag_categories)
 
         for i, tab in enumerate(flag_categories):
-            for code in SORTED_FLAGS:
-                if str.lower(code.category) == str.lower(tab):
-                    if code.inputtype == "checkbox" and not code.name in ["remonsterate", "bingoboingo"]:
-                        tabs[i].checkbox(label=code.name + " - " + code.long_description,
-                                         on_change=update_active_flags(),
-                                         key=code.name)
-                    elif code.inputtype == "combobox":
-                        tabs[i].selectbox(label=code.name + " - " + code.long_description,
-                                          options=code.choices,
-                                          index=int(code.default_index),
-                                          on_change=update_active_flags(),
-                                          key=code.name)
-                    elif code.inputtype == "float2":
-                        tabs[i].number_input(label=code.name + " - " + code.long_description,
+            for flag in SORTED_FLAGS:
+                if str.lower(flag.category) == str.lower(tab):
+                    if flag.inputtype == "boolean" and not flag.name in ["remonsterate", "bingoboingo"]:
+                        tabs[i].checkbox(label=flag.name + " - " + flag.long_description,
+                                         on_change=update_active_flags,
+                                         key=flag.name)
+                    elif flag.inputtype == "combobox":
+                        tabs[i].selectbox(label=flag.name + " - " + flag.long_description,
+                                          options=flag.choices,
+                                          index=int(flag.default_index),
+                                          on_change=update_active_flags,
+                                          key=flag.name)
+                    elif flag.inputtype == "float2":
+                        tabs[i].number_input(label=flag.name + " - " + flag.long_description,
                                              min_value=0.00,
                                              value=1.00,
                                              step=0.01,
-                                             on_change=update_active_flags(),
-                                             key=code.name)
-                    elif code.inputtype == "integer":
-                        tabs[i].number_input(label=code.name + " - " + code.long_description,
+                                             on_change=update_active_flags,
+                                             key=flag.name)
+                    elif flag.inputtype == "integer":
+                        tabs[i].number_input(label=flag.name + " - " + flag.long_description,
                                              min_value=0,
                                              step=1,
-                                             value=int(code.default_value),
-                                             on_change=update_active_flags(),
-                                             key=code.name)
+                                             value=int(flag.default_value),
+                                             on_change=update_active_flags,
+                                             key=flag.name)
 
     with sl.expander("Input and Output", True):
         global input_rom_data
@@ -172,12 +274,21 @@ def main():
                             options=modes,
                             key="gamemode")
 
-        sl.text_area("Active Flags", value=str.lower(", ".join(selected_flags)), disabled=True)
+        if "selected_flags" not in sl.session_state.keys():
+            sl.session_state["selected_flags"] = []
+
+        if "flagstring" not in sl.session_state.keys():
+            sl.session_state["flagstring"] = ""
+
+        sl.text_area("Active Flags",
+                     value=str.lower(", ".join(sl.session_state["selected_flags"])),
+                     on_change=apply_flagstring,
+                     key="flagstring")
 
         # Creates a button and causes it to generate a game when clicked
         # The button is disabled until a valid rom file is supplied and some flags are selected
         if sl.button(label="Generate!",
-                     disabled=not (len(selected_flags) > 0 and valid_rom_file),
+                     disabled=not (len(sl.session_state["selected_flags"]) > 0 and valid_rom_file),
                      key="generate_button"):
             generate_game()
 
