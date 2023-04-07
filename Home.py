@@ -145,42 +145,55 @@ def generate_game():
     global output_spoiler_log
     global output_seed
 
-    bundle = f"{VERSION}" + "|" + \
-             str.lower(sl.session_state["gamemode"]) + "|" + \
-             str.lower(" ".join(sl.session_state["selected_flags"])) + "|" + \
-             str(sl.session_state["seed"])
-    parent_connection, child_connection = Pipe()
-    kwargs = {
-        "infile_buffer": io.BytesIO(input_rom_data.getvalue()),
-        "outfile_buffer": io.BytesIO(input_rom_data.getvalue()),
-        "seed": bundle
-    }
-    child = Process(
-        target=randomize_web,
-        args=(child_connection,),
-        kwargs=kwargs
-    )
-    child.start()
-    sl.session_state["status"] = "Beginning randomization."
-    sl.session_state["status_control"].text(sl.session_state["status"])
-    while True:
-        try:
-            item = parent_connection.recv()
-            if isinstance(item, str):
-                # Status update
-                sl.session_state["status"] += "\n" + item
-                sl.session_state["status_control"].text(sl.session_state["status"])
-            elif isinstance(item, dict):
-                # Return values
-                output_rom_data = item["ord"]
-                output_seed = item["os"]
-                output_spoiler_log = item["osl"]
+    batch_count = sl.session_state["batch"]
+    starting_seed = sl.session_state["seed"]
+    if not starting_seed:
+        from time import time
+        starting_seed = int(time())
+    sl.session_state["output_files"] = []
+
+    for iteration in range(batch_count):
+        sl.session_state["status"] = ""
+        bundle = f"{VERSION}" + "|" + \
+                 str.lower(sl.session_state["gamemode"]) + "|" + \
+                 str.lower(" ".join(sl.session_state["selected_flags"])) + "|" + \
+                 str(starting_seed + iteration)
+        parent_connection, child_connection = Pipe()
+        kwargs = {
+            "infile_buffer": io.BytesIO(input_rom_data.getvalue()),
+            "outfile_buffer": io.BytesIO(input_rom_data.getvalue()),
+            "seed": bundle
+        }
+        child = Process(
+            target=randomize_web,
+            args=(child_connection,),
+            kwargs=kwargs
+        )
+        child.start()
+        sl.session_state["status"] = "Beginning randomization of ROM number " + str(iteration + 1) + \
+                                     " of " + str(batch_count) + ". Please don't touch any controls until the" \
+                                     " randomization completes or things will explode."
+        sl.session_state["status_control"].text(sl.session_state["status"])
+        while True:
+            try:
+                item = parent_connection.recv()
+                if isinstance(item, str):
+                    # Status update
+                    sl.session_state["status"] += "\n" + item
+                    sl.session_state["status_control"].text(sl.session_state["status"])
+                elif isinstance(item, dict):
+                    # Return values
+                    sl.session_state["output_files"].append({
+                        "output_rom_data": item["ord"],
+                        "output_seed": item["os"],
+                        "output_spoiler_log": item["osl"]
+                    })
+                    break
+                elif not item:
+                    break
+            except EOFError:
                 break
-            elif not item:
-                break
-        except EOFError:
-            break
-    child.join()
+        child.join()
 
 
 def main():
@@ -262,10 +275,18 @@ def main():
             valid_rom_file = False
 
         sl.markdown(file_upload_message)
+
         sl.number_input(label="Seed Number (0 = random)",
                         min_value=0,
                         step=1,
                         key="seed")
+
+        sl.number_input(label="Number of randomized ROMs to create",
+                        min_value=0,
+                        step=1,
+                        value=1,
+                        key="batch")
+
         modes = []
         for mode in ALL_MODES:
             if str.title(mode.name) not in modes:
@@ -287,10 +308,10 @@ def main():
 
         # Creates a button and causes it to generate a game when clicked
         # The button is disabled until a valid rom file is supplied and some flags are selected
-        if sl.button(label="Generate!",
-                     disabled=not (len(sl.session_state["selected_flags"]) > 0 and valid_rom_file),
-                     key="generate_button"):
-            generate_game()
+        sl.button(label="Generate!",
+                  on_click=generate_game,
+                  disabled=not (len(sl.session_state["selected_flags"]) > 0 and valid_rom_file),
+                  key="generate_button")
 
         if "status" in sl.session_state.keys():
             sl.session_state["status_control"] = sl.text(sl.session_state["status"])
@@ -299,20 +320,27 @@ def main():
 
         global output_rom_data
         global output_spoiler_log
-        if output_rom_data:
+        if "output_files" not in sl.session_state.keys():
+            sl.session_state["output_files"] = []
+
+        if "output_files" in sl.session_state.keys() and len(sl.session_state["output_files"]) > 0:
+            first_output_seed = ""
             with io.BytesIO() as buffer:
                 with zipfile.ZipFile(buffer, "w") as output_zip:
-                    output_zip.writestr(input_rom_data.name[:input_rom_data.name.index(".")] +
-                                        "-" + str(output_seed) + ".smc",
-                                        output_rom_data.getvalue())
-                    if output_spoiler_log:
+                    for output_file in sl.session_state["output_files"]:
+                        if not first_output_seed:
+                            first_output_seed = str(output_file["output_seed"])
                         output_zip.writestr(input_rom_data.name[:input_rom_data.name.index(".")] +
-                                            "-" + str(output_seed) + ".txt",
-                                            output_spoiler_log)
+                                            "-" + str(output_file["output_seed"]) + ".smc",
+                                            output_file["output_rom_data"].getvalue())
+                        if output_file["output_spoiler_log"]:
+                            output_zip.writestr(input_rom_data.name[:input_rom_data.name.index(".")] +
+                                                "-" + str(output_file["output_seed"]) + ".txt",
+                                                output_file["output_spoiler_log"])
                 sl.download_button(label="Download Randomized ROM(s)",
                                    data=buffer,
                                    file_name=input_rom_data.name[:input_rom_data.name.index(".")] +
-                                   "-" + str(output_seed) + ".zip",
+                                   "-" + str(first_output_seed) + ".zip",
                                    mime="application/zip",
                                    key="output_romfile")
 
