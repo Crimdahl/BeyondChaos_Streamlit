@@ -1,8 +1,8 @@
 #! /usr/bin/env python3
-import BeyondChaosRandomizer.BeyondChaos.monsterrandomizer as monsterrandomizer
 from io import BytesIO
 from math import log, floor
 
+from BeyondChaosRandomizer.BeyondChaos.monsterrandomizer import monsterdict, updatePos, get_monsters
 from BeyondChaosRandomizer.BeyondChaos.utils import read_multi, write_multi, utilrandom as random
 
 # Guardian x4, Broken Dirt Drgn, Kefka + Ice Dragon
@@ -255,11 +255,11 @@ class Formation():
             if self.bosses & (1 << i):
                 eid += 0x100
             self.big_enemy_ids.append(eid)
-            self.enemies.append(monsterrandomizer.monsterdict[eid])
+            self.enemies.append(monsterdict[eid])
             enemy_pos = self.enemy_pos[i]
             x, y = enemy_pos >> 4, enemy_pos & 0xF
             self.enemies[i].update_pos(x, y)
-            monsterrandomizer.updatePos(self.enemies[i].id, x, y)
+            updatePos(self.enemies[i].id, x, y)
         for e in self.enemies:
             if not e:
                 continue
@@ -528,7 +528,7 @@ if __name__ == "__main__":
     from sys import argv
 
     filename = argv[1]
-    monsters = monsterrandomizer.get_monsters(filename)
+    monsters = get_monsters(filename)
     for m in monsters:
         m.read_stats(filename)
     formations = get_formations(filename=filename)
