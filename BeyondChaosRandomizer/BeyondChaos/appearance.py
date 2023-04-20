@@ -1,15 +1,18 @@
 import itertools
 import os
 import string
-import options
+import BeyondChaosRandomizer.BeyondChaos.options as options
 import pathlib
 
-from character import get_characters
-from utils import (CHARACTER_PALETTE_TABLE, EVENT_PALETTE_TABLE, FEMALE_NAMES_TABLE, MALE_NAMES_TABLE,
-                   MOOGLE_NAMES_TABLE, RIDING_SPRITE_TABLE, SPRITE_REPLACEMENT_TABLE, CORAL_TABLE,
-                   generate_character_palette, get_palette_transformer, hex2int, name_to_bytes,
-                   open_mei_fallback, read_multi, shuffle_char_hues,
-                   Substitution, utilrandom as random, write_multi)
+from BeyondChaosRandomizer.BeyondChaos.character import get_characters
+from BeyondChaosRandomizer.BeyondChaos.utils import (CHARACTER_PALETTE_TABLE, EVENT_PALETTE_TABLE, FEMALE_NAMES_TABLE,
+                                                     MALE_NAMES_TABLE,
+                                                     MOOGLE_NAMES_TABLE, RIDING_SPRITE_TABLE, SPRITE_REPLACEMENT_TABLE,
+                                                     CORAL_TABLE,
+                                                     generate_character_palette, get_palette_transformer, hex2int,
+                                                     name_to_bytes,
+                                                     open_mei_fallback, read_multi, shuffle_char_hues,
+                                                     Substitution, utilrandom as random, write_multi)
 
 sprite_replacement_list = None
 makeover_groups = None
@@ -66,7 +69,8 @@ def get_sprite_replacements():
     return sprite_replacement_list
 
 
-def recolor_character_palette(fout, pointer, palette=None, flesh=False, middle=True, santa=False, skintones=None, char_hues=None, trance=False):
+def recolor_character_palette(fout, pointer, palette=None, flesh=False, middle=True, santa=False, skintones=None,
+                              char_hues=None, trance=False):
     fout.seek(pointer)
     if palette is None:
         palette = [read_multi(fout, length=2) for _ in range(16)]
@@ -206,11 +210,11 @@ def manage_coral(fout):
     coraldescription = coraldescription1 + bytes([0x01]) + coraldescription2
 
     coral_sub = Substitution()
-    coral_sub.set_location(0xEFC08) ##change the name when opening a chest
+    coral_sub.set_location(0xEFC08)  ##change the name when opening a chest
     coral_sub.bytestring = newcoralnamebytes
     coral_sub.write(fout)
 
-    coral_sub.set_location(0xEFD7F) ##Change the name in the description
+    coral_sub.set_location(0xEFD7F)  ##Change the name in the description
     coral_sub.bytestring = coraldescription
     coral_sub.write(fout)
 
@@ -329,7 +333,7 @@ def manage_character_names(fout, change_to, male, moogle_names=None, male_names=
     for c, name in enumerate(names):
         name = name_to_bytes(name, 6)
         assert len(name) == 6
-        fout.seek(0x478C0 + (6*c))
+        fout.seek(0x478C0 + (6 * c))
         fout.write(name)
 
 
@@ -387,14 +391,17 @@ def get_sprite_swaps(char_ids, male, female, vswaps):
     wild = options.Options_.is_flag_active('partyparty')
     clone_mode = options.Options_.is_flag_active('cloneparty')
     replace_all = options.Options_.is_flag_active('novanilla') or options.Options_.is_flag_active('frenchvanilla')
-    external_vanillas = False if options.Options_.is_flag_active('novanilla') else (options.Options_.is_flag_active('frenchvanilla') or clone_mode)
+    external_vanillas = False if options.Options_.is_flag_active('novanilla') else (
+                options.Options_.is_flag_active('frenchvanilla') or clone_mode)
     if not sprite_swap_mode:
         return []
 
     known_replacements = get_sprite_replacements()
 
     # uniqueids for sprites pulled from rom
-    vuids = {0: "terra", 1: "locke", 2: "cyan", 3: "shadow", 4: "edgar", 5: "sabin", 6: "celes", 7: "strago", 8: "relm", 9: "setzer", 10: "moogle", 11: "gau", 12: "gogo6", 13: "umaro", 16: "leo", 17: "banon", 18: "terra", 21: "kefka"}
+    vuids = {0: "terra", 1: "locke", 2: "cyan", 3: "shadow", 4: "edgar", 5: "sabin", 6: "celes", 7: "strago", 8: "relm",
+             9: "setzer", 10: "moogle", 11: "gau", 12: "gogo6", 13: "umaro", 16: "leo", 17: "banon", 18: "terra",
+             21: "kefka"}
 
     # determine which character ids are makeover'd
     blacklist = set()
@@ -405,7 +412,7 @@ def get_sprite_swaps(char_ids, male, female, vswaps):
         replace_min = 8 if not wild else 16
         replace_max = 12 if not wild else 20
         num_to_replace = min(len(known_replacements), random.randint(replace_min, replace_max))
-        is_replaced = [True] * num_to_replace + [False]*(len(char_ids)-num_to_replace)
+        is_replaced = [True] * num_to_replace + [False] * (len(char_ids) - num_to_replace)
         random.shuffle(is_replaced)
         for i, t in enumerate(is_replaced):
             if i in vuids and not t:
@@ -483,7 +490,7 @@ def get_sprite_swaps(char_ids, male, female, vswaps):
                 candidates = male_candidates
             else:
                 candidates = neutral_candidates
-            if random.randint(0, len(neutral_candidates)+2*len(candidates)) <= len(neutral_candidates):
+            if random.randint(0, len(neutral_candidates) + 2 * len(candidates)) <= len(neutral_candidates):
                 candidates = neutral_candidates
         if clone_mode:
             reverse_blacklist = [c for c in candidates if c.is_on(blacklist)]
@@ -514,7 +521,8 @@ def manage_character_appearance(fout, preserve_graphics=False, moogle_names=None
     moogle_mode = options.Options_.is_flag_active('kupokupo')
     ghost_mode = options.Options_.is_flag_active('halloween')
     christmas_mode = options.Options_.is_flag_active('christmas')
-    sprite_swap_mode = options.Options_.is_flag_active('makeover') and not (sabin_mode or tina_mode or soldier_mode or moogle_mode or ghost_mode)
+    sprite_swap_mode = options.Options_.is_flag_active('makeover') and not (
+                sabin_mode or tina_mode or soldier_mode or moogle_mode or ghost_mode)
     new_palette_mode = not options.Options_.is_flag_active('sometimeszombies')
 
     sprite_log = ""
@@ -541,7 +549,7 @@ def manage_character_appearance(fout, preserve_graphics=False, moogle_names=None
 
     if (wild or tina_mode or sabin_mode or christmas_mode):
         if christmas_mode:
-            char_ids = list(range(0, 0x15)) # don't replace kefka
+            char_ids = list(range(0, 0x15))  # don't replace kefka
         else:
             char_ids = list(range(0, 0x16))
     else:
@@ -561,8 +569,8 @@ def manage_character_appearance(fout, preserve_graphics=False, moogle_names=None
         # all characters are moogles except Mog, Imp, and Esper Terra
         if wild:
             # make mog human
-            mog = random.choice(list(range(0, 0x0A)) + list(range(0x0B, 0x0F)) +[0x10, 0x11, 0x13, 0x15])
-            #esper terra and imp neither human nor moogle
+            mog = random.choice(list(range(0, 0x0A)) + list(range(0x0B, 0x0F)) + [0x10, 0x11, 0x13, 0x15])
+            # esper terra and imp neither human nor moogle
             esper_terra, imp = random.sample([0x0F, 0x12, 0x14], 2)
         else:
             mog = random.choice(list(range(0, 0x0A)) + list(range(0x0B, 0x0E)))
@@ -644,7 +652,7 @@ def manage_character_appearance(fout, preserve_graphics=False, moogle_names=None
         f.close()
 
     for c in sprite_ids:
-        fout.seek(0x36F1B + (2*c))
+        fout.seek(0x36F1B + (2 * c))
         portrait = read_multi(fout, length=2)
         char_portraits[c] = portrait
         fout.seek(0x36F00 + c)
@@ -712,7 +720,8 @@ def manage_character_appearance(fout, preserve_graphics=False, moogle_names=None
                                                        swap_to[c].portrait_palette_filename), "rb")
                 except IOError:
                     use_fallback = True
-                    print("failed to load portrait %s for %s, using fallback" %(swap_to[c].portrait_filename, swap_to[c].name))
+                    print("failed to load portrait %s for %s, using fallback" % (
+                    swap_to[c].portrait_filename, swap_to[c].name))
                 else:
                     new_portrait_data = g.read(0x320)
                     new_portrait_palette_data = h.read(0x20)
@@ -732,7 +741,7 @@ def manage_character_appearance(fout, preserve_graphics=False, moogle_names=None
         elif portrait == 0 and wild and change_to[c] != 0:
             portrait = char_portraits[0xE]
             portrait_palette = char_portrait_palettes[0xE]
-        fout.seek(0x36F1B + (2*c))
+        fout.seek(0x36F1B + (2 * c))
         write_multi(fout, portrait, length=2)
         fout.seek(0x36F00 + c)
         fout.write(portrait_palette)
@@ -796,10 +805,10 @@ def manage_palettes(fout, change_to, char_ids):
         twinpal = random.randint(0, 5)
         char_palette_pool = list(range(0, 6)) + list(range(0, 6))
         char_palette_pool.remove(twinpal)
-        char_palette_pool.append(random.choice(list(range(0, twinpal))+list(range(twinpal, 6))))
+        char_palette_pool.append(random.choice(list(range(0, twinpal)) + list(range(twinpal, 6))))
         while True:
             random.shuffle(char_palette_pool)
-            #make sure terra, locke, and edgar are all different
+            # make sure terra, locke, and edgar are all different
             if twinpal in char_palette_pool[0:2]:
                 continue
             if char_palette_pool[0] == char_palette_pool[1]:
@@ -855,13 +864,13 @@ def manage_palettes(fout, change_to, char_ids):
         fout.seek(0x2CE2B + c)
         fout.write(bytes([new_palette]))
         pointers = [0, 4, 9, 13]
-        pointers = [ptr + 0x18EA60 + (18*c) for ptr in pointers]
+        pointers = [ptr + 0x18EA60 + (18 * c) for ptr in pointers]
         if c < 14:
             for ptr in pointers:
                 fout.seek(ptr)
                 byte = ord(fout.read(1))
                 byte = byte & 0xF1
-                byte |= ((new_palette+2) << 1)
+                byte |= ((new_palette + 2) << 1)
                 fout.seek(ptr)
                 fout.write(bytes([byte]))
         character.palette = new_palette
@@ -894,7 +903,7 @@ def manage_palettes(fout, change_to, char_ids):
             skintones = skintones[:5] + [snowmanvampire]
 
     for i in range(6):
-        pointer = 0x268000 + (i*0x20)
+        pointer = 0x268000 + (i * 0x20)
         if new_palette_mode:
             palette = recolor_character_palette(fout, pointer, palette=None,
                                                 flesh=(i == 5), santa=(christmas_mode and i == 3),
@@ -902,17 +911,17 @@ def manage_palettes(fout, change_to, char_ids):
         else:
             palette = recolor_character_palette(fout, pointer, palette=None,
                                                 flesh=(i == 5), santa=(christmas_mode and i == 3))
-        pointer = 0x2D6300 + (i*0x20)
+        pointer = 0x2D6300 + (i * 0x20)
         recolor_character_palette(fout, pointer, palette=palette)
 
     # esper terra
-    pointer = 0x268000 + (8*0x20)
+    pointer = 0x268000 + (8 * 0x20)
     if new_palette_mode:
         palette = recolor_character_palette(fout, pointer, palette=None, trance=True)
     else:
         palette = recolor_character_palette(fout, pointer, palette=None, flesh=True,
                                             middle=False)
-    pointer = 0x2D6300 + (6*0x20)
+    pointer = 0x2D6300 + (6 * 0x20)
     palette = recolor_character_palette(fout, pointer, palette=palette)
 
     # recolor magitek and chocobos
@@ -927,7 +936,7 @@ def manage_palettes(fout, change_to, char_ids):
             write_multi(fout, c, length=2)
 
     recolor_palette(0x2cfd4, 23)
-    recolor_palette(0x268000+(7*0x20), 16)
+    recolor_palette(0x268000 + (7 * 0x20), 16)
     recolor_palette(0x12ee20, 16)
     recolor_palette(0x12ef20, 16)
 
@@ -953,4 +962,3 @@ def manage_palettes(fout, change_to, char_ids):
 
         fout.seek(pointer)
         fout.write(data)
-

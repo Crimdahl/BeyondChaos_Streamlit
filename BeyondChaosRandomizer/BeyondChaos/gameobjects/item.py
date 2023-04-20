@@ -1,6 +1,6 @@
 from random import random
 
-from utils import hex2int
+from BeyondChaosRandomizer.BeyondChaos.utils import hex2int
 
 
 class ItemBlock:

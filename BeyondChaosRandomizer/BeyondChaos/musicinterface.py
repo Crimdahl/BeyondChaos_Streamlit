@@ -8,12 +8,14 @@ import os
 import string
 import pathlib
 
-from locationrandomizer import get_locations, get_location
-from dialoguemanager import set_dialogue_var, set_pronoun, patch_dialogue, load_patch_file
-from utils import utilrandom as random, open_mei_fallback as open
+from BeyondChaosRandomizer.BeyondChaos.locationrandomizer import get_locations, get_location
+from BeyondChaosRandomizer.BeyondChaos.dialoguemanager import set_dialogue_var, set_pronoun, patch_dialogue, \
+    load_patch_file
+from BeyondChaosRandomizer.BeyondChaos.utils import utilrandom as random, open_mei_fallback as open
 
-from music.jukebox import add_music_player
-from music.musicrandomizer import process_music, process_formation_music_by_table, process_map_music, get_legacy_import, \
+from BeyondChaosRandomizer.BeyondChaos.music.jukebox import add_music_player
+from BeyondChaosRandomizer.BeyondChaos.music.musicrandomizer import process_music, process_formation_music_by_table, \
+    process_map_music, get_legacy_import, \
     get_spc_memory_usage, get_music_spoiler as get_spoiler, initialize as johnnydmad_initialize
 
 from music.mfvitools.insertmfvi import byte_insert, bytes_to_int

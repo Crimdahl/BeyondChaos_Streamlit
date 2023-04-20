@@ -1,6 +1,7 @@
-from utils import Substitution, RANDOM_MULTIPLIER, random
-from character import get_characters
 from io import BytesIO
+
+from BeyondChaosRandomizer.BeyondChaos.utils import Substitution, RANDOM_MULTIPLIER, random
+from BeyondChaosRandomizer.BeyondChaos.character import get_characters
 
 
 def allergic_dog(output_rom_buffer: BytesIO):

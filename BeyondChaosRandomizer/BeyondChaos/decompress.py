@@ -3,7 +3,7 @@ from io import BytesIO
 from sys import argv
 from shutil import copyfile
 
-from utils import read_multi, write_multi
+from BeyondChaosRandomizer.BeyondChaos.utils import read_multi, write_multi
 
 def decompress(bytestring, simple=False, complicated=True, debug=False):
     result = bytearray([])

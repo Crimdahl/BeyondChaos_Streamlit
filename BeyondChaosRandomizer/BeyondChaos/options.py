@@ -1,7 +1,7 @@
 import re
 from dataclasses import dataclass, field
 from typing import List, Set, Union
-from .utils import pipe_print
+from BeyondChaosRandomizer.BeyondChaos.utils import pipe_print
 
 
 @dataclass(frozen=True)
@@ -718,7 +718,7 @@ def get_makeover_groups():
         if makeover_groups:
             return makeover_groups
 
-        from .appearance import get_sprite_replacements
+        from BeyondChaosRandomizer.BeyondChaos.appearance import get_sprite_replacements
         sprite_replacements = get_sprite_replacements()
         makeover_groups = {}
 

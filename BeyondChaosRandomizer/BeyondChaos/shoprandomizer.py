@@ -1,6 +1,7 @@
 from io import BytesIO
-from utils import SHOP_TABLE, utilrandom as random
-from itemrandomizer import get_ranked_items, get_item
+
+from BeyondChaosRandomizer.BeyondChaos.utils import SHOP_TABLE, utilrandom as random
+from BeyondChaosRandomizer.BeyondChaos.itemrandomizer import get_ranked_items, get_item
 
 # Despite documentation, these are the only pricings available.
 # 0 x1 price

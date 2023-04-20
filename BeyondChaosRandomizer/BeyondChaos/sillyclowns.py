@@ -1,5 +1,6 @@
-from dialoguemanager import get_dialogue, set_dialogue
-from utils import open_mei_fallback, Substitution, utilrandom as random, PASSWORDS_TABLE, POEMS_TABLE
+from BeyondChaosRandomizer.BeyondChaos.dialoguemanager import get_dialogue, set_dialogue
+from BeyondChaosRandomizer.BeyondChaos.utils import open_mei_fallback, Substitution, utilrandom as random, \
+    PASSWORDS_TABLE, POEMS_TABLE
 
 
 POEM_PAGE_BREAK = "<wait 390 frames><wait 1 frame><page>"

@@ -1,9 +1,9 @@
 import random
-
-from gameobjects.character import Character
-from randomizers.baserandomizer import Randomizer
-from options import Options
 from typing import List
+
+from BeyondChaosRandomizer.BeyondChaos.gameobjects.character import Character
+from BeyondChaosRandomizer.BeyondChaos.randomizers.baserandomizer import Randomizer
+from BeyondChaosRandomizer.BeyondChaos.options import Options
 
 
 class CharacterStats(Randomizer):

@@ -1,13 +1,13 @@
-from character import get_characters, get_character
-from esperrandomizer import get_espers
-from formationrandomizer import (REPLACE_FORMATIONS, NOREPLACE_FORMATIONS, get_formations, get_fsets,
+from BeyondChaosRandomizer.BeyondChaos.character import get_characters, get_character
+from BeyondChaosRandomizer.BeyondChaos.esperrandomizer import get_espers
+from BeyondChaosRandomizer.BeyondChaos.formationrandomizer import (REPLACE_FORMATIONS, NOREPLACE_FORMATIONS, get_formations, get_fsets,
                                  get_formation, get_fset)
-from itemrandomizer import get_item
-from locationrandomizer import get_locations, get_location, get_npcs
-from monsterrandomizer import REPLACE_ENEMIES, get_monsters
-from shoprandomizer import get_shops
-from towerrandomizer import randomize_tower
-from utils import name_to_bytes, read_multi, Substitution, utilrandom as random, write_multi, AutoLearnRageSub
+from BeyondChaosRandomizer.BeyondChaos.itemrandomizer import get_item
+from BeyondChaosRandomizer.BeyondChaos.locationrandomizer import get_locations, get_location, get_npcs
+from BeyondChaosRandomizer.BeyondChaos.monsterrandomizer import REPLACE_ENEMIES, get_monsters
+from BeyondChaosRandomizer.BeyondChaos.shoprandomizer import get_shops
+from BeyondChaosRandomizer.BeyondChaos.towerrandomizer import randomize_tower
+from BeyondChaosRandomizer.BeyondChaos.utils import name_to_bytes, read_multi, Substitution, utilrandom as random, write_multi, AutoLearnRageSub
 
 
 def get_npc_palettes():

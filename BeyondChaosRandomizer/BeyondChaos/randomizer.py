@@ -8,67 +8,71 @@ from sys import argv
 from time import time, sleep, gmtime
 from typing import Callable, Dict, List, Set, Tuple
 from multiprocessing import Pipe, Process
-
-import character
-import locationrandomizer
-import options
-from monsterrandomizer import MonsterBlock
-from randomizers.characterstats import CharacterStats
-from ancient import manage_ancient
-from appearance import manage_character_appearance, manage_coral
-from character import get_characters, get_character, equip_offsets
-from chestrandomizer import mutate_event_items, get_event_items
-from config import (get_input_path, get_output_path, save_input_path, save_output_path, get_items,
-                    set_value)
-from decompress import Decompressor
-from dialoguemanager import (manage_dialogue_patches, get_dialogue,
-                             set_dialogue, read_dialogue,
-                             read_location_names, write_location_names)
-from esperrandomizer import (get_espers, allocate_espers, randomize_magicite)
-from formationrandomizer import (REPLACE_FORMATIONS, KEFKA_EXTRA_FORMATION,
-                                 NOREPLACE_FORMATIONS, get_formations,
-                                 get_fsets, get_formation, Formation,
-                                 FormationSet)
-from itemrandomizer import (reset_equippable, get_ranked_items, get_item,
-                            reset_special_relics, reset_rage_blizzard,
-                            reset_cursed_shield, unhardcode_tintinabar,
-                            ItemBlock)
-from locationrandomizer import (get_locations, get_location, get_zones,
-                                get_npcs, randomize_forest, NPCBlock)
-from menufeatures import (improve_item_display, improve_gogo_status_menu,
-                          improve_rage_menu, show_original_names,
-                          improve_dance_menu, y_equip_relics, fix_gogo_portrait)
-from monsterrandomizer import (REPLACE_ENEMIES, MonsterGraphicBlock, get_monsters,
-                               get_metamorphs, get_ranked_monsters,
-                               shuffle_monsters, get_monster, read_ai_table,
-                               change_enemy_name, randomize_enemy_name,
-                               get_collapsing_house_help_skill)
-from musicinterface import randomize_music, manage_opera, get_music_spoiler, music_init, get_opera_log
-from options import ALL_MODES, NORMAL_FLAGS, Options_
-from patches import (allergic_dog, banon_life3, vanish_doom, evade_mblock,
-                     death_abuse, no_kutan_skip, show_coliseum_rewards,
-                     cycle_statuses, no_dance_stumbles, fewer_flashes,
-                     change_swdtech_speed, change_cursed_shield_battles, sprint_shoes_break, title_gfx, apply_namingway,
-                     improved_party_gear, patch_doom_gaze, nicer_poison, fix_xzone, imp_skimp, hidden_relic)
-from shoprandomizer import (get_shops, buy_owned_breakable_tools)
-from sillyclowns import randomize_passwords, randomize_poem
-from skillrandomizer import (SpellBlock, CommandBlock, SpellSub, ComboSpellSub,
-                             RandomSpellSub, MultipleSpellSub, ChainSpellSub,
-                             get_ranked_spells, get_spell)
-from towerrandomizer import randomize_tower
-from utils import (COMMAND_TABLE, LOCATION_TABLE, LOCATION_PALETTE_TABLE,
-                   FINAL_BOSS_AI_TABLE, SKIP_EVENTS_TABLE, DANCE_NAMES_TABLE,
-                   DIVERGENT_TABLE,
-                   get_long_battle_text_pointer,
-                   Substitution, shorttexttable, name_to_bytes,
-                   hex2int, int2bytes, read_multi, write_multi,
-                   generate_swapfunc, shift_middle, get_palette_transformer,
-                   battlebg_palettes, set_randomness_multiplier,
-                   mutate_index, utilrandom as random, open_mei_fallback,
-                   AutoLearnRageSub, pipe_print, set_parent_pipe)
-from wor import manage_wor_recruitment, manage_wor_skip
 from random import Random
-from remonsterate.remonsterate import remonsterate
+
+import BeyondChaosRandomizer.BeyondChaos.character as character
+import BeyondChaosRandomizer.BeyondChaos.locationrandomizer as locationrandomizer
+import BeyondChaosRandomizer.BeyondChaos.options as options
+from BeyondChaosRandomizer.BeyondChaos.monsterrandomizer import MonsterBlock
+from BeyondChaosRandomizer.BeyondChaos.randomizers.characterstats import CharacterStats
+from BeyondChaosRandomizer.BeyondChaos.ancient import manage_ancient
+from BeyondChaosRandomizer.BeyondChaos.appearance import manage_character_appearance, manage_coral
+from BeyondChaosRandomizer.BeyondChaos.character import get_characters, get_character, equip_offsets
+from BeyondChaosRandomizer.BeyondChaos.chestrandomizer import mutate_event_items, get_event_items
+from BeyondChaosRandomizer.BeyondChaos.config import (get_input_path, get_output_path, save_input_path,
+                                                      save_output_path, get_items,
+                                                      set_value)
+from BeyondChaosRandomizer.BeyondChaos.decompress import Decompressor
+from BeyondChaosRandomizer.BeyondChaos.dialoguemanager import (manage_dialogue_patches, get_dialogue,
+                                                               set_dialogue, read_dialogue,
+                                                               read_location_names, write_location_names)
+from BeyondChaosRandomizer.BeyondChaos.esperrandomizer import (get_espers, allocate_espers, randomize_magicite)
+from BeyondChaosRandomizer.BeyondChaos.formationrandomizer import (REPLACE_FORMATIONS, KEFKA_EXTRA_FORMATION,
+                                                                   NOREPLACE_FORMATIONS, get_formations,
+                                                                   get_fsets, get_formation, Formation,
+                                                                   FormationSet)
+from BeyondChaosRandomizer.BeyondChaos.itemrandomizer import (reset_equippable, get_ranked_items, get_item,
+                                                              reset_special_relics, reset_rage_blizzard,
+                                                              reset_cursed_shield, unhardcode_tintinabar,
+                                                              ItemBlock)
+from BeyondChaosRandomizer.BeyondChaos.locationrandomizer import (get_locations, get_location, get_zones,
+                                                                  get_npcs, randomize_forest, NPCBlock)
+from BeyondChaosRandomizer.BeyondChaos.menufeatures import (improve_item_display, improve_gogo_status_menu,
+                                                            improve_rage_menu, show_original_names,
+                                                            improve_dance_menu, y_equip_relics, fix_gogo_portrait)
+from BeyondChaosRandomizer.BeyondChaos.monsterrandomizer import (REPLACE_ENEMIES, MonsterGraphicBlock, get_monsters,
+                                                                 get_metamorphs, get_ranked_monsters,
+                                                                 shuffle_monsters, get_monster, read_ai_table,
+                                                                 change_enemy_name, randomize_enemy_name,
+                                                                 get_collapsing_house_help_skill)
+from BeyondChaosRandomizer.BeyondChaos.musicinterface import randomize_music, manage_opera, get_music_spoiler, \
+    music_init, get_opera_log
+from BeyondChaosRandomizer.BeyondChaos.options import ALL_MODES, NORMAL_FLAGS, Options_
+from BeyondChaosRandomizer.BeyondChaos.patches import (allergic_dog, banon_life3, vanish_doom, evade_mblock,
+                                                       death_abuse, no_kutan_skip, show_coliseum_rewards,
+                                                       cycle_statuses, no_dance_stumbles, fewer_flashes,
+                                                       change_swdtech_speed, change_cursed_shield_battles,
+                                                       sprint_shoes_break, title_gfx, apply_namingway,
+                                                       improved_party_gear, patch_doom_gaze, nicer_poison, fix_xzone,
+                                                       imp_skimp, hidden_relic)
+from BeyondChaosRandomizer.BeyondChaos.shoprandomizer import (get_shops, buy_owned_breakable_tools)
+from BeyondChaosRandomizer.BeyondChaos.sillyclowns import randomize_passwords, randomize_poem
+from BeyondChaosRandomizer.BeyondChaos.skillrandomizer import (SpellBlock, CommandBlock, SpellSub, ComboSpellSub,
+                                                               RandomSpellSub, MultipleSpellSub, ChainSpellSub,
+                                                               get_ranked_spells, get_spell)
+from BeyondChaosRandomizer.BeyondChaos.towerrandomizer import randomize_tower
+from BeyondChaosRandomizer.BeyondChaos.utils import (COMMAND_TABLE, LOCATION_TABLE, LOCATION_PALETTE_TABLE,
+                                                     FINAL_BOSS_AI_TABLE, SKIP_EVENTS_TABLE, DANCE_NAMES_TABLE,
+                                                     DIVERGENT_TABLE,
+                                                     get_long_battle_text_pointer,
+                                                     Substitution, shorttexttable, name_to_bytes,
+                                                     hex2int, int2bytes, read_multi, write_multi,
+                                                     generate_swapfunc, shift_middle, get_palette_transformer,
+                                                     battlebg_palettes, set_randomness_multiplier,
+                                                     mutate_index, utilrandom as random, open_mei_fallback,
+                                                     AutoLearnRageSub, pipe_print, set_parent_pipe)
+from BeyondChaosRandomizer.BeyondChaos.wor import manage_wor_recruitment, manage_wor_skip
+from BeyondChaosRandomizer.BeyondChaos.remonsterate.remonsterate import remonsterate
 
 VERSION = "CE-4.2.1"
 BETA = False
@@ -80,7 +84,7 @@ TEST_SEED = "CE-4.2.1|normal|b c d e f g h i j k l m n o p q r s t u w y z elect
 # FLARE GLITCH TEST_SEED = "CE-4.2.0|normal|bcdefgimnopqrstuwyzmakeoverpartypartynovanillarandombossessupernaturalalasdracocapslockoffjohnnydmadnotawaitermimetimedancingmaduinquestionablecontenteasymodocanttouchthisdearestmolulu|1635554018"
 # REMONSTERATE ASSERTION TEST_SEED = "CE-4.2.0|normal|bcdefgijklmnopqrstuwyzmakeoverpartypartyrandombossesalasdracocapslockoffjohnnydmadnotawaiterbsiabmimetimedancingmaduinremonsterate|1642044398"
 # TEST_SEED = "CE-4.2.1|katn|b c d e f g h i j k m n o p q r s t u w y z makeover partyparty novanilla randombosses dancingmaduin madworld alasdraco capslockoff johnnyachaotic notawaiter removeflashing bsiab questionablecontent thescenarionottaken|1671237882"
-#TEST_SEED = "CE-4.2.1|normal|b d e f g h i j k m n o p q r s t u w y z makeover partyparty novanilla electricboogaloo randombosses dancingmaduin dancelessons cursepower:16 swdtechspeed:faster alasdraco capslockoff johnnydmad notawaiter canttouchthis easymodo cursedencounters|1672183987"
+# TEST_SEED = "CE-4.2.1|normal|b d e f g h i j k m n o p q r s t u w y z makeover partyparty novanilla electricboogaloo randombosses dancingmaduin dancelessons cursepower:16 swdtechspeed:faster alasdraco capslockoff johnnydmad notawaiter canttouchthis easymodo cursedencounters|1672183987"
 TEST_FILE = "FF3.smc"
 seed, flags = None, None
 seedcounter = 1
@@ -5134,7 +5138,8 @@ def randomize(connection: Pipe = None, **kwargs) -> str:
                             mode_num = i
                             break
             application = ALL_MODES[mode_num]
-            allowed_flags = [f for f in NORMAL_FLAGS if f.category == "flags" and f.name not in application.prohibited_flags]
+            allowed_flags = [f for f in NORMAL_FLAGS if
+                             f.category == "flags" and f.name not in application.prohibited_flags]
             pipe_print()
             for flag in sorted(allowed_flags, key=lambda f: f.name):
                 pipe_print(flag.name + " - " + flag.long_description)
@@ -5298,8 +5303,8 @@ def randomize(connection: Pipe = None, **kwargs) -> str:
     expand_rom()
 
     pipe_print("\nNow beginning randomization.\n"
-                        "The randomization is very thorough, so it may take some time.\n"
-                        'Please be patient and wait for "randomization successful" to appear.')
+               "The randomization is very thorough, so it may take some time.\n"
+               'Please be patient and wait for "randomization successful" to appear.')
 
     rng = Random(seed)
 
@@ -5430,7 +5435,7 @@ def randomize(connection: Pipe = None, **kwargs) -> str:
         if type(amount) == bool:
             while True:
                 amount = input("\nHow many character should receive innate relics? "
-                                      "(0-14 or random):\n")
+                               "(0-14 or random):\n")
                 try:
                     if amount.lower() == "random" or 0 < int(amount) < 15:
                         break
@@ -6072,7 +6077,8 @@ def randomize(connection: Pipe = None, **kwargs) -> str:
     if not application or application != "web":
         with open(outlog, 'w+') as f:
             f.write(get_logstring(
-                ["characters", "stats", "aesthetics", "commands", "blitz inputs", "magitek", "slots", "dances", "espers",
+                ["characters", "stats", "aesthetics", "commands", "blitz inputs", "magitek", "slots", "dances",
+                 "espers",
                  "item magic", "item effects", "command-change relics", "colosseum", "monsters", "music",
                  "remonsterate", "shops", "treasure chests", "zozo clock", "secret items"]))
 
@@ -6090,9 +6096,9 @@ def randomize(connection: Pipe = None, **kwargs) -> str:
             pipe_print("WELCOME TO BEYOND CHAOS BINGO MODE")
             pipe_print("Include what type of squares? (blank for all)")
             pipe_print("    a   Abilities\n"
-                                "    i   Items\n"
-                                "    m   Monsters\n"
-                                "    s   Spells")
+                       "    i   Items\n"
+                       "    m   Monsters\n"
+                       "    s   Spells")
             bingoflags = input("> ").strip()
             if not bingoflags:
                 bingoflags = "aims"
@@ -6157,16 +6163,16 @@ if __name__ == "__main__":
     if len(args) > 1 and args[1] == '?':
         pipe_print(
             '\tBeyond Chaos Randomizer Community Edition, version ' + VERSION + '\n'
-            '\t\tOptional Keyword Arguments:\n'
-            '\t\tsource=<file path to your unrandomized Final Fantasy 3 v1.0 ROM file>\n'
-            '\t\tdestination=<directory path where you want the randomized ROM and spoiler log created>\n'
-            '\t\tseed=<flag and seed information in the format version.mode.flags.seed>\n'
-            '\t\tbingotype=<The desired bingo options, if you are using the bingoboingo flag>\n'
-            '\t\tbingosize=<The desired positive integer for the size of bingo card, '
-            'if you are using the bingoboingo flag>\n'
-            '\t\tbingodifficulty=<The desired bingo difficulty selection, if you are using the bingoboingo flag>\n'
-            '\t\tbingocards=<The desired positive integer for number of bingo cards to generate, '
-            'if you are using the bingoboingo flag>\n'
+                                                                                '\t\tOptional Keyword Arguments:\n'
+                                                                                '\t\tsource=<file path to your unrandomized Final Fantasy 3 v1.0 ROM file>\n'
+                                                                                '\t\tdestination=<directory path where you want the randomized ROM and spoiler log created>\n'
+                                                                                '\t\tseed=<flag and seed information in the format version.mode.flags.seed>\n'
+                                                                                '\t\tbingotype=<The desired bingo options, if you are using the bingoboingo flag>\n'
+                                                                                '\t\tbingosize=<The desired positive integer for the size of bingo card, '
+                                                                                'if you are using the bingoboingo flag>\n'
+                                                                                '\t\tbingodifficulty=<The desired bingo difficulty selection, if you are using the bingoboingo flag>\n'
+                                                                                '\t\tbingocards=<The desired positive integer for number of bingo cards to generate, '
+                                                                                'if you are using the bingoboingo flag>\n'
         )
         sys.exit()
     try:

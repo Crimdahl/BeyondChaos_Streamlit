@@ -1,5 +1,5 @@
 from io import BytesIO
-from utils import Substitution
+from BeyondChaosRandomizer.BeyondChaos.utils import Substitution
 
 common_added = False
 

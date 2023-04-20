@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
-from utils import (ENEMY_NAMES_TABLE, MODIFIERS_TABLE, MOVES_TABLE,
-                   NAMEGEN_TABLE, utilrandom as random)
+from BeyondChaosRandomizer.BeyondChaos.utils import (ENEMY_NAMES_TABLE, MODIFIERS_TABLE, MOVES_TABLE,
+                                                     NAMEGEN_TABLE, utilrandom as random)
+
 try:
     modifiers = [line.strip() for line in open(MODIFIERS_TABLE).readlines()]
 except FileNotFoundError:
@@ -69,10 +70,9 @@ def generate_name(size=None, maxsize=10):
 
         if name:
             for ename in enemynames:
-                if len(name) > (lookback+1):
+                if len(name) > (lookback + 1):
                     length = min(len(name), len(ename))
                     if name[:length] == ename[:length]:
-
                         name = ""
                         break
 
@@ -100,6 +100,7 @@ def generate_attack():
     if len(modifier) + len(move) < 10:
         return ("%s %s" % (modifier, move)).strip()
     return modifier + move
+
 
 if __name__ == "__main__":
     for i in range(0x100):

@@ -1,12 +1,12 @@
 import copy
 import traceback
 from io import BytesIO
-from utils import (write_multi, read_multi, ENEMY_TABLE,
-                   name_to_bytes, get_palette_transformer, mutate_index,
-                   make_table, utilrandom as random)
-from skillrandomizer import get_spell, get_ranked_spells
-from itemrandomizer import get_ranked_items, get_item
-from namerandomizer import generate_attack, generate_name
+from BeyondChaosRandomizer.BeyondChaos.utils import (write_multi, read_multi, ENEMY_TABLE,
+                                                     name_to_bytes, get_palette_transformer, mutate_index,
+                                                     make_table, utilrandom as random)
+from BeyondChaosRandomizer.BeyondChaos.skillrandomizer import get_spell, get_ranked_spells
+from BeyondChaosRandomizer.BeyondChaos.itemrandomizer import get_ranked_items, get_item
+from BeyondChaosRandomizer.BeyondChaos.namerandomizer import generate_attack, generate_name
 
 # Dummied Umaro, Dummied Kefka, Colossus, CzarDragon, ???, ???
 REPLACE_ENEMIES = [0x10f, 0x136, 0x137]
@@ -633,13 +633,13 @@ class MonsterBlock:
         fout.seek(self.specialeffectpointer)
         fout.write(bytes(random.randint(0, 0x21)))
 
-        candidates = list(range(0, 33)) #randomize special animations
+        candidates = list(range(0, 33))  # randomize special animations
         self.attackanimation = random.choice(candidates)
 
         if halloween:
-            self.battleanimation = 0x00 #Make enemies scream for Halloween
+            self.battleanimation = 0x00  # Make enemies scream for Halloween
         else:
-            candidates = sorted(set(range(0, 0x5A)) - set([0, 0x1C])) #randomize battle animations
+            candidates = sorted(set(range(0, 0x5A)) - set([0, 0x1C]))  # randomize battle animations
             self.battleanimation = random.choice(candidates)
 
     def mutate_graphics_swap(self, candidates):
@@ -659,7 +659,7 @@ class MonsterBlock:
         self.graphics.copy_data(chosen.graphics)
         self.copy_visible(chosen)
 
-    def read_stats(self, rom_file_buffer: BytesIO=False):
+    def read_stats(self, rom_file_buffer: BytesIO = False):
         global all_spells
         global HIGHEST_LEVEL
 
@@ -770,9 +770,9 @@ class MonsterBlock:
             return a and b and c and d and e and f
 
         if Options_.mode.name == "katn" or Options_.is_flag_active("madworld"):
-            restricted = [0xEA, 0xC8] #restrict Baba Breath and Seize
+            restricted = [0xEA, 0xC8]  # restrict Baba Breath and Seize
         else:
-            restricted = [0x13, 0x14] #restrict Meteor and Ultima for normal playthroughs
+            restricted = [0x13, 0x14]  # restrict Meteor and Ultima for normal playthroughs
         if Options_.is_flag_active("darkworld"):
             restricted = []  # All skills are fair game sucka
 
@@ -2085,8 +2085,8 @@ def get_collapsing_house_help_skill():
                 skills = m.get_skillset(ids_only=False)
                 all_skills.extend([z for z in skills
                                    if (z.target_enemy_default or (
-                                z.target_everyone and not z.target_one_side_only)) and z.spellid not in [0xEE, 0xEF,
-                                                                                                         0xFE, 0xFF]])
+                            z.target_everyone and not z.target_one_side_only)) and z.spellid not in [0xEE, 0xEF,
+                                                                                                     0xFE, 0xFF]])
 
     if status_specials:
         sleep_index = ranked.index(specialdict["sleep"])

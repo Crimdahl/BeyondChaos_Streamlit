@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 from io import BytesIO
 from copy import copy
-from formationrandomizer import get_fset
-from utils import (read_multi, write_multi, battlebg_palettes, MAP_NAMES_TABLE,
-                   UNUSED_LOCATIONS_TABLE, MAP_BATTLE_BG_TABLE,
-                   ENTRANCE_REACHABILITY_TABLE, LOCATION_MAPS_TABLE,
-                   utilrandom as random)
+from BeyondChaosRandomizer.BeyondChaos.formationrandomizer import get_fset
+from BeyondChaosRandomizer.BeyondChaos.utils import (read_multi, write_multi, battlebg_palettes, MAP_NAMES_TABLE,
+                                                     UNUSED_LOCATIONS_TABLE, MAP_BATTLE_BG_TABLE,
+                                                     ENTRANCE_REACHABILITY_TABLE, LOCATION_MAPS_TABLE,
+                                                     utilrandom as random)
 
 locations = None
 zones = None
@@ -106,7 +106,7 @@ class NPCBlock():
     def set_id(self, npcid):
         self.npcid = npcid
 
-    def read_data(self, rom_file_buffer: BytesIO=False):
+    def read_data(self, rom_file_buffer: BytesIO = False):
         rom_file_buffer.seek(self.pointer)
         value = read_multi(rom_file_buffer, length=4)
         self.palette = (value & 0x1C0000) >> 18
@@ -147,7 +147,7 @@ class NPCBlock():
         byte6 = self.graphics
         byte7 = (self.move_type & 0xF) | ((self.sprite_priority & 0x3) << 4) | ((self.vehicle & 0x3) << 6)
         byte8 = (self.facing & 0x03) | ((self.no_turn_when_speaking & 0x1) << 2) | (
-                    (self.layer_priority & 0x3) << 3) | ((self.special_anim & 0x7) << 5)
+                (self.layer_priority & 0x3) << 3) | ((self.special_anim & 0x7) << 5)
 
         fout.write(bytes([byte4, byte5, byte6, byte7, byte8]))
 
@@ -724,7 +724,8 @@ class Location():
 
         random.shuffle(self.chests)
         for c in self.chests:
-            if self.locid in range(0x139, 0x13d) and c.empty: #if the chest is in the Phoenix Cave and empty - fill with high level MIAB
+            if self.locid in range(0x139,
+                                   0x13d) and c.empty:  # if the chest is in the Phoenix Cave and empty - fill with high level MIAB
                 c.mutate_contents(monster=True, guideline=50000, crazy_prices=crazy_prices,
                                   uncapped_monsters=uncapped_monsters, no_monsters=no_monsters)
                 continue
@@ -919,7 +920,6 @@ class LongEntrance(Entrance):
         self.dest = read_multi(rom_file_buffer, length=2)
         self.destx = ord(rom_file_buffer.read(1))
         self.desty = ord(rom_file_buffer.read(1))
-
 
     def write_data(self, fout, nextpointer):
         if nextpointer >= 0x2DFE00:

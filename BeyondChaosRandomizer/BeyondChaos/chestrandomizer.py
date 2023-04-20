@@ -1,9 +1,9 @@
 import math
 from io import BytesIO
 from dialoguemanager import set_dialogue
-from formationrandomizer import get_formations, get_fsets
-from itemrandomizer import get_ranked_items, get_item
-from utils import read_multi, write_multi, mutate_index, utilrandom as random, Substitution
+from BeyondChaosRandomizer.BeyondChaos.formationrandomizer import get_formations, get_fsets
+from BeyondChaosRandomizer.BeyondChaos.itemrandomizer import get_ranked_items, get_item
+from BeyondChaosRandomizer.BeyondChaos.utils import read_multi, write_multi, mutate_index, utilrandom as random, Substitution
 
 valid_ids = list(range(1, 0x200))
 banned_formids = [0, 0x1d7]
