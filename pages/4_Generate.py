@@ -148,7 +148,11 @@ def update_rom_data():
 
 
 def main():
-    sl.set_page_config(layout="wide")
+    sl.set_page_config(
+        layout="wide",
+        page_icon="favicon.png",
+        page_title="Beyond Chaos Web"
+    )
     set_stylesheet()
     sl.title("Generate Your Game")
 

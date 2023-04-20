@@ -33,7 +33,11 @@ def update_moogle_names():
 
 
 def main():
-    sl.set_page_config(layout="wide")
+    sl.set_page_config(
+        layout="wide",
+        page_icon="favicon.png",
+        page_title="Beyond Chaos Web"
+    )
     set_stylesheet()
     sl.title("Customization")
     sl.markdown('<p style="font-size: 14px; margin-top: -20px;">WIP - more customizations to come!</p>',
