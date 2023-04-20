@@ -203,98 +203,103 @@ def main():
     set_stylesheet()
     sl.title("Flag Selection")
 
-    if "initialized" not in sl.session_state.keys():
+    try:
+        if "initialized" not in sl.session_state.keys():
+            initialize_states()
+            sl.experimental_rerun()
+
+        modes = []
+        for mode in ALL_MODES:
+            if str.title(mode.name) not in modes:
+                modes.append(str.title(mode.name))
+
+        sl.selectbox(
+            label="Flag Presets",
+            options=DEFAULT_PRESETS.keys(),
+            index=list(DEFAULT_PRESETS.keys()).index(sl.session_state["preset"])
+            if "preset" in sl.session_state.keys() else 0,
+            on_change=apply_flag_preset,
+            key="widget_preset",
+            disabled="lock" in sl.session_state.keys() and sl.session_state["lock"]
+        )
+
+        sl.selectbox(label="Game Mode",
+                     options=modes,
+                     key="widget_gamemode",
+                     index=modes.index(sl.session_state["gamemode"]),
+                     disabled="lock" in sl.session_state.keys() and sl.session_state["lock"],
+                     on_change=update_game_mode)
+
+        sl.button(
+            label="Clear Flags",
+            on_click=clear_selected_flags,
+            args=(True,),
+            disabled="lock" in sl.session_state.keys() and sl.session_state["lock"]
+        )
+
+        global flag_categories
+        flag_categories = {"Flags": 0, "Sprite": 0, "Sprite Categories": 0, "Aesthetic": 0,
+                           "Battle": 0, "Field": 0, "Characters": 0, "Gamebreaking": 0, "Experimental": 0}
+
+        for flag in NORMAL_FLAGS + MAKEOVER_MODIFIER_FLAGS:
+            for category in flag_categories:
+                if str(flag.category).lower() == category.lower().replace(" ", ""):
+                    flag_categories[category] = flag_categories[category] + 1
+
+        tabs = sl.tabs(flag_categories)
+
+        update_active_flags()
+
+        for i, tab in enumerate(flag_categories.keys()):
+            if flag_categories[tab] <= 0:
+                continue
+            for flag in SORTED_FLAGS:
+                if str(flag.category).lower() == str(tab).lower().replace(" ", ""):
+                    if flag.inputtype == "boolean" and flag.name not in ["bingoboingo"]:
+                        tabs[i].checkbox(label=flag.name + " - " + flag.long_description,
+                                         value=sl.session_state[flag.name],
+                                         key="widget_"+flag.name,
+                                         disabled="lock" in sl.session_state.keys() and sl.session_state["lock"],
+                                         on_change=update_flag,
+                                         args=(flag.name,))
+                    elif flag.inputtype == "combobox":
+                        tabs[i].selectbox(label=flag.name + " - " + flag.long_description,
+                                          index=int(flag.choices.index(sl.session_state[flag.name])),
+                                          options=flag.choices,
+                                          key="widget_"+flag.name,
+                                          disabled="lock" in sl.session_state.keys() and sl.session_state["lock"],
+                                          on_change=update_flag,
+                                          args=(flag.name,))
+                    elif flag.inputtype == "float2":
+                        tabs[i].number_input(label=flag.name + " - " + flag.long_description,
+                                             value=float(sl.session_state[flag.name]),
+                                             min_value=0.00,
+                                             step=0.01,
+                                             key="widget_"+flag.name,
+                                             disabled="lock" in sl.session_state.keys() and sl.session_state[
+                                                 "lock"],
+                                             on_change=update_flag,
+                                             args=(flag.name,))
+                    elif flag.inputtype == "integer":
+                        tabs[i].number_input(label=flag.name + " - " + flag.long_description,
+                                             value=int(sl.session_state[flag.name]),
+                                             min_value=0,
+                                             step=1,
+                                             key="widget_"+flag.name,
+                                             disabled="lock" in sl.session_state.keys() and sl.session_state[
+                                                 "lock"],
+                                             on_change=update_flag,
+                                             args=(flag.name,))
+        sl.divider()
+        sl.text_area("Active Flags",
+                     value=str.lower(", ".join(sl.session_state["selected_flags"])),
+                     on_change=apply_flagstring,
+                     key="widget_flagstring",
+                     disabled="lock" in sl.session_state.keys() and sl.session_state["lock"])
+    except KeyError:
         initialize_states()
         sl.experimental_rerun()
 
-    modes = []
-    for mode in ALL_MODES:
-        if str.title(mode.name) not in modes:
-            modes.append(str.title(mode.name))
-
-    sl.selectbox(
-        label="Flag Presets",
-        options=DEFAULT_PRESETS.keys(),
-        index=list(DEFAULT_PRESETS.keys()).index(sl.session_state["preset"])
-        if "preset" in sl.session_state.keys() else 0,
-        on_change=apply_flag_preset,
-        key="widget_preset",
-        disabled="lock" in sl.session_state.keys() and sl.session_state["lock"]
-    )
-
-    sl.selectbox(label="Game Mode",
-                 options=modes,
-                 key="widget_gamemode",
-                 index=modes.index(sl.session_state["gamemode"]),
-                 disabled="lock" in sl.session_state.keys() and sl.session_state["lock"],
-                 on_change=update_game_mode)
-
-    sl.button(
-        label="Clear Flags",
-        on_click=clear_selected_flags,
-        args=(True,),
-        disabled="lock" in sl.session_state.keys() and sl.session_state["lock"]
-    )
-
-    global flag_categories
-    flag_categories = {"Flags": 0, "Sprite": 0, "Sprite Categories": 0, "Aesthetic": 0,
-                       "Battle": 0, "Field": 0, "Characters": 0, "Gamebreaking": 0, "Experimental": 0}
-
-    for flag in NORMAL_FLAGS + MAKEOVER_MODIFIER_FLAGS:
-        for category in flag_categories:
-            if str(flag.category).lower() == category.lower().replace(" ", ""):
-                flag_categories[category] = flag_categories[category] + 1
-
-    tabs = sl.tabs(flag_categories)
-
-    update_active_flags()
-
-    for i, tab in enumerate(flag_categories.keys()):
-        if flag_categories[tab] <= 0:
-            continue
-        for flag in SORTED_FLAGS:
-            if str(flag.category).lower() == str(tab).lower().replace(" ", ""):
-                if flag.inputtype == "boolean" and flag.name not in ["bingoboingo"]:
-                    tabs[i].checkbox(label=flag.name + " - " + flag.long_description,
-                                     value=sl.session_state[flag.name],
-                                     key="widget_"+flag.name,
-                                     disabled="lock" in sl.session_state.keys() and sl.session_state["lock"],
-                                     on_change=update_flag,
-                                     args=(flag.name,))
-                elif flag.inputtype == "combobox":
-                    tabs[i].selectbox(label=flag.name + " - " + flag.long_description,
-                                      index=int(flag.choices.index(sl.session_state[flag.name])),
-                                      options=flag.choices,
-                                      key="widget_"+flag.name,
-                                      disabled="lock" in sl.session_state.keys() and sl.session_state["lock"],
-                                      on_change=update_flag,
-                                      args=(flag.name,))
-                elif flag.inputtype == "float2":
-                    tabs[i].number_input(label=flag.name + " - " + flag.long_description,
-                                         value=float(sl.session_state[flag.name]),
-                                         min_value=0.00,
-                                         step=0.01,
-                                         key="widget_"+flag.name,
-                                         disabled="lock" in sl.session_state.keys() and sl.session_state[
-                                             "lock"],
-                                         on_change=update_flag,
-                                         args=(flag.name,))
-                elif flag.inputtype == "integer":
-                    tabs[i].number_input(label=flag.name + " - " + flag.long_description,
-                                         value=int(sl.session_state[flag.name]),
-                                         min_value=0,
-                                         step=1,
-                                         key="widget_"+flag.name,
-                                         disabled="lock" in sl.session_state.keys() and sl.session_state[
-                                             "lock"],
-                                         on_change=update_flag,
-                                         args=(flag.name,))
-    sl.divider()
-    sl.text_area("Active Flags",
-                 value=str.lower(", ".join(sl.session_state["selected_flags"])),
-                 on_change=apply_flagstring,
-                 key="widget_flagstring",
-                 disabled="lock" in sl.session_state.keys() and sl.session_state["lock"])
 
 
 if __name__ == "__main__":
