@@ -916,6 +916,7 @@ def remonsterate(connection: Pipe, **kwargs):
             else:
                 image_filename, tags = line, set([])
             try:
+                print(str(os.path.join(sprite_paths, image_filename)))
                 image = prepare_image(Image.open(os.path.join(sprite_paths, image_filename)))
                 image.tags = tags
                 # image.close()
