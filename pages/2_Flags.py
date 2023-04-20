@@ -69,9 +69,9 @@ def set_stylesheet():
     sl.markdown(
         '<style>'
         # stApp contains all of the content for the app. Probably use it like the HTML element.
-        '   .stApp {'
-        '       background-color: white;'
-        '   }'
+        # '   .stApp {'
+        # '       background-color: white;'
+        # '   }'
         # '   *{'
         # '       font-family: "Arial";'
         # '   }'
