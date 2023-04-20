@@ -904,7 +904,9 @@ def remonsterate(connection: Pipe, **kwargs):
     randomize_connection = connection
     images = []
 
-    print(str(os.listdir(sprite_paths)))
+    print("Current Working Directory: " + str(os.getcwd()))
+    print("Current File Directory: " + str(os.path.dirname(__file__)))
+    print("Sprite Path Directory: " + str(os.listdir(sprite_paths)))
     print(str(os.listdir(os.path.join(sprite_paths, "monsters", "Actraiser"))))
     try:
         for line in open(os.path.join(file_paths, images_tags_filename)):
@@ -916,7 +918,6 @@ def remonsterate(connection: Pipe, **kwargs):
                 continue
             if ':' in line:
                 image_filename, tags = line.split(':')
-                print(str(image_filename))
                 tags = tags.split(',')
                 tags = {t for t in tags if t.strip()}
             else:
@@ -928,8 +929,9 @@ def remonsterate(connection: Pipe, **kwargs):
                 # image.close()
                 images.append(image)
             except FileNotFoundError:
-                connection.send("Remonsterate: %s was listed in images_and_tags.txt, "
-                                "but was not found in the sprites directory." % image_filename)
+                connection.send("Remonsterate: " + image_filename + " was listed in images_and_tags.txt, "
+                                "but was not found at " +
+                                str(os.path.join(sprite_paths, image_filename)) + ".")
         if len(images) == 0:
             connection.send("Remonsterate: images_and_tags.txt is empty. To use remonsterate, "
                             "place .png images into the sprites folder and document the file paths to those images in "
