@@ -710,6 +710,18 @@ def manage_character_appearance(fout, preserve_graphics=False, moogle_names=None
                 use_fallback = False
 
                 try:
+                    print(str(os.path.join(os.getcwd(),
+                                                       "BeyondChaosRandomizer",
+                                                       "BeyondChaos",
+                                                       "custom",
+                                                       "sprites",
+                                                       swap_to[c].portrait_filename)))
+                    print(str(os.path.join(os.getcwd(),
+                                                       "BeyondChaosRandomizer",
+                                                       "BeyondChaos",
+                                                       "custom",
+                                                       "sprites",
+                                                       swap_to[c].portrait_palette_filename)))
                     g = open_mei_fallback(os.path.join(os.getcwd(),
                                                        "BeyondChaosRandomizer",
                                                        "BeyondChaos",
