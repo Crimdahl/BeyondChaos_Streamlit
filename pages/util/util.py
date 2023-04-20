@@ -9,6 +9,7 @@ from pathlib import Path
 # sys.path.append(BASE_REPO_PATH)
 # sys.path.append(os.path.join(BASE_REPO_PATH, "BeyondChaosRandomizer\\BeyondChaos"))
 sl.text(str(os.getcwd()))
+sl.text_area(str(os.listdir(os.getcwd())))
 
 from BeyondChaosRandomizer.BeyondChaos.options import NORMAL_FLAGS, MAKEOVER_MODIFIER_FLAGS, get_makeover_groups
 
