@@ -292,10 +292,10 @@ def manage_opera(fout, affect_music):
     except IOError:
         try:
             with open(os.path.join(pathlib.Path(__file__).parent.absolute(),
-                                   "custom", "sprites", f"{merge[4]}"), "rb") as f:
+                                   "custom", "Sprites", f"{merge[4]}"), "rb") as f:
                 sprite = f.read()
         except:
-            print(f"failed to open custom/opera/{merge[4]} or custom/sprites/{merge[4]}")
+            print(f"failed to open custom/opera/{merge[4]} or custom/Sprites/{merge[4]}")
             sprite = None
     if sprite:
         # print(f"merge {merge}, pose {pose}")
@@ -316,10 +316,10 @@ def manage_opera(fout, affect_music):
         except IOError:
             try:
                 with open(os.path.join(pathlib.Path(__file__).parent.absolute(), "custom",
-                                       "sprites", f"{c.sprite}.bin"), "rb") as f:
+                                       "Sprites", f"{c.sprite}.bin"), "rb") as f:
                     sprite = f.read()
             except:
-                print(f"failed to open custom/opera/{c.sprite}.bin or custom/sprites/{c.sprite}.bin")
+                print(f"failed to open custom/opera/{c.sprite}.bin or custom/Sprites/{c.sprite}.bin")
                 continue
         offset, extra_tiles = char_offsets[cname]
         # tiles = list(range(0x28)) + extra_tiles
