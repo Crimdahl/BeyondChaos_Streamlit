@@ -632,7 +632,7 @@ class Location():
         self.copy_chests(location)
 
     def read_chests(self, rom_file_buffer: BytesIO):
-        from chestrandomizer import ChestBlock
+        from BeyondChaosRandomizer.BeyondChaos.chestrandomizer import ChestBlock
         rom_file_buffer.seek(self.chestpointer)
         begin = read_multi(rom_file_buffer, length=2)
         end = read_multi(rom_file_buffer, length=2)
@@ -676,7 +676,7 @@ class Location():
             self.events.append(e)
 
     def copy_chests(self, location):
-        from chestrandomizer import ChestBlock
+        from BeyondChaosRandomizer.BeyondChaos.chestrandomizer import ChestBlock
         self.chests = []
         for chest in location.chests:
             c = ChestBlock(pointer=None, location=self.locid)
@@ -1169,8 +1169,8 @@ if __name__ == "__main__":
         filename = argv[1]
     else:
         filename = "program.rom"
-    from formationrandomizer import get_formations, get_fsets
-    from monsterrandomizer import get_monsters
+    from BeyondChaosRandomizer.BeyondChaos.formationrandomizer import get_formations, get_fsets
+    from BeyondChaosRandomizer.BeyondChaos.monsterrandomizer import get_monsters
 
     with open(filename, "rb") as infile:
         input_file_buffer = infile.read()

@@ -37,7 +37,7 @@ def get_orphaned_formations(old_version=False):
         return orphaned_formations
 
     orphaned_formations = set([])
-    from monsterrandomizer import get_monsters
+    from BeyondChaosRandomizer.BeyondChaos.monsterrandomizer import get_monsters
     monsters = get_monsters()
     extra_miabs = get_extra_miabs(0)
     event_enemies = OLD_EVENT_ENEMIES if old_version else EVENT_ENEMIES
@@ -73,7 +73,7 @@ def get_appropriate_formations():
     if appropriate_formations is not None:
         return appropriate_formations
 
-    from formationrandomizer import NOREPLACE_FORMATIONS
+    from BeyondChaosRandomizer.BeyondChaos.formationrandomizer import NOREPLACE_FORMATIONS
     formations = get_formations()
     formations = [f for f in formations if not f.battle_event]
     formations = [f for f in formations if f.formid not in
@@ -327,7 +327,7 @@ class ChestBlock:
     @property
     def description(self):
         if self.monster:
-            from formationrandomizer import get_fset
+            from BeyondChaosRandomizer.BeyondChaos.formationrandomizer import get_fset
             s = "Enemy {0:03d}: ".format(self.effective_id)
             fset = get_fset(self.contents + 0x100)
             s += fset.formations[0].description(renamed=True, simple=True)
@@ -392,7 +392,7 @@ class ChestBlock:
             else:
                 value = self.contents
         elif self.monster:
-            from formationrandomizer import get_fset
+            from BeyondChaosRandomizer.BeyondChaos.formationrandomizer import get_fset
             formation = get_fset(self.contents | 0x100).formations[0]
             items = []
             for monster in formation.present_enemies:
@@ -471,7 +471,7 @@ class ChestBlock:
             # monster
             self.set_content_type(0x20)
 
-            from locationrandomizer import get_location
+            from BeyondChaosRandomizer.BeyondChaos.locationrandomizer import get_location
             rank = self.rank
 
             if self.is_clock or not rank:

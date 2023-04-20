@@ -49,7 +49,7 @@ clusters = None
 
 
 def get_new_formations(areaname, supplement=True):
-    from randomizer import get_namelocdict
+    from BeyondChaosRandomizer.BeyondChaos.randomizer import get_namelocdict
     namelocdict = get_namelocdict()
     setids = set([])
     for key in namelocdict:
@@ -307,7 +307,7 @@ def remap_maps(routes):
         if not ANCIENT:
             if loc.locid not in towerlocids:
                 loc.make_tower_flair()
-                from options import Options_
+                from BeyondChaosRandomizer.BeyondChaos.options import Options_
                 loc.unlock_chests(200, 1000, uncapped_monsters=Options_.is_flag_active('bsiab'))
                 fsets = get_new_fsets("kefka's tower", 20)
                 fset = random.choice(fsets)
@@ -1340,7 +1340,7 @@ def randomize_tower(ancient=False, nummaps=None, morefanatical=False):
 
 
 def make_secret_treasure_room(mapid, beltroom):
-    from itemrandomizer import get_secret_item
+    from BeyondChaosRandomizer.BeyondChaos.itemrandomizer import get_secret_item
     candidates = []
     for line in open(TREASURE_ROOMS_TABLE):
         locid, entid, chestid = tuple(map(int, line.strip().split(',')))
@@ -1397,7 +1397,7 @@ def make_secret_treasure_room(mapid, beltroom):
 
 
 if __name__ == "__main__":
-    from randomizer import get_monsters
+    from BeyondChaosRandomizer.BeyondChaos.randomizer import get_monsters
 
     get_monsters(filename="program.rom")
     get_formations(filename="program.rom")

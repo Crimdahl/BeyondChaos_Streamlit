@@ -306,7 +306,7 @@ def manage_ancient(Options_, fout, sourcefile, form_music_overrides=None, randlo
     tower_msg_sub.set_location(0xA03A7)
     tower_msg_sub.write(fout)
 
-    from locationrandomizer import NPCBlock, EventBlock
+    from BeyondChaosRandomizer.BeyondChaos.locationrandomizer import NPCBlock, EventBlock
     falcon = get_location(0xb)
     save_point = NPCBlock(pointer=None, locid=falcon.locid)
     attributes = {
@@ -1177,7 +1177,7 @@ def manage_ancient(Options_, fout, sourcefile, form_music_overrides=None, randlo
                 if key > 0:
                     final_cut.bytestring += bytearray([0x3F, c, key])
         final_cut.bytestring += bytearray([0x99, 0x03, locked & 0xFF, locked >> 8])
-        from chestrandomizer import get_2pack
+        from BeyondChaosRandomizer.BeyondChaos.chestrandomizer import get_2pack
         event_bosses = {
             1: [0xC18A4, 0xC184B],
             2: [0xC16DD, 0xC171D, 0xC1756],

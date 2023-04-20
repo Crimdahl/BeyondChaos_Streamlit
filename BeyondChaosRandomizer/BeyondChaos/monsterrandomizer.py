@@ -199,8 +199,8 @@ class MonsterBlock:
         self.original_drops = []
 
     def determine_location(self):
-        from formationrandomizer import get_formations, get_fsets
-        from locationrandomizer import get_locations, get_zones
+        from BeyondChaosRandomizer.BeyondChaos.formationrandomizer import get_formations, get_fsets
+        from BeyondChaosRandomizer.BeyondChaos.locationrandomizer import get_locations, get_zones
         formations = {f for f in get_formations()
                       if self in f.present_enemies}
         fsets = [fs for fs in get_fsets() if len(fs.formations) == 4]
@@ -209,7 +209,7 @@ class MonsterBlock:
             return ""
 
         def score_location(location):
-            from locationrandomizer import Zone
+            from BeyondChaosRandomizer.BeyondChaos.locationrandomizer import Zone
             score = 0
             fsets = location.fsets
             for fset in fsets:
@@ -779,7 +779,7 @@ class MonsterBlock:
         banned = restricted
         # No blizzard, mega volt, or tek laser in solo terra
         if safe_solo_terra:
-            from formationrandomizer import get_fset
+            from BeyondChaosRandomizer.BeyondChaos.formationrandomizer import get_fset
             for id in [0x39, 0x3A]:
                 fset = get_fset(id)
                 for f in fset.formations:
@@ -1913,7 +1913,7 @@ def shuffle_monsters(monsters, safe_solo_terra=True):
                 in_narshe_caves = False
 
                 for id in [0x39, 0x3A]:
-                    from formationrandomizer import get_fset
+                    from BeyondChaosRandomizer.BeyondChaos.formationrandomizer import get_fset
                     fset = get_fset(id)
                     for f in fset.formations:
                         if m in f.present_enemies or n in f.present_enemies:
@@ -2075,7 +2075,7 @@ def get_metamorphs(rom_file_buffer: BytesIO = None):
 def get_collapsing_house_help_skill():
     status_specials = []
     all_skills = []
-    from formationrandomizer import get_fset
+    from BeyondChaosRandomizer.BeyondChaos.formationrandomizer import get_fset
     for id in [0x80]:
         fset = get_fset(id)
         for f in fset.formations:

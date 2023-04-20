@@ -719,7 +719,7 @@ def randomize_slots(pointer: int):
             if spell is None or spell.spellid not in used:
                 break
         if spell:
-            from skillrandomizer import spellnames
+            from BeyondChaosRandomizer.BeyondChaos.skillrandomizer import spellnames
             slotString = "%s: %s" % (slotNames[i], spellnames[spell.spellid])
             log(slotString, "slots")
             used.append(spell.spellid)
@@ -2455,7 +2455,7 @@ def manage_colorize_animations():
 
 
 def manage_items(items: List[ItemBlock], changed_commands: Set[int] = None) -> List[ItemBlock]:
-    from itemrandomizer import (set_item_changed_commands, extend_item_breaks)
+    from BeyondChaosRandomizer.BeyondChaos.itemrandomizer import (set_item_changed_commands, extend_item_breaks)
     always_break = Options_.is_flag_active('collateraldamage')
     crazy_prices = Options_.is_flag_active('madworld')
     extra_effects = Options_.is_flag_active('masseffect')
@@ -3446,7 +3446,7 @@ def manage_formations_hidden(formations: List[Formation],
 
 
 def assign_unused_enemy_formations():
-    from chestrandomizer import add_orphaned_formation, get_orphaned_formations
+    from BeyondChaosRandomizer.BeyondChaos.chestrandomizer import add_orphaned_formation, get_orphaned_formations
     get_orphaned_formations()
     siegfried = get_monster(0x37)
     chupon = get_monster(0x40)
@@ -4725,7 +4725,7 @@ def manage_dances():
         outfile_rom_buffer.write(name)
 
     for i, dance in enumerate(dance_names):
-        from skillrandomizer import spellnames
+        from BeyondChaosRandomizer.BeyondChaos.skillrandomizer import spellnames
         dance_names = [spellnames[dances[i * 4 + j]] for j in range(4)]
         dancestr = "%s:\n  " % dance
         frequencies = [7, 6, 2, 1]
@@ -5528,7 +5528,7 @@ def randomize(connection: Pipe = None, **kwargs) -> str:
     start_in_wor = Options_.is_flag_active('worringtriad')
     if Options_.is_flag_active("random_character_stats"):
         # do this after swapping berserk
-        from itemrandomizer import set_item_changed_commands
+        from BeyondChaosRandomizer.BeyondChaos.itemrandomizer import set_item_changed_commands
         set_item_changed_commands(changed_commands)
         loglist = reset_special_relics(items, characters, outfile_rom_buffer)
         log_string = "COMMAND CHANGERS\n---------------------------\n"
