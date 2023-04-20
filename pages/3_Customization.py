@@ -4,7 +4,7 @@ import os
 from pages.util.util import initialize_states
 from pathlib import Path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.append(os.path.join(Path(__file__).resolve().parent, "BeyondChaosRandomizer"))
+sys.path.append(os.path.join(Path(__file__).resolve().parent, "BeyondChaosRandomizer\\BeyondChaos"))
 
 
 def set_stylesheet():

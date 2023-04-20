@@ -4,7 +4,7 @@ import os
 from pathlib import Path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 print(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-sys.path.append(os.path.join(Path(__file__).resolve().parent, "BeyondChaosRandomizer"))
+sys.path.append(os.path.join(Path(__file__).resolve().parent, "BeyondChaosRandomizer\\BeyondChaos"))
 print(os.path.dirname(os.path.join(Path(__file__).resolve().parent, "BeyondChaosRandomizer")))
 from json import loads
 from pages.util.util import initialize_states
