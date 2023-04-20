@@ -903,11 +903,6 @@ def remonsterate(connection: Pipe, **kwargs):
     global randomize_connection
     randomize_connection = connection
     images = []
-
-    print("Current Working Directory: " + str(os.getcwd()))
-    print("Current File Directory: " + str(os.path.dirname(__file__)))
-    print("Sprite Path Directory: " + str(os.listdir(sprite_paths)))
-    print(str(os.listdir(os.path.join(sprite_paths, "Castlevania"))))
     try:
         for line in open(os.path.join(file_paths, images_tags_filename)):
             if '#' in line:
