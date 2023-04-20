@@ -714,16 +714,15 @@ def manage_character_appearance(fout, preserve_graphics=False, moogle_names=None
                                                        "BeyondChaosRandomizer",
                                                        "BeyondChaos",
                                                        "custom",
-                                                       "Sprites",
+                                                       "sprites",
                                                        swap_to[c].portrait_filename), "rb")
                     h = open_mei_fallback(os.path.join(os.getcwd(),
                                                        "BeyondChaosRandomizer",
                                                        "BeyondChaos",
                                                        "custom",
-                                                       "Sprites",
+                                                       "sprites",
                                                        swap_to[c].portrait_palette_filename), "rb")
-                except IOError as e:
-                    raise e
+                except IOError:
                     use_fallback = True
                     print("failed to load portrait %s for %s, using fallback" % (
                     swap_to[c].portrait_filename, swap_to[c].name))
