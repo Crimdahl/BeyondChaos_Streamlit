@@ -718,7 +718,7 @@ def get_makeover_groups():
         if makeover_groups:
             return makeover_groups
 
-        from appearance import get_sprite_replacements
+        from .appearance import get_sprite_replacements
         sprite_replacements = get_sprite_replacements()
         makeover_groups = {}
 
