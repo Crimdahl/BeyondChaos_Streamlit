@@ -1,5 +1,5 @@
 import traceback
-import options
+import BeyondChaosRandomizer.BeyondChaos.options as options
 
 from io import BytesIO
 from BeyondChaosRandomizer.BeyondChaos.utils import (hex2int, write_multi, read_multi, ITEM_TABLE,
