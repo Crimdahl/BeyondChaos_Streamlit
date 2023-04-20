@@ -18,8 +18,6 @@ ALL_OBJECTS = None
 file_paths = os.path.join(os.getcwd(), "BeyondChaosRandomizer", "BeyondChaos", "remonsterate")
 sprite_paths = os.path.join(os.getcwd(), "BeyondChaosRandomizer", "BeyondChaos", "remonsterate", "sprites")
 
-print(str(os.listdir(sprite_paths)))
-print(str(os.listdir(os.path.join(sprite_paths, "monsters", "Actraiser"))))
 monster_list = None
 outfile_rom_buffer = None
 seed = None
@@ -905,8 +903,12 @@ def remonsterate(connection: Pipe, **kwargs):
     global randomize_connection
     randomize_connection = connection
     images = []
+
+    print(str(os.listdir(sprite_paths)))
+    print(str(os.listdir(os.path.join(sprite_paths, "monsters", "Actraiser"))))
     try:
         for line in open(os.path.join(file_paths, images_tags_filename)):
+            print(str(os.path.join(file_paths, images_tags_filename)))
             if '#' in line:
                 line, comment = line.split('#', 1)
             line = line.strip()
@@ -914,11 +916,13 @@ def remonsterate(connection: Pipe, **kwargs):
                 continue
             if ':' in line:
                 image_filename, tags = line.split(':')
+                print(str(image_filename))
                 tags = tags.split(',')
                 tags = {t for t in tags if t.strip()}
             else:
                 image_filename, tags = line, set([])
             try:
+                print(str(os.path.join(sprite_paths, image_filename)))
                 image = prepare_image(Image.open(os.path.join(sprite_paths, image_filename)))
                 image.tags = tags
                 # image.close()

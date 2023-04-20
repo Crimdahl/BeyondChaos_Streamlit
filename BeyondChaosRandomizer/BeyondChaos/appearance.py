@@ -710,11 +710,15 @@ def manage_character_appearance(fout, preserve_graphics=False, moogle_names=None
                 use_fallback = False
 
                 try:
-                    g = open_mei_fallback(os.path.join(pathlib.Path(__file__).parent.absolute(),
+                    g = open_mei_fallback(os.path.join(os.getcwd(),
+                                                       "BeyondChaosRandomizer",
+                                                       "BeyondChaos",
                                                        "custom",
                                                        "sprites",
                                                        swap_to[c].portrait_filename), "rb")
-                    h = open_mei_fallback(os.path.join(pathlib.Path(__file__).parent.absolute(),
+                    h = open_mei_fallback(os.path.join(os.getcwd(),
+                                                       "BeyondChaosRandomizer",
+                                                       "BeyondChaos",
                                                        "custom",
                                                        "sprites",
                                                        swap_to[c].portrait_palette_filename), "rb")
