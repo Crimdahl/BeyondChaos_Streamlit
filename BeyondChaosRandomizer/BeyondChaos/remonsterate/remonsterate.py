@@ -17,6 +17,9 @@ randomize_connection = None
 ALL_OBJECTS = None
 file_paths = os.path.join(os.getcwd(), "BeyondChaosRandomizer", "BeyondChaos", "remonsterate")
 sprite_paths = os.path.join(os.getcwd(), "BeyondChaosRandomizer", "BeyondChaos", "remonsterate", "sprites")
+
+print(str(os.listdir(sprite_paths)))
+print(str(os.listdir(os.path.join(sprite_paths, "monsters", "Actraiser"))))
 monster_list = None
 outfile_rom_buffer = None
 seed = None
@@ -916,7 +919,6 @@ def remonsterate(connection: Pipe, **kwargs):
             else:
                 image_filename, tags = line, set([])
             try:
-                print(str(os.path.join(sprite_paths, image_filename)))
                 image = prepare_image(Image.open(os.path.join(sprite_paths, image_filename)))
                 image.tags = tags
                 # image.close()
