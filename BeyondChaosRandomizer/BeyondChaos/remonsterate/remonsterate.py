@@ -15,8 +15,8 @@ from io import BytesIO
 VERSION = '5.3'
 randomize_connection = None
 ALL_OBJECTS = None
-file_paths = os.path.join(os.getcwd(), "remonsterate")
-sprite_paths = os.path.join(os.getcwd(), "remonsterate", "sprites")
+file_paths = os.path.join(os.getcwd(), "BeyondChaosRandomizer", "BeyondChaos", "remonsterate")
+sprite_paths = os.path.join(os.getcwd(), "BeyondChaosRandomizer", "BeyondChaos", "remonsterate", "sprites")
 monster_list = None
 outfile_rom_buffer = None
 seed = None
