@@ -3,7 +3,9 @@ import streamlit as sl
 import os
 from pathlib import Path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+print(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 sys.path.append(os.path.join(Path(__file__).resolve().parent.parent, "BeyondChaosRandomizer"))
+print(os.path.dirname(os.path.join(Path(__file__).resolve().parent.parent, "BeyondChaosRandomizer")))
 from BeyondChaosRandomizer.BeyondChaos.options import NORMAL_FLAGS, MAKEOVER_MODIFIER_FLAGS, get_makeover_groups
 
 get_makeover_groups()
