@@ -15,8 +15,8 @@ from io import BytesIO
 VERSION = '5.3'
 randomize_connection = None
 ALL_OBJECTS = None
-file_paths = os.path.join(os.getcwd(), "BeyondChaosRandomizer", "BeyondChaos", "remonsterate")
-sprite_paths = os.path.join(os.getcwd(), "BeyondChaosRandomizer", "BeyondChaos", "remonsterate", "sprites")
+file_paths = os.path.dirname(__file__)
+sprite_paths = os.path.join(os.path.dirname(__file__), "sprites")
 
 monster_list = None
 outfile_rom_buffer = None
@@ -907,10 +907,9 @@ def remonsterate(connection: Pipe, **kwargs):
     print("Current Working Directory: " + str(os.getcwd()))
     print("Current File Directory: " + str(os.path.dirname(__file__)))
     print("Sprite Path Directory: " + str(os.listdir(sprite_paths)))
-    print(str(os.listdir(os.path.join(sprite_paths, "monsters", "Actraiser"))))
+    print(str(os.listdir(os.path.join(sprite_paths, "Castlevania"))))
     try:
         for line in open(os.path.join(file_paths, images_tags_filename)):
-            print(str(os.path.join(file_paths, images_tags_filename)))
             if '#' in line:
                 line, comment = line.split('#', 1)
             line = line.strip()
@@ -923,7 +922,6 @@ def remonsterate(connection: Pipe, **kwargs):
             else:
                 image_filename, tags = line, set([])
             try:
-                print(str(os.path.join(sprite_paths, image_filename)))
                 image = prepare_image(Image.open(os.path.join(sprite_paths, image_filename)))
                 image.tags = tags
                 # image.close()
