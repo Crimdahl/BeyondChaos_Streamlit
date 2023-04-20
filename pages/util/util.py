@@ -3,10 +3,12 @@ import streamlit as sl
 import os
 from pathlib import Path
 
-BASE_REPO_PATH = str(Path(os.path.abspath(__file__)).resolve().parent.parent.parent)
-print(BASE_REPO_PATH)
-sys.path.append(BASE_REPO_PATH)
-sys.path.append(os.path.join(BASE_REPO_PATH, "BeyondChaosRandomizer\\BeyondChaos"))
+# BASE_REPO_PATH = str(Path(os.path.abspath(__file__)).resolve().parent.parent.parent)
+# print(os.getcwd())
+# sys.path.append(".")
+# sys.path.append(BASE_REPO_PATH)
+# sys.path.append(os.path.join(BASE_REPO_PATH, "BeyondChaosRandomizer\\BeyondChaos"))
+sl.text(str(os.getcwd()))
 
 from BeyondChaosRandomizer.BeyondChaos.options import NORMAL_FLAGS, MAKEOVER_MODIFIER_FLAGS, get_makeover_groups
 
