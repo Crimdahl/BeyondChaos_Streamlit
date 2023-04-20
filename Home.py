@@ -1,59 +1,60 @@
-import io
 import streamlit as sl
+import io
 import hashlib
 import zipfile
 import sys
-
-sys.path.append("BeyondChaosRandomizer/BeyondChaos")
-
 from multiprocessing import Pipe, Process
-from BeyondChaosRandomizer.BeyondChaos.randomizer import randomize
-from BeyondChaosRandomizer.BeyondChaos.options import ALL_MODES, NORMAL_FLAGS, MAKEOVER_MODIFIER_FLAGS
-from BeyondChaosRandomizer.BeyondChaos.utils import WELL_KNOWN_ROM_HASHES
+from pages.util.util import initialize_states
 from streamlit.elements.utils import _shown_default_value_warning
 _shown_default_value_warning = False
 
+sys.path.append("BeyondChaosRandomizer/BeyondChaos")
+
+from BeyondChaosRandomizer.BeyondChaos.randomizer import randomize
+from BeyondChaosRandomizer.BeyondChaos.options import ALL_MODES, NORMAL_FLAGS, MAKEOVER_MODIFIER_FLAGS
+from BeyondChaosRandomizer.BeyondChaos.utils import WELL_KNOWN_ROM_HASHES
+
 VERSION = "4.2.1 CE"
 SORTED_FLAGS = sorted(NORMAL_FLAGS + MAKEOVER_MODIFIER_FLAGS, key=lambda x: x.name)
-DEFAULT_PRESETS = {
+DEFAULT_PRESETS = ({
     'None': [],
     'New Player': [
         "b", "c", "e", "f", "g", "i", "n", "o", "p", "q", "r", "s", "t", "w", "y", "z",
         "alasdraco", "capslockoff", "partyparty", "makeover", "johnnydmad",
         "questionablecontent", "dancelessons", "swdtechspeed:faster"
     ],
-    'Intermediate Player':[
+    'Intermediate Player': [
         "b", "c", "d", "e", "f", "g", "i", "j", "k", "m", "n", "o", "p", "q", "r", "s", "t", "u", "w", "y", "z",
         "alasdraco", "capslockoff", "partyparty", "makeover", "johnnydmad", "notawaiter", "mimetime",
         "electricboogaloo", "questionablecontent", "dancelessons", "remonsterate", "swdtechspeed:random"
     ],
-    'Advanced Player':[
+    'Advanced Player': [
         "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "m", "n", "o", "p", "q", "r", "s", "t", "u", "w", "y", "z",
         "alasdraco", "capslockoff", "partyparty", "makeover", "johnnydmad", "notawaiter", "dancingmaduin", "bsiab",
         "mimetime", "randombosses", "electricboogaloo", "questionablecontent", "dancelessons", "remonsterate",
         "swdtechspeed:random"
     ],
-    'Chaotic Player':[
+    'Chaotic Player': [
         "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "m", "n", "o", "p", "q", "r", "s", "t", "u", "w", "y", "z",
         "alasdraco", "capslockoff", "partyparty", "makeover", "johnnyachaotic", "notawaiter", "dancingmaduin", "bsiab",
         "mimetime", "randombosses", "electricboogaloo", "questionablecontent", "dancelessons", "remonsterate",
         "swdtechspeed:random", "masseffect", "allcombos", "supernatural", "randomboost:2", "thescenarionottaken"
     ],
-    'KAN Race - Easy':[
+    'KAN Race - Easy': [
         "b", "c", "d", "e", "f", "g", "i", "j", "k", "m", "n", "o", "p", "q", "r", "s", "t", "w", "y", "z",
         "capslockoff", "partyparty", "makeover", "johnnydmad", "notawaiter", "madworld"
     ],
-    'KAN Race - Medium':[
+    'KAN Race - Medium': [
         "b", "c", "d", "e", "f", "g", "i", "j", "k", "m", "n", "o", "p", "q", "r", "s", "t", "u", "w", "y", "z",
         "capslockoff", "partyparty", "makeover", "johnnydmad", "notawaiter", "madworld", "randombosses",
         "electricboogaloo"
     ],
-    'KAN Race - Insane':[
+    'KAN Race - Insane': [
         "b", "c", "d", "e", "f", "g", "i", "j", "k", "m", "n", "o", "p", "q", "r", "s", "t", "u", "w", "y", "z",
         "capslockoff", "partyparty", "makeover", "johnnydmad", "notawaiter", "madworld", "randombosses",
         "electricboogaloo", "darkworld", "bsiab"
     ]
-}
+})
 
 flag_categories = []
 input_rom_data = None
@@ -75,25 +76,26 @@ def set_stylesheet():
     #   margin-left: 50px;
     sl.markdown(
         '<style>'
-            # stApp contains all of the content for the app. Probably use it like the HTML element.
-            '.stApp {'
-                'background-color: white;'
-            '}'
-            # Setting the expander header text style
-            '.streamlit-expanderHeader:first-child:first-child p{'
-                'font-size: 18px;'
-                'font-weight: bold;'
-            '}'
-            # Setting overflow on the status box
-            '.streamlit-expanderContent div:nth-child(8) div:first-child{'
-                'max-height: 300px;'
-                'overflow-y: auto;'
-                'overflow-x: hidden;'
-                'white-space: pre-line;'
-                # These two attributes keep the scroll area anchored to the bottom as new content comes in.
-                'flex-direction: column-reverse;' 
-                'display: flex;'
-            '}'
+        # stApp contains all of the content for the app. Probably use it like the HTML element.
+        '.stApp {'
+        'background-color: white;'
+        '}'
+        # Setting the expander header text style
+        '.streamlit-expanderHeader:first-child:first-child p{'
+        'font-size: 18px;'
+        'font-weight: bold;'
+        '}'
+        # Setting overflow on the status box
+        # '.streamlit-expanderContent div:nth-child(8) div:first-child{' Caught unintended elements
+        'div [data-testid="stVerticalBlock"] div div [data-testid="stText"]{'
+        'max-height: 300px;'
+        'overflow-y: auto;'
+        'overflow-x: hidden;'
+        'white-space: pre-line;'
+        # These two attributes keep the scroll area anchored to the bottom as new content comes in.
+        'flex-direction: column-reverse;'
+        'display: flex;'
+        '}'
         '</style>',
         unsafe_allow_html=True
     )
@@ -148,6 +150,7 @@ def update_active_flags():
 
 
 def apply_flag_preset(flagset=None):
+    print("Applying preset.")
     if flagset:
         selected_presets = flagset
     elif not sl.session_state["preset"] == "None":
@@ -166,7 +169,12 @@ def apply_flag_preset(flagset=None):
                 preset_flag_name = preset_flag
             if flag.name == preset_flag_name:
                 if ":" in preset_flag:
-                    sl.session_state[flag.name] = str(preset_flag[str(preset_flag).index(":") + 1:]).title()
+                    if flag.inputtype == "combobox":
+                        sl.session_state[flag.name] = str(preset_flag[str(preset_flag).index(":") + 1:]).title()
+                    elif flag.inputtype == "integer":
+                        sl.session_state[flag.name] = int(preset_flag[str(preset_flag).index(":") + 1:])
+                    elif flag.inputtype == "float2":
+                        sl.session_state[flag.name] = float(preset_flag[str(preset_flag).index(":") + 1:])
                 else:
                     sl.session_state[flag.name] = True
                 continue
@@ -200,7 +208,7 @@ def generate_game():
                      str(starting_seed + iteration)
             parent_connection, child_connection = Pipe()
             kwargs = {
-                "source": "web",
+                "application": "web",
                 "infile_rom_buffer": io.BytesIO(input_rom_data.getvalue()),
                 "outfile_rom_buffer": io.BytesIO(input_rom_data.getvalue()),
                 "seed": bundle
@@ -257,10 +265,16 @@ def main():
     sl.markdown('<p style="font-size: 14px; margin-top: -20px;">Based on Beyond Chaos ' + VERSION + '</p>',
                 unsafe_allow_html=True)
 
-    with sl.expander(label="Flag Selection", expanded=False):
+    if "initialized" not in sl.session_state.keys():
+        initialize_states()
+        sl.experimental_rerun()
+
+    with sl.expander(label="Flag Selection", expanded=True):
         sl.selectbox(
             label="Flag Presets",
             options=DEFAULT_PRESETS.keys(),
+            index=list(DEFAULT_PRESETS.keys()).index(sl.session_state["preset"])
+                  if "preset" in sl.session_state.keys() else 0,
             on_change=apply_flag_preset,
             key="preset",
             disabled="lock" in sl.session_state.keys() and sl.session_state["lock"]
@@ -282,39 +296,42 @@ def main():
 
         tabs = sl.tabs(flag_categories)
 
+        update_active_flags()
+
         for i, tab in enumerate(flag_categories):
             for flag in SORTED_FLAGS:
                 if str.lower(flag.category) == str.lower(tab):
-                    if flag.inputtype == "boolean" and not flag.name in ["remonsterate", "bingoboingo"]:
+                    if flag.inputtype == "boolean" and not flag.name in ["bingoboingo"]:
                         tabs[i].checkbox(label=flag.name + " - " + flag.long_description,
-                                         on_change=update_active_flags,
+                                         value=sl.session_state[flag.name],
+                                         # on_change=update_active_flags,
                                          key=flag.name,
                                          disabled="lock" in sl.session_state.keys() and sl.session_state["lock"])
                     elif flag.inputtype == "combobox":
                         tabs[i].selectbox(label=flag.name + " - " + flag.long_description,
                                           options=flag.choices,
-                                          index=int(flag.default_index),
-                                          on_change=update_active_flags,
+                                          index=int(flag.choices.index(sl.session_state[flag.name])),
+                                          # on_change=update_active_flags,
                                           key=flag.name,
                                           disabled="lock" in sl.session_state.keys() and sl.session_state["lock"])
                     elif flag.inputtype == "float2":
                         tabs[i].number_input(label=flag.name + " - " + flag.long_description,
                                              min_value=0.00,
-                                             value=1.00,
+                                             value=float(sl.session_state[flag.name]),
                                              step=0.01,
-                                             on_change=update_active_flags,
+                                             # on_change=update_active_flags,
                                              key=flag.name,
                                              disabled="lock" in sl.session_state.keys() and sl.session_state["lock"])
                     elif flag.inputtype == "integer":
                         tabs[i].number_input(label=flag.name + " - " + flag.long_description,
                                              min_value=0,
                                              step=1,
-                                             value=int(flag.default_value),
-                                             on_change=update_active_flags,
+                                             value=int(sl.session_state[flag.name]),
+                                             # on_change=update_active_flags,
                                              key=flag.name,
                                              disabled="lock" in sl.session_state.keys() and sl.session_state["lock"])
 
-    with sl.expander(label="Input and Output", expanded=False):
+    with sl.expander(label="Input and Output", expanded=True):
         global input_rom_data
         input_rom_data = sl.file_uploader(
             label="ROM File",
@@ -335,6 +352,7 @@ def main():
             else:
                 file_upload_message = ":green[Valid FF3/FF6 1.0 ROM detected!]"
                 valid_rom_file = True
+                sl.session_state["rom_file_name"] = input_rom_data.name
         else:
             file_upload_message = ""
             input_rom_data = None
@@ -381,7 +399,7 @@ def main():
         sl.button(label="Generate!",
                   on_click=lock_gui,
                   disabled=("lock" in sl.session_state.keys() and sl.session_state["lock"])
-                  or not (len(sl.session_state["selected_flags"]) > 0 and valid_rom_file),
+                           or not (len(sl.session_state["selected_flags"]) > 0 and valid_rom_file),
                   key="generate_button")
 
         if "status" in sl.session_state.keys():
@@ -397,10 +415,10 @@ def main():
                 '<style>'
                 # stApp contains all of the content for the app. Probably use it like the HTML element.
                 'div [data-testid="stFileUploader"] {'
-                    'display:none;'
+                'display:none;'
                 '}'
                 'div [data-testid="stMarkdownContainer"] p:first-child span:first-child{'
-                    'display:none;'
+                'display:none;'
                 '}'
                 '</style>',
                 unsafe_allow_html=True
@@ -421,16 +439,19 @@ def main():
                     for output_file in sl.session_state["output_files"]:
                         if not first_output_seed:
                             first_output_seed = str(output_file["output_seed"])
-                        output_zip.writestr(input_rom_data.name[:input_rom_data.name.index(".")] +
+                        output_zip.writestr(sl.session_state["rom_file_name"][:sl.session_state["rom_file_name"].
+                                            index(".")] +
                                             "-" + str(output_file["output_seed"]) + ".smc",
                                             output_file["output_rom_data"].getvalue())
                         if output_file["output_spoiler_log"]:
-                            output_zip.writestr(input_rom_data.name[:input_rom_data.name.index(".")] +
+                            output_zip.writestr(sl.session_state["rom_file_name"][:sl.session_state["rom_file_name"].
+                                                index(".")] +
                                                 "-" + str(output_file["output_seed"]) + ".txt",
                                                 output_file["output_spoiler_log"])
                 sl.download_button(label="Download Randomized ROM(s)",
                                    data=buffer,
-                                   file_name=input_rom_data.name[:input_rom_data.name.index(".")] +
+                                   file_name=sl.session_state["rom_file_name"][:sl.session_state["rom_file_name"].
+                                                                               index(".")] +
                                    "-" + str(first_output_seed) + ".zip",
                                    mime="application/zip",
                                    key="output_romfile")
