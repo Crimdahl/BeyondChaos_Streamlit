@@ -1,6 +1,6 @@
 import io
 
-from utils import CHAR_TABLE, hex2int, utilrandom as random
+from BeyondChaosRandomizer.BeyondChaos.utils import CHAR_TABLE, hex2int, utilrandom as random
 
 equip_offsets = {"weapon": 15,
                  "shield": 16,
