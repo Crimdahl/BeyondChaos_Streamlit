@@ -142,6 +142,11 @@ def generate_game():
         sl.session_state["lock"] = False
 
 
+def update_rom_data():
+    if "input_romfile" in sl.session_state.keys() and sl.session_state["input_romfile"]:
+        sl.session_state["input_rom_data"] = sl.session_state["input_romfile"]
+
+
 def main():
     sl.set_page_config(layout="wide")
     set_stylesheet()
@@ -166,8 +171,9 @@ def main():
                     disabled="lock" in sl.session_state.keys() and sl.session_state["lock"]
                 )
 
-        sl.session_state["input_rom_data"] = sl.file_uploader(
+        sl.file_uploader(
             label="Upload your English FF6 1.0 rom below.",
+            on_change=update_rom_data,
             key="input_romfile"
         )
 
