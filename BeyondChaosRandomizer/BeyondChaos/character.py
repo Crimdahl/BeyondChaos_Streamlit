@@ -17,7 +17,7 @@ character_list = []
 
 
 def load_characters(rom_file_buffer: io.BytesIO=False, force_reload=False):
-    from gameobjects.character import Character
+    from BeyondChaosRandomizer.BeyondChaos.gameobjects.character import Character
     if character_list and not force_reload:
         return
 
@@ -89,10 +89,10 @@ class CharacterBlock:
             s += "Looks like: %s\n" % self.new_appearance
             s += "Originally: %s\n" % self.original_appearance
 
-        from options import Use_new_randomizer
+        from BeyondChaosRandomizer.BeyondChaos.options import Use_new_randomizer
         if not Use_new_randomizer:
             # Using the refactored randomizer will prevent these fields from ever being populated
-            from utils import make_table
+            from BeyondChaosRandomizer.BeyondChaos.utils import make_table
             statblurbs = {}
             for name in CHARSTATNAMES:
                 blurb = "{0:8} {1}".format(name.upper() + ":", self.stats[name])
@@ -114,7 +114,7 @@ class CharacterBlock:
         return s.strip()
 
     def get_notable_equips(self):
-        from itemrandomizer import get_ranked_items
+        from BeyondChaosRandomizer.BeyondChaos.itemrandomizer import get_ranked_items
         items = [i for i in get_ranked_items() if
                  i.equippable & (1 << self.id) and not i.imp_only]
         weapons = [i for i in items if i.is_weapon]
