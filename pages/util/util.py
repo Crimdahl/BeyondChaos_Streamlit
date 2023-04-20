@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 
 BASE_REPO_PATH = str(Path(os.path.abspath(__file__)).resolve().parent.parent.parent)
+print(BASE_REPO_PATH)
 sys.path.append(BASE_REPO_PATH)
 sys.path.append(os.path.join(BASE_REPO_PATH, "BeyondChaosRandomizer\\BeyondChaos"))
 
@@ -11,6 +12,7 @@ from BeyondChaosRandomizer.BeyondChaos.options import NORMAL_FLAGS, MAKEOVER_MOD
 
 get_makeover_groups()
 SORTED_FLAGS = sorted(NORMAL_FLAGS + MAKEOVER_MODIFIER_FLAGS, key=lambda x: x.name)
+
 
 @sl.cache_data
 def load_female_character_names():
