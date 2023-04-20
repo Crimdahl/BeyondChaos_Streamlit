@@ -1,7 +1,7 @@
 import streamlit as sl
 import sys
-
-sys.path.append("../BeyondChaosRandomizer/BeyondChaos")
+import os
+sys.path.append(os.path.join(os.getcwd(), "BeyondChaosRandomizer\\BeyondChaos"))
 
 from pages.util.util import initialize_states
 from BeyondChaosRandomizer.BeyondChaos.options import ALL_MODES, NORMAL_FLAGS, \

@@ -1,12 +1,13 @@
 import sys
 import streamlit as sl
+import os
 from pathlib import Path
-sys.path.append("BeyondChaosRandomizer/BeyondChaos")
+sys.path.append(os.path.join(os.getcwd(), "BeyondChaosRandomizer\\BeyondChaos"))
 from BeyondChaosRandomizer.BeyondChaos.options import NORMAL_FLAGS, MAKEOVER_MODIFIER_FLAGS, get_makeover_groups
 
 get_makeover_groups()
 SORTED_FLAGS = sorted(NORMAL_FLAGS + MAKEOVER_MODIFIER_FLAGS, key=lambda x: x.name)
-
+print(os.path.join(os.getcwd(), "BeyondChaosRandomizer\\BeyondChaos"))
 
 @sl.cache_data
 def load_female_character_names():

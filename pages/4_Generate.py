@@ -1,5 +1,6 @@
 import streamlit as sl
 import sys
+import os
 from hashlib import md5
 from json import dumps
 from time import time
@@ -7,7 +8,7 @@ from io import BytesIO
 from multiprocessing import Process, Pipe
 from zipfile import ZipFile
 from pages.util.util import initialize_states
-sys.path.append("BeyondChaosRandomizer/BeyondChaos")
+sys.path.append(os.path.join(os.getcwd(), "BeyondChaosRandomizer\\BeyondChaos"))
 from BeyondChaosRandomizer.BeyondChaos.utils import WELL_KNOWN_ROM_HASHES
 from BeyondChaosRandomizer.BeyondChaos.randomizer import randomize, VERSION
 
