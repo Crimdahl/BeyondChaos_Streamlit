@@ -8,7 +8,8 @@ from io import BytesIO
 from multiprocessing import Process, Pipe
 from zipfile import ZipFile
 from pages.util.util import initialize_states
-sys.path.append(os.path.join(os.getcwd(), "BeyondChaosRandomizer\\BeyondChaos"))
+from pathlib import Path
+sys.path.append(os.path.join(Path(__file__).resolve().parent, "BeyondChaosRandomizer"))
 from BeyondChaosRandomizer.BeyondChaos.utils import WELL_KNOWN_ROM_HASHES
 from BeyondChaosRandomizer.BeyondChaos.randomizer import randomize, VERSION
 

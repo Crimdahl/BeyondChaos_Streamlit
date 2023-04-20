@@ -1,9 +1,11 @@
 import streamlit as sl
 import sys
 import os
-sys.path.append(os.path.join(os.getcwd(), "BeyondChaosRandomizer\\BeyondChaos"))
+from pathlib import Path
+sys.path.append(os.path.join(Path(__file__).resolve().parent, "BeyondChaosRandomizer"))
 from json import loads
 from pages.util.util import initialize_states
+print(str(Path(__file__).resolve().parent))
 
 
 def set_stylesheet():
