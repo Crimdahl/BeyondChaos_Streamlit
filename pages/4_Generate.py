@@ -1,6 +1,4 @@
 import streamlit as sl
-import sys
-import os
 from hashlib import md5
 from json import dumps
 from time import time
@@ -8,14 +6,15 @@ from io import BytesIO
 from multiprocessing import Process, Pipe
 from zipfile import ZipFile
 from pages.util.util import initialize_states
-from pathlib import Path
 
-BASE_REPO_PATH = str(Path(os.path.abspath(__file__)).resolve().parent)
-sys.path.append(BASE_REPO_PATH)
-sys.path.append(os.path.join(BASE_REPO_PATH, "BeyondChaosRandomizer\\BeyondChaos"))
-
-from BeyondChaosRandomizer.BeyondChaos.utils import WELL_KNOWN_ROM_HASHES
-from BeyondChaosRandomizer.BeyondChaos.randomizer import randomize, VERSION
+try:
+    from BeyondChaosRandomizer.BeyondChaos.utils import WELL_KNOWN_ROM_HASHES
+    from BeyondChaosRandomizer.BeyondChaos.randomizer import randomize, VERSION
+except ModuleNotFoundError:
+    import sys
+    sys.path.append("BeyondChaosRandomizer\\BeyondChaos")
+    from BeyondChaosRandomizer.BeyondChaos.utils import WELL_KNOWN_ROM_HASHES
+    from BeyondChaosRandomizer.BeyondChaos.randomizer import randomize, VERSION
 
 
 def set_stylesheet():

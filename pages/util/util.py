@@ -1,18 +1,12 @@
-import sys
 import streamlit as sl
-import os
 from pathlib import Path
 
-# BASE_REPO_PATH = str(Path(os.path.abspath(__file__)).resolve().parent.parent.parent)
-# print(os.getcwd())
-# sys.path.append(".")
-# sys.path.append(BASE_REPO_PATH)
-# sys.path.append(os.path.join(BASE_REPO_PATH, "BeyondChaosRandomizer\\BeyondChaos"))
-sl.text(str(os.getcwd()))
-sl.text(str(os.listdir(os.path.join(os.getcwd(), "BeyondChaosRandomizer"))))
-sl.text_area("System Path", str(sys.path))
-
-from BeyondChaosRandomizer.BeyondChaos.options import NORMAL_FLAGS, MAKEOVER_MODIFIER_FLAGS, get_makeover_groups
+try:
+    from BeyondChaosRandomizer.BeyondChaos.options import NORMAL_FLAGS, MAKEOVER_MODIFIER_FLAGS, get_makeover_groups
+except ModuleNotFoundError:
+    import sys
+    sys.path.append("BeyondChaosRandomizer\\BeyondChaos")
+    from BeyondChaosRandomizer.BeyondChaos.options import NORMAL_FLAGS, MAKEOVER_MODIFIER_FLAGS, get_makeover_groups
 
 get_makeover_groups()
 SORTED_FLAGS = sorted(NORMAL_FLAGS + MAKEOVER_MODIFIER_FLAGS, key=lambda x: x.name)

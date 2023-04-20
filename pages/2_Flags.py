@@ -1,15 +1,15 @@
 import streamlit as sl
-import sys
-import os
-from pathlib import Path
-
-BASE_REPO_PATH = str(Path(os.path.abspath(__file__)).resolve().parent)
-sys.path.append(BASE_REPO_PATH)
-sys.path.append(os.path.join(BASE_REPO_PATH, "BeyondChaosRandomizer\\BeyondChaos"))
-
 from pages.util.util import initialize_states
-from BeyondChaosRandomizer.BeyondChaos.options import ALL_MODES, NORMAL_FLAGS, \
-                                                      MAKEOVER_MODIFIER_FLAGS, get_makeover_groups
+
+try:
+    from BeyondChaosRandomizer.BeyondChaos.options import ALL_MODES, NORMAL_FLAGS, \
+        MAKEOVER_MODIFIER_FLAGS, get_makeover_groups
+except ModuleNotFoundError:
+    import sys
+    sys.path.append("BeyondChaosRandomizer\\BeyondChaos")
+    from BeyondChaosRandomizer.BeyondChaos.options import ALL_MODES, NORMAL_FLAGS, \
+        MAKEOVER_MODIFIER_FLAGS, get_makeover_groups
+
 
 flag_categories = []
 get_makeover_groups()
