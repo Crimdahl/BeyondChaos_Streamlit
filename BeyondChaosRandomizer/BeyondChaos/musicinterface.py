@@ -18,7 +18,7 @@ from BeyondChaosRandomizer.BeyondChaos.music.musicrandomizer import process_musi
     process_map_music, get_legacy_import, \
     get_spc_memory_usage, get_music_spoiler as get_spoiler, initialize as johnnydmad_initialize
 
-from music.mfvitools.insertmfvi import byte_insert, bytes_to_int
+from BeyondChaosRandomizer.BeyondChaos.music.mfvitools.insertmfvi import byte_insert, bytes_to_int
 
 BC_MUSIC_FREESPACE = ["53C5F-9FDFF", "310000-37FFFF", "410000-4FFFFF"]
 
