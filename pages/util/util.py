@@ -1,5 +1,5 @@
 import streamlit as sl
-from pathlib import Path
+import os
 
 try:
     from BeyondChaosRandomizer.BeyondChaos.options import NORMAL_FLAGS, MAKEOVER_MODIFIER_FLAGS, get_makeover_groups
@@ -15,7 +15,8 @@ SORTED_FLAGS = sorted(NORMAL_FLAGS + MAKEOVER_MODIFIER_FLAGS, key=lambda x: x.na
 @sl.cache_data
 def load_female_character_names():
     names = ""
-    with open(Path("BeyondChaosRandomizer\\BeyondChaos\\custom\\femalenames.txt")) as namefile:
+    with open(os.path.join(os.getcwd(),
+                           "BeyondChaosRandomizer", "BeyondChaos", "custom", "femalenames.txt")) as namefile:
         for line in namefile:
             names += line
     return names.strip()
@@ -24,7 +25,8 @@ def load_female_character_names():
 @sl.cache_data
 def load_male_character_names():
     names = ""
-    with open(Path("BeyondChaosRandomizer\\BeyondChaos\\custom\\malenames.txt")) as namefile:
+    with open(os.path.join(os.getcwd(),
+                           "BeyondChaosRandomizer", "BeyondChaos", "custom", "malenames.txt")) as namefile:
         for line in namefile:
             names += line
     return names.strip()
@@ -33,7 +35,8 @@ def load_male_character_names():
 @sl.cache_data
 def load_moogle_character_names():
     names = ""
-    with open(Path("BeyondChaosRandomizer\\BeyondChaos\\custom\\mooglenames.txt")) as namefile:
+    with open(os.path.join(os.getcwd(),
+                           "BeyondChaosRandomizer", "BeyondChaos", "custom", "mooglenames.txt")) as namefile:
         for line in namefile:
             names += line
     return names.strip()
@@ -42,8 +45,9 @@ def load_moogle_character_names():
 @sl.cache_data
 def load_sprite_replacements():
     sprite_data = ""
-    with open(Path("BeyondChaosRandomizer\\BeyondChaos\\custom\\spritereplacements.txt")) as namefile:
-        for line in namefile:
+    with open(os.path.join(os.getcwd(),
+                           "BeyondChaosRandomizer", "BeyondChaos", "custom", "spritereplacements.txt")) as spritefile:
+        for line in spritefile:
             sprite_data += line
     return sprite_data
 
