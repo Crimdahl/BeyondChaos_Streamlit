@@ -219,6 +219,7 @@ def main():
 
             sl.number_input(label="Number of randomized ROMs to create",
                             min_value=1,
+                            max_value=10,
                             step=1,
                             value=1,
                             key="batch",

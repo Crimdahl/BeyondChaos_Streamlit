@@ -779,6 +779,19 @@ def main():
         # Populate the Changelog tab
         #
         with tabs[2].expander(
+                label='Version 0.1.2.6: Capped batch generation at 10.',
+                expanded=False,
+
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>Basically Denial of Service protection against somebody generating at huge number of '
+                'games at once and running the server out of memory.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
                 label='Version 0.1.2.5: Improved generation exception handling.',
                 expanded=False,
 
