@@ -184,9 +184,10 @@ def main():
         if "input_rom_data" and sl.session_state["input_rom_data"]:
             # ROM file's session state gets an object with attributes: id, name, type, size
             rom_hash = md5(sl.session_state["input_rom_data"].getbuffer()).hexdigest()
-            if not str.endswith(sl.session_state["input_rom_data"].name, ".smc"):
+            if not str.endswith(sl.session_state["input_rom_data"].name, ".smc") and \
+                    not str.endswith(sl.session_state["input_rom_data"].name, ".sfc"):
                 file_upload_message = ":red[The uploaded file has an invalid extension. " \
-                                      "SNES ROM files should have the extension '.smc'.]"
+                                      "SNES ROM files should have the extension '.smc' or '.sfc'.]"
                 sl.session_state["valid_rom_file"] = False
             elif rom_hash not in WELL_KNOWN_ROM_HASHES:
                 file_upload_message = ":red[WARNING! The selected file does not match supported " \
