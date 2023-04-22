@@ -268,7 +268,7 @@ def main():
                 '<hr>'
 
                 '<p class="username">'
-                    '<b>emberling</b>, randomizing all of the music'
+                    '<b>emberling</b>'
                 '</p>'
                 '<div class="pill first-pill">'
                     'Music'
