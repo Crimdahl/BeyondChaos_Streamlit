@@ -779,6 +779,23 @@ def main():
         # Populate the Changelog tab
         #
         with tabs[2].expander(
+                label='Version 0.1.2.5: Improved generation exception handling.',
+                expanded=False,
+
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>Wrapped the entire randomize() call in a try/except block that will pass any exceptions back '
+                'to the web interface via the Pipe.</li>'
+                '<li>The web interface now catches Exception objects passed back through the randomize() Pipe, halts '
+                'the randomization process, and displays the error on screen. Previously the interface would still '
+                'say "Randomization complete!" even if the randomization failed.</li>'
+                '<li>Fixed a typo when detecting output files.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
                 label='Version 0.1.2.4: Improved Community tab dark mode compatibility. Added BCB Discord link.',
                 expanded=False,
 

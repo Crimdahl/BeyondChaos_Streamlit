@@ -113,7 +113,8 @@ def generate_game():
             while True:
                 try:
                     if not child.is_alive():
-                        sl.session_state["status"] += "\n" + "ERROR: The thread that was handling randomization died."
+                        sl.session_state["status"] += "\n" + "The randomization failed because the thread that " \
+                            "was handling randomization died."
                         sl.session_state["status_control"].text(sl.session_state["status"])
                         break
                     if parent_connection.poll(timeout=5):
@@ -133,10 +134,15 @@ def generate_game():
                                 "output_spoiler_log": item["osl"]
                             })
                             break
+                        elif isinstance(item, Exception):
+                            sl.session_state["status"] = "The randomization failed with the following exception: " + \
+                                str(item)
+                            break
                 except EOFError:
                     break
             child.join()
-        sl.session_state["status"] = "Randomization Complete"
+        if "output_files" in sl.session_state.keys() and len(sl.session_state["output_files"]) > 0:
+            sl.session_state["status"] = "Randomization Complete"
         sl.session_state["status_control"].text(sl.session_state["status"])
     finally:
         sl.session_state["lock"] = False
