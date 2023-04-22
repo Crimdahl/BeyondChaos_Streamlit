@@ -778,7 +778,7 @@ def manage_character_appearance(fout, preserve_graphics=False, moogle_names=None
             try:
                 g = open_mei_fallback(os.path.join(pathlib.Path(__file__).parent.absolute(),
                                                    "custom",
-                                                   "sprites", swap_to[c].file), "rb")
+                                                   "Sprites", swap_to[c].file), "rb")
             except IOError:
                 newsprite = sprites[change_to[c]]
                 for ch in characters:
