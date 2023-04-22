@@ -785,7 +785,7 @@ def main():
         ):
             sl.markdown(
                 "<ul>"
-                '<li>Basically Denial of Service protection against somebody generating at huge number of '
+                '<li>Basically Denial of Service protection against somebody generating a huge number of '
                 'games at once and running the server out of memory.</li>'
                 "</ul><br>",
                 unsafe_allow_html=True
