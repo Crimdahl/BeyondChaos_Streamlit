@@ -479,12 +479,12 @@ def get_sprite_swaps(char_ids, male, female, vswaps):
         female_candidates = [c for c in replace_candidates if c.gender == "female"]
         male_candidates = [c for c in replace_candidates if c.gender == "male"]
         neutral_candidates = [c for c in replace_candidates if c.gender != "male" and c.gender != "female"]
-        for candidate in female_candidates:
-            print("Female sprite swap candidates: " + str(candidate.name))
-        for candidate in male_candidates:
-            print("Male sprite swap candidates: " + str(candidate.name))
-        for candidate in neutral_candidates:
-            print("Neutral sprite swap candidates: " + str(candidate.name))
+        # for candidate in female_candidates:
+        #     print("Female sprite swap candidates: " + str(candidate.name))
+        # for candidate in male_candidates:
+        #     print("Male sprite swap candidates: " + str(candidate.name))
+        # for candidate in neutral_candidates:
+        #     print("Neutral sprite swap candidates: " + str(candidate.name))
 
     swap_to = {}
     for char_id in random.sample(char_ids, len(char_ids)):
@@ -494,13 +494,13 @@ def get_sprite_swaps(char_ids, male, female, vswaps):
             candidates = replace_candidates
         else:
             if char_id in female:
-                print("Char id " + str(char_id) + " is female. Using female candidates.")
+                # print("Char id " + str(char_id) + " is female. Using female candidates.")
                 candidates = female_candidates
             elif char_id in male:
-                print("Char id " + str(char_id) + " is male. Using male candidates.")
+                # print("Char id " + str(char_id) + " is male. Using male candidates.")
                 candidates = male_candidates
             else:
-                print("Char id " + str(char_id) + " is neutral. Using neutral candidates.")
+                # print("Char id " + str(char_id) + " is neutral. Using neutral candidates.")
                 candidates = neutral_candidates
             if random.randint(0, len(neutral_candidates) + 2 * len(candidates)) <= len(neutral_candidates):
                 candidates = neutral_candidates
@@ -513,8 +513,8 @@ def get_sprite_swaps(char_ids, male, female, vswaps):
                 candidates.remove(swap_to[char_id])
                 continue
         final_candidates = [c for c in candidates if not c.is_on(blacklist)]
-        for candidate in neutral_candidates:
-            print("Final candidates for char id " + str(char_id) + ": " + str(candidate.name))
+        # for candidate in neutral_candidates:
+        #     print("Final candidates for char id " + str(char_id) + ": " + str(candidate.name))
         if final_candidates:
             weights = [c.weight for c in final_candidates]
             swap_to[char_id] = random.choices(final_candidates, weights)[0]
@@ -652,6 +652,7 @@ def manage_character_appearance(fout, preserve_graphics=False, moogle_names=None
     riding_sprites = {}
     try:
         f = open(RIDING_SPRITE_TABLE, "r")
+        print("Riding table opened successfully.")
     except IOError:
         pass
     else:
@@ -660,7 +661,7 @@ def manage_character_appearance(fout, preserve_graphics=False, moogle_names=None
             try:
                 g = open_mei_fallback(os.path.join(pathlib.Path(__file__).parent.absolute(),
                                                    "custom",
-                                                   "sprites",
+                                                   "Sprites",
                                                    filename), "rb")
             except IOError:
                 continue
