@@ -471,6 +471,9 @@ def get_sprite_swaps(char_ids, male, female, vswaps):
         if r.weight:
             replace_candidates.append(r)
 
+    for candidate in replace_candidates:
+        print("Sprite swap candidate: " + str(candidate.name))
+
     # select sprite replacements
     if not wild or sprite_swap_mode:
         female_candidates = [c for c in replace_candidates if c.gender == "female"]
@@ -594,9 +597,12 @@ def manage_character_appearance(fout, preserve_graphics=False, moogle_names=None
             change_to = dict(list(zip(char_ids, change_to)))
         else:
             random.shuffle(female)
+            # print("List of female characters: " + str(female))
             random.shuffle(male)
+            # print("List of male characters: " + str(male))
             change_to = dict(list(zip(sorted(male), male)) +
                              list(zip(sorted(female), female)))
+            # print("change_to dict contents: " + str(change_to))
 
     manage_character_names(fout, change_to, male, moogle_names, male_names, female_names)
 

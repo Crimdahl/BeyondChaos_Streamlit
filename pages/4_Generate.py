@@ -263,7 +263,11 @@ def main():
                             first_output_seed = str(output_file["output_seed"])
                         output_zip.writestr(sl.session_state["rom_file_name"][:sl.session_state["rom_file_name"].
                                             index(".")] +
-                                            "-" + str(output_file["output_seed"]) + ".smc",
+                                            "-" + str(output_file["output_seed"]) +
+                                            sl.session_state["input_rom_data"].name[
+                                                str(sl.session_state["input_rom_data"].name).rindex("."):
+                                            ],
+                        #".smc",
                                             output_file["output_rom_data"].getvalue())
                         if output_file["output_spoiler_log"]:
                             output_zip.writestr(sl.session_state["rom_file_name"][:sl.session_state["rom_file_name"].
