@@ -38,12 +38,12 @@ def process_import():
 def main():
     sl.set_page_config(
         layout="wide",
-        page_icon="favicon.png",
+        page_icon="images/favicon.png",
         page_title="Beyond Chaos Web"
     )
     set_stylesheet()
     sl.title("Beyond Chaos: Web Edition")
-    sl.markdown('<p style="font-size: 14px; margin-top: -20px;font-family: Arial;">Version 0.1.2.1</p>',
+    sl.markdown('<p style="font-size: 14px; margin-top: -20px;font-family: Arial;">Version 0.1.2.2</p>',
                 unsafe_allow_html=True)
 
     if "initialized" not in sl.session_state.keys():

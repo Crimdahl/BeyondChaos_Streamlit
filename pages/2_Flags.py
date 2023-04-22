@@ -201,7 +201,7 @@ def update_game_mode():
 def main():
     sl.set_page_config(
         layout="wide",
-        page_icon="favicon.png",
+        page_icon="images/favicon.png",
         page_title="Beyond Chaos Web"
     )
     set_stylesheet()
