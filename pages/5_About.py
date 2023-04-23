@@ -779,6 +779,20 @@ def main():
         # Populate the Changelog tab
         #
         with tabs[2].expander(
+                label='Version 0.1.2.6: Adjusted music and sprites text on the welcome screen.',
+                expanded=False,
+
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>Corrected an inaccuracy regarding the music randomization in Beyond Chaos. Sound Fonts are '
+                'a technology that did not exist during FF6\'s developement.</li>'
+                '<li>Slightly adjusted the line about sprite shuffling.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
                 label='Version 0.1.2.6: Capped batch generation at 10.',
                 expanded=False,
 

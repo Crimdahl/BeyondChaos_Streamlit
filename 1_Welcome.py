@@ -43,7 +43,7 @@ def main():
     )
     set_stylesheet()
     sl.title("Beyond Chaos: Web Edition")
-    sl.markdown('<p style="font-size: 14px; margin-top: -20px;font-family: Arial;">Version 0.1.2.6</p>',
+    sl.markdown('<p style="font-size: 14px; margin-top: -20px;font-family: Arial;">Version 0.1.2.7</p>',
                 unsafe_allow_html=True)
 
     if "initialized" not in sl.session_state.keys():
@@ -71,10 +71,10 @@ def main():
                 "ability as a command, even combo commands and chaining commands!</li>"
                 "<li>Which character is permanently berserk and which command the berserker will use. "
                 "They aren't always fight-ers...</li>"
-                "<li>Monster names, palettes, stats, abilities, and spells. Sprites can be shuffled with sprites of enemies"
-                " from across all of gaming.</li>"
-                "<li>In-game music. Music from other games is included, adapted to the FF6 soundfont. There's even an "
-                "in-game jukebox!</li>"
+                "<li>Monster names, palettes, stats, abilities, and spells. Sprites can be "
+                "shuffled with sprites of enemies from various other games.</li>"
+                "<li>In-game music. Music from other games is included, adapted to the FF6 sound engine. "
+                "There's even an in-game jukebox!</li>"
                 "<li>Breakable items, item breaks, and item-learnable spells.</li>"
                 "<li>Blitz controller inputs, the swdtech gauge speed, and outcomes for dances and slots.</li>"
                 "<li>Chest and shop contents, including location and contents of Monster-In-A-Box encounters.</li>"
