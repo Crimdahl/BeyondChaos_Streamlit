@@ -785,7 +785,7 @@ def main():
         ):
             sl.markdown(
                 "<ul>"
-                '<li>Corrected an inaccuracy regarding the music randomization in Beyond Chaos. Sound Fonts are '
+                '<li>Corrected an inaccuracy regarding the music randomization in Beyond Chaos. SoundFont is '
                 'a technology that did not exist during FF6\'s developement.</li>'
                 '<li>Slightly adjusted the line about sprite shuffling.</li>'
                 "</ul><br>",
