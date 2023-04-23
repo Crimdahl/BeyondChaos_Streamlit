@@ -779,7 +779,7 @@ def main():
         # Populate the Changelog tab
         #
         with tabs[2].expander(
-                label='Version 0.1.2.6: Adjusted music and sprites text on the welcome screen.',
+                label='Version 0.1.2.7: Adjusted music and sprites text on the welcome screen.',
                 expanded=False,
 
         ):
