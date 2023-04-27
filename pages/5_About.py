@@ -788,7 +788,7 @@ def main():
         ):
             sl.markdown(
                 "<ul>"
-                '<li>Some location changes in thescenarionottaken were accidentally being discarded, resulting'
+                '<li>Some location changes in thescenarionottaken were accidentally being discarded, resulting '
                 'in softlocks when talking to certain NPCs. A fix has been applied.</li>'
                 "</ul><br>",
                 unsafe_allow_html=True
