@@ -680,7 +680,8 @@ NORMAL_FLAGS = [
          inputtype="boolean"),
     Flag(name='thescenarionottaken',
          description='DIVERGENT PATHS MODE',
-         long_description="Changes the way the 3 scenarios are split up, to resemble PowerPanda's "
+         long_description="Changes the way the 3 scenarios are split up, "
+                          "to resemble PowerPanda's "
                           "'Divergent Paths' mod.",
          category="experimental",
          inputtype="boolean"),

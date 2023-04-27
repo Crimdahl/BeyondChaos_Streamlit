@@ -611,6 +611,9 @@ def main():
                     '<b>JennyBeans</b>, robot streamer extrordinaire'
                 '</p>'  
                 '<div class="pill first-pill">'
+                    'Permadeath'
+                '</div>'  
+                '<div class="pill">'
                     'VTuber'
                 '</div>'
                 '<div class="pill">'
@@ -778,6 +781,21 @@ def main():
         #
         # Populate the Changelog tab
         #
+        with tabs[2].expander(
+                label='Version 0.1.2.9: Hid thescenarionottaken. The flag is currently broken.',
+                expanded=False,
+
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>The Scenario Not Taken is currently broken and will softlock you when attempting to '
+                'enter South Figaro Cave at the beginning of the game. The code has been hidden until a '
+                'fix is applied.</li>'
+                '<li>Added the "Permadeath" tag to JennyBeans.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
         with tabs[2].expander(
                 label='Version 0.1.2.8: Disabled manually editing Active Flags.',
                 expanded=False,
