@@ -779,6 +779,21 @@ def main():
         # Populate the Changelog tab
         #
         with tabs[2].expander(
+                label='Version 0.1.2.8: Disabled manually editing Active Flags.',
+                expanded=False,
+
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>Users can no longer manually edit the Active Flags. This is to prevent errors when invalid data '
+                'is supplied, which can result in a user no longer being able to operate the page. This is temporary '
+                'while we work on fixing the issue properly. </li>'
+                '<li>Added another known issue.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
                 label='Version 0.1.2.7: Adjusted music and sprites text on the welcome screen.',
                 expanded=False,
 
@@ -968,6 +983,8 @@ def main():
             "<ul>"
             '<li>Remonsterate occasionally fails to randomize the monster sprites. It will automatically retry, '
             'but occasionally it can take multiple Remonsterate passes.</li>'
+            '<li>If the first Dance spell used in a battle is a spell with multiple repetitions, such as '
+            'Quadra Slice/Slam, the background of the battle will be redrawn multiple times.</li>'
             "</ul>",
             unsafe_allow_html=True
         )

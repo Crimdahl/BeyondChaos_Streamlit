@@ -224,21 +224,21 @@ def main():
             if "preset" in sl.session_state.keys() else 0,
             on_change=apply_flag_preset,
             key="widget_preset",
-            disabled="lock" in sl.session_state.keys() and sl.session_state["lock"]
+            disabled=False
         )
 
         sl.selectbox(label="Game Mode",
                      options=modes,
                      key="widget_gamemode",
                      index=modes.index(sl.session_state["gamemode"]),
-                     disabled="lock" in sl.session_state.keys() and sl.session_state["lock"],
+                     disabled=False,
                      on_change=update_game_mode)
 
         sl.button(
             label="Clear Flags",
             on_click=clear_selected_flags,
             args=(True,),
-            disabled="lock" in sl.session_state.keys() and sl.session_state["lock"]
+            disabled=False
         )
 
         global flag_categories
@@ -263,7 +263,7 @@ def main():
                         tabs[i].checkbox(label=flag.name + " - " + flag.long_description,
                                          value=sl.session_state[flag.name],
                                          key="widget_"+flag.name,
-                                         disabled="lock" in sl.session_state.keys() and sl.session_state["lock"],
+                                         disabled=False,
                                          on_change=update_flag,
                                          args=(flag.name,))
                     elif flag.inputtype == "combobox":
@@ -271,7 +271,7 @@ def main():
                                           index=int(flag.choices.index(sl.session_state[flag.name])),
                                           options=flag.choices,
                                           key="widget_"+flag.name,
-                                          disabled="lock" in sl.session_state.keys() and sl.session_state["lock"],
+                                          disabled=False,
                                           on_change=update_flag,
                                           args=(flag.name,))
                     elif flag.inputtype == "float2":
@@ -280,8 +280,7 @@ def main():
                                              min_value=0.00,
                                              step=0.01,
                                              key="widget_"+flag.name,
-                                             disabled="lock" in sl.session_state.keys() and sl.session_state[
-                                                 "lock"],
+                                             disabled=False,
                                              on_change=update_flag,
                                              args=(flag.name,))
                     elif flag.inputtype == "integer":
@@ -290,8 +289,7 @@ def main():
                                              min_value=0,
                                              step=1,
                                              key="widget_"+flag.name,
-                                             disabled="lock" in sl.session_state.keys() and sl.session_state[
-                                                 "lock"],
+                                             disabled=False,
                                              on_change=update_flag,
                                              args=(flag.name,))
         sl.divider()
@@ -299,7 +297,7 @@ def main():
                      value=str.lower(", ".join(sl.session_state["selected_flags"])),
                      on_change=apply_flagstring,
                      key="widget_flagstring",
-                     disabled="lock" in sl.session_state.keys() and sl.session_state["lock"])
+                     disabled=True)
     except KeyError:
         initialize_states()
         sl.experimental_rerun()
