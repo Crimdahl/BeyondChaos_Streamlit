@@ -782,6 +782,19 @@ def main():
         # Populate the Changelog tab
         #
         with tabs[2].expander(
+                label='Version 0.1.2.10: Re-enabled thescenarionottaken.',
+                expanded=False,
+
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>Some location changes in thescenarionottaken were accidentally being discarded, resulting'
+                'in softlocks when talking to certain NPCs. A fix has been applied.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
                 label='Version 0.1.2.9: Hid thescenarionottaken. The flag is currently broken.',
                 expanded=False,
 

@@ -259,7 +259,7 @@ def main():
                 continue
             for flag in SORTED_FLAGS:
                 if str(flag.category).lower() == str(tab).lower().replace(" ", ""):
-                    if flag.inputtype == "boolean" and flag.name not in ["bingoboingo", "thescenarionottaken"]:
+                    if flag.inputtype == "boolean" and flag.name not in ["bingoboingo"]:
                         tabs[i].checkbox(label=flag.name + " - " + flag.long_description,
                                          value=sl.session_state[flag.name],
                                          key="widget_"+flag.name,

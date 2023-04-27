@@ -5362,7 +5362,7 @@ def randomize(connection: Pipe = None, **kwargs) -> str:
         monsters = get_monsters(infile_rom_buffer)
         formations = get_formations(infile_rom_buffer)
         fsets = get_fsets(infile_rom_buffer)
-        locations = get_locations(infile_rom_buffer)
+        locations = get_locations(outfile_rom_buffer)
         items = get_ranked_items(infile_rom_buffer)
         zones = get_zones(infile_rom_buffer)
         get_metamorphs(infile_rom_buffer)
