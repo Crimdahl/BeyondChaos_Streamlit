@@ -63,7 +63,9 @@ def process_export():
         "status_control",
         "output_romfile",
         "rom_file_name",
-        "status"
+        "status",
+        "flag_errors",
+        "import_results"
     ]
     export_data = {}
     for key, value in sorted(sl.session_state.items()):

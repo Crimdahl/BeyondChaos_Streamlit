@@ -831,6 +831,23 @@ def main():
         # Populate the Changelog tab
         #
         with tabs[2].expander(
+                label='Version 0.2.0.0: Added validation to the Welcome and Flags screens.',
+                expanded=False,
+
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>When importing settings from the Welcome screen, the supplied values '
+                'are now validated. If invalid values are found, the user is notified via error text and '
+                'the values are reset to their default values.</li>'
+                '<li>Added exception handling to the Flags screen. If a flag acquires an invalid value, '
+                'the screen should no longer error out and become unusable. Instead, the offending flag '
+                'is reset to its default value.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
                 label='Version 0.1.2.10: Re-enabled thescenarionottaken.',
                 expanded=False,
 

@@ -10,7 +10,45 @@ except ModuleNotFoundError:
 
 get_makeover_groups()
 SORTED_FLAGS = sorted(NORMAL_FLAGS + MAKEOVER_MODIFIER_FLAGS, key=lambda x: x.name)
-
+DEFAULT_PRESETS = ({
+    'None': [],
+    'New Player': [
+        "b", "c", "e", "f", "g", "i", "n", "o", "p", "q", "r", "s", "t", "w", "y", "z",
+        "alasdraco", "capslockoff", "partyparty", "makeover", "johnnydmad",
+        "questionablecontent", "dancelessons", "swdtechspeed:faster"
+    ],
+    'Intermediate Player': [
+        "b", "c", "d", "e", "f", "g", "i", "j", "k", "m", "n", "o", "p", "q", "r", "s", "t", "u", "w", "y", "z",
+        "alasdraco", "capslockoff", "partyparty", "makeover", "johnnydmad", "notawaiter", "mimetime",
+        "electricboogaloo", "questionablecontent", "dancelessons", "remonsterate", "swdtechspeed:random"
+    ],
+    'Advanced Player': [
+        "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "m", "n", "o", "p", "q", "r", "s", "t", "u", "w", "y", "z",
+        "alasdraco", "capslockoff", "partyparty", "makeover", "johnnydmad", "notawaiter", "dancingmaduin", "bsiab",
+        "mimetime", "randombosses", "electricboogaloo", "questionablecontent", "dancelessons", "remonsterate",
+        "swdtechspeed:random"
+    ],
+    'Chaotic Player': [
+        "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "m", "n", "o", "p", "q", "r", "s", "t", "u", "w", "y", "z",
+        "alasdraco", "capslockoff", "partyparty", "makeover", "johnnyachaotic", "notawaiter", "dancingmaduin", "bsiab",
+        "mimetime", "randombosses", "electricboogaloo", "questionablecontent", "dancelessons", "remonsterate",
+        "swdtechspeed:random", "masseffect", "allcombos", "supernatural", "randomboost:2", "thescenarionottaken"
+    ],
+    'KAN Race - Easy': [
+        "b", "c", "d", "e", "f", "g", "i", "j", "k", "m", "n", "o", "p", "q", "r", "s", "t", "w", "y", "z",
+        "capslockoff", "partyparty", "makeover", "johnnydmad", "notawaiter", "madworld"
+    ],
+    'KAN Race - Medium': [
+        "b", "c", "d", "e", "f", "g", "i", "j", "k", "m", "n", "o", "p", "q", "r", "s", "t", "u", "w", "y", "z",
+        "capslockoff", "partyparty", "makeover", "johnnydmad", "notawaiter", "madworld", "randombosses",
+        "electricboogaloo"
+    ],
+    'KAN Race - Insane': [
+        "b", "c", "d", "e", "f", "g", "i", "j", "k", "m", "n", "o", "p", "q", "r", "s", "t", "u", "w", "y", "z",
+        "capslockoff", "partyparty", "makeover", "johnnydmad", "notawaiter", "madworld", "randombosses",
+        "electricboogaloo", "darkworld", "bsiab"
+    ]
+})
 
 @sl.cache_data
 def load_female_character_names():

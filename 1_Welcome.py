@@ -1,6 +1,6 @@
 import streamlit as sl
 from json import loads
-from pages.util.util import initialize_states
+from pages.util.util import initialize_states, DEFAULT_PRESETS
 
 
 def set_stylesheet():
@@ -19,20 +19,212 @@ def set_stylesheet():
 
 
 def process_import():
+    try:
+        from BeyondChaosRandomizer.BeyondChaos.options import ALL_MODES, NORMAL_FLAGS, \
+            MAKEOVER_MODIFIER_FLAGS, get_makeover_groups
+    except ModuleNotFoundError:
+        import sys
+
+        sys.path.append("BeyondChaosRandomizer\\BeyondChaos")
+        from BeyondChaosRandomizer.BeyondChaos.options import ALL_MODES, NORMAL_FLAGS, \
+            MAKEOVER_MODIFIER_FLAGS, get_makeover_groups
+
+    all_flags = NORMAL_FLAGS + MAKEOVER_MODIFIER_FLAGS
+    all_flags_dict = {}
+    all_modes_keys = [str(mode.name).lower() for mode in ALL_MODES]
+    all_preset_keys = [str(preset).lower() for preset in DEFAULT_PRESETS.keys()]
+
+    for flag in all_flags:
+        all_flags_dict[str(flag.name).lower()] = flag
+
+    sl.session_state["import_results"] = ""
     if sl.session_state["imported_settings"]:
         if not sl.session_state["imported_settings"].name.endswith(".json"):
-            sl.session_state["valid_import"] = False
+            sl.session_state["import_results"] = False
         else:
-            sl.session_state["valid_import"] = True
             settings = loads(sl.session_state["imported_settings"].getvalue())
             for key, value in settings.items():
                 if key in ["female_names", "male_names",
                            "moogle_names", "sprite_replacements"]:
                     sl.session_state[key] = "\n".join(value).strip()
+                elif key == "batch":
+                    try:
+                        # Test if the value is a number
+                        int(value)
+                        # Ensure the value is an integer. Other falsy values will technically evaluate to 0 above.
+                        if not type(value) == int:
+                            raise ValueError
+                    except ValueError:
+                        sl.session_state["import_results"] += '<li>Setting "' + \
+                            str(key) + \
+                            '" was expecting a number and received a non-numeric value: "' + \
+                            str(value) \
+                            + '." The setting has been reset to its default value of ' + \
+                            str(1) + '.</li>'
+                        sl.session_state[key] = 1
+                        continue
+                    if not 1 <= int(value) <= 10:
+                        sl.session_state["import_results"] += '<li>Setting "' + \
+                            str(key) + \
+                            '" had a value outside of the acceptable range of ' + \
+                            '1-10: ' + str(value) + \
+                            '. The setting has been reset to its default value of 1.</li>'
+                        sl.session_state[key] = 1
+                    else:
+                        sl.session_state[key] = value
+                elif key == "gamemode":
+                    if not type(value) == str:
+                        sl.session_state["import_results"] += '<li>Setting "' + \
+                            str(key) + \
+                            '" was expecting a string and did not receive one. ' \
+                            'The setting has been reset to its default value of "Normal."</li>'
+                        sl.session_state[key] = "Normal"
+                    elif str(str(value)).lower() not in all_modes_keys:
+                        sl.session_state["import_results"] += '<li>Setting "' + \
+                            str(key) + \
+                            '" received an invalid value: "' + \
+                            str(value) + \
+                            '." valid values are: ' + str(all_modes_keys) + \
+                            '. The setting has been reset to its default value of "Normal."</li>'
+                        sl.session_state[key] = "Normal"
+                    else:
+                        sl.session_state[key] = value
+                elif key == "preset":
+                    if not type(value) == str:
+                        sl.session_state["import_results"] += '<li>Setting "' + \
+                            str(key) + \
+                            '" was expecting a string and did not receive one. ' \
+                            'The setting has been reset to its default value of "None."</li>'
+                        sl.session_state[key] = "None"
+                    elif str(value).lower() not in all_preset_keys:
+                        sl.session_state["import_results"] += '<li>Setting "' + \
+                            str(key) + \
+                            '" received an invalid value: "' + \
+                            str(value) + \
+                            '." valid values are: ' + str(all_preset_keys) + \
+                            '. The setting has been reset to its default value of "None."</li>'
+                        sl.session_state[key] = "None"
+                    else:
+                        sl.session_state[key] = value
+                elif key == "seed":
+                    try:
+                        # Test if the value is a number
+                        int(value)
+                        # Ensure the value is an integer. Other falsy values will technically evaluate to 0 above.
+                        if not type(value) == int:
+                            raise ValueError
+                    except ValueError:
+                        sl.session_state["import_results"] += '<li>Setting "' + \
+                            str(key) + \
+                            '" was expecting a number and received a non-numeric value: "' + \
+                            str(value) \
+                            + '." The setting has been reset to its default value of ' + \
+                            str(1) + '.</li>'
+                        sl.session_state[key] = 1
+                        continue
+                    sl.session_state[key] = int(value)
                 else:
-                    sl.session_state[key] = value
-            from Home import update_active_flags
-            update_active_flags()
+                    # The key is a flag. We need to validate is has a correct value
+                    try:
+                        if str(all_flags_dict[key].inputtype).lower() == "boolean":
+                            if not type(value) == bool:
+                                sl.session_state["import_results"] += '<li>Flag "' + \
+                                    str(key) + \
+                                    '" was not expecting a value and received one: "' + str(value) + \
+                                    '." The flag has been turned off.</li>'
+                                sl.session_state[key] = False
+                            else:
+                                sl.session_state[key] = bool(value)
+                        elif str(all_flags_dict[key].inputtype).lower() == "combobox":
+                            if str(value) not in all_flags_dict[key].choices:
+                                if type(value) == bool:
+                                    sl.session_state["import_results"] += '<li>Flag "' + \
+                                        str(key) + \
+                                        '" was expecting a value and did not receive one. ' \
+                                        'The flag has been reset to its default value of "' + \
+                                        str(all_flags_dict[key].default_value) + \
+                                        '."</li>'
+                                    sl.session_state[key] = \
+                                        all_flags_dict[key].choices[all_flags_dict[key].default_index]
+                                else:
+                                    sl.session_state["import_results"] += '<li>Flag "' + \
+                                        str(key) + \
+                                        '" received an invalid value: "' + \
+                                        str(value) + \
+                                        '." valid values are: ' + str(all_flags_dict[key].choices) + \
+                                        '. The flag has been reset to its default value of "' + \
+                                        str(all_flags_dict[
+                                                key].default_value) + \
+                                        '."</li>'
+                                    sl.session_state[key] = \
+                                        all_flags_dict[key].choices[all_flags_dict[key].default_index]
+                            else:
+                                sl.session_state[key] = str(value)
+                        elif str(all_flags_dict[key].inputtype).lower() == "integer":
+                            try:
+                                # Test if the value is a number
+                                int(value)
+                                # Ensure the value is a float. Other falsy values will technically evaluate to 0 above.
+                                if not type(value) == int:
+                                    raise ValueError
+                            except ValueError:
+                                sl.session_state["import_results"] += '<li>Flag "' + \
+                                    str(key) + \
+                                    '" was expecting an integer and received a non-numeric value: "' + \
+                                    str(value) \
+                                    + '." The flag has been reset to its default value of ' + \
+                                    str(all_flags_dict[key].default_value) + \
+                                    '.</li>'
+                                sl.session_state[key] = int(all_flags_dict[key].default_value)
+                                continue
+                            if not all_flags_dict[key].minimum_value <= \
+                                    int(value) <= all_flags_dict[key].maximum_value:
+                                sl.session_state["import_results"] += '<li>Flag "' + \
+                                    str(key) + \
+                                    '" had a value outside of the acceptable range of ' + \
+                                    str(all_flags_dict[key].minimum_value) + '-' + \
+                                    str(all_flags_dict[key].maximum_value) + ': ' + \
+                                    str(value) + \
+                                    '. The flag has been reset to its default value of ' + \
+                                    str(all_flags_dict[key].default_value) + \
+                                    '.</li>'
+                                sl.session_state[key] = int(all_flags_dict[key].default_value)
+                            else:
+                                sl.session_state[key] = int(value)
+                        elif str(all_flags_dict[key].inputtype).lower() == "float2":
+                            try:
+                                # Test if the value is a number
+                                float(value)
+                                # Ensure the value is a float. Other falsy values will technically evaluate to 0 above.
+                                if not type(value) == float and not type(value) == int:
+                                    raise ValueError
+                            except ValueError:
+                                sl.session_state["import_results"] += '<li>Flag "' + \
+                                    str(key) + \
+                                    '" was expecting a decimal number and received a non-numeric value: "' + \
+                                    str(value) \
+                                    + '." The flag has been reset to its default value of ' + \
+                                    str(all_flags_dict[key].default_value) + \
+                                    '.</li>'
+                                sl.session_state[key] = float(all_flags_dict[key].default_value)
+                                continue
+                            if not all_flags_dict[key].minimum_value <= \
+                                    float(value) <= all_flags_dict[key].maximum_value:
+                                sl.session_state["import_results"] += '<li>Flag "' + \
+                                    str(key) + \
+                                    '" had a value outside of the acceptable range of ' + \
+                                    str(all_flags_dict[key].minimum_value) + '-' + \
+                                    str(all_flags_dict[key].maximum_value) + ': ' + \
+                                    str(value) + \
+                                    '. The flag has been reset to its default value of ' + \
+                                    str(all_flags_dict[key].default_value) + \
+                                    '.</li>'
+                                sl.session_state[key] = float(all_flags_dict[str(key)].default_value)
+                            else:
+                                sl.session_state[key] = float(value)
+                    except KeyError:
+                        print("Crimdahl forgot to check a key when validating the import: " + key)
+                        continue
 
 
 def main():
@@ -43,7 +235,7 @@ def main():
     )
     set_stylesheet()
     sl.title("Beyond Chaos: Web Edition")
-    sl.markdown('<p style="font-size: 14px; margin-top: -20px;font-family: Arial;">Version 0.1.2.10</p>',
+    sl.markdown('<p style="font-size: 14px; margin-top: -20px;font-family: Arial;">Version 0.2.0.0</p>',
                 unsafe_allow_html=True)
 
     if "initialized" not in sl.session_state.keys():
@@ -116,15 +308,32 @@ def main():
                 on_click=process_import
             )
 
-        if "valid_import" in sl.session_state.keys():
-            if sl.session_state["valid_import"]:
-                sl.markdown(
-                    ":green[Settings successfully imported.]"
-                )
+        if "import_results" in sl.session_state.keys():
+            if not sl.session_state["import_results"]:
+                if type(sl.session_state["import_results"]) == str:
+                    sl.markdown(
+                        '<div style="color: green; font-size: 14pt;">'
+                        '   Settings successfully imported.'
+                        '</div>',
+                        unsafe_allow_html=True
+                    )
+                elif type(sl.session_state["import_results"]) == bool:
+                    sl.markdown(
+                        '<div style="color:red; font-size: 14pt;">'
+                        '   The uploaded file had an invalid extension. '
+                        '   Settings files should have the extension ".json".'
+                        '</div>',
+                        unsafe_allow_html=True
+                    )
             else:
                 sl.markdown(
-                    ":red[The uploaded file had an invalid extension. " \
-                    "settings files should have the extension '.json'.]"
+                    '<div style="color: darkorange; font-size: 14pt;">'
+                    '   Settings successfully imported, with errors:'
+                    '</div>'
+                    '<ul>' +
+                    str(sl.session_state["import_results"]) +
+                    '</ul>',
+                    unsafe_allow_html=True
                 )
     except KeyError:
         initialize_states()
