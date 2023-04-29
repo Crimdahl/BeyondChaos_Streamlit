@@ -774,6 +774,21 @@ def main():
                         '<img class="social" src=' + img_to_html("images/ico_tiktok.png") + '>'
                     '</a>'
                 '</p>'
+                '<hr>'
+                                                                
+                '<p class="username"><b>RetrophoneTV</b>'
+                '</p>'
+                '<p>'
+                    '&emsp;'
+                    '<a href="https://www.twitch.tv/retrophiletv">'
+                        '<img class="social" src=' + img_to_html("images/ico_twitch.png") + '>'
+                    '</a>'
+                    '&emsp;'
+                    '<a href="https://discord.gg/5ce2YJFrye">'
+                        '<img class="social" src=' + img_to_html("images/ico_discord.png") + '>'
+                    '</a>'
+                    '&emsp;'
+                '</p>'
                 '<br>'
                 ,
                 unsafe_allow_html=True
@@ -790,6 +805,7 @@ def main():
                 "<ul>"
                 '<li>Some location changes in thescenarionottaken were accidentally being discarded, resulting '
                 'in softlocks when talking to certain NPCs. A fix has been applied.</li>'
+                '<li>Added RetrophileTV to community streamers.</li>'
                 "</ul><br>",
                 unsafe_allow_html=True
             )
