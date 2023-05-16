@@ -235,7 +235,7 @@ def main():
     )
     set_stylesheet()
     sl.title("Beyond Chaos: Web Edition")
-    sl.markdown('<p style="font-size: 14px; margin-top: -20px;font-family: Arial;">Version 0.2.0.0</p>',
+    sl.markdown('<p style="font-size: 14px; margin-top: -20px;font-family: Arial;">Version 0.2.0.1</p>',
                 unsafe_allow_html=True)
 
     if "initialized" not in sl.session_state.keys():

@@ -831,6 +831,18 @@ def main():
         # Populate the Changelog tab
         #
         with tabs[2].expander(
+                label='Version 0.2.0.1: Fixed gpboost code.',
+                expanded=False,
+
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>The gpboost code was broken due to a typo in the code.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
                 label='Version 0.2.0.0: Added validation to the Welcome and Flags screens.',
                 expanded=False,
 
