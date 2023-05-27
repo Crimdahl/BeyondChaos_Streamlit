@@ -5933,7 +5933,7 @@ def randomize(connection: Pipe = None, **kwargs) -> str:
                             pipe_print("The supplied value for the gp multiplier was not a positive number.")
             if not type(gp_boost_value) == bool:
                 for m in monsters:
-                    m.stats['gpboost'] = int(min(0xFFFF, float(gp_boost_value) * m.stats['gp']))
+                    m.stats['gp'] = int(min(0xFFFF, float(gp_boost_value) * m.stats['gp']))
                     m.write_stats(outfile_rom_buffer)
 
         if Options_.is_flag_active('naturalmagic') or Options_.is_flag_active('naturalstats'):
