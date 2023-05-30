@@ -4762,6 +4762,7 @@ def manage_cursed_encounters(formations: List[Formation], fsets: List[FormationS
                         281, 282, 283, 285, 286, 287,
                         297, 303, 400, 382, 402, 403,
                         404]  # event formation sets that can be shuffled with cursedencounters
+    bad_event_fsets = [58, 108, 128]  # Narshe Cave, Magitek Factory Escape, Collapsing House
     event_formations = set()
     salt_formations = set()
 
@@ -4773,9 +4774,12 @@ def manage_cursed_encounters(formations: List[Formation], fsets: List[FormationS
             salt_formations.add((formation.formid - 3))
             salt_formations.add((formation.formid - 4))
         for i, v in enumerate(formation.big_enemy_ids):
-            if formation.big_enemy_ids[i] in [273, 293, 299, 304, 306, 307, 313, 314, 315, 323, 355, 356, 357, 358, 362,
-                                              363, 364, 365, 369,
-                                              373]:  # don't do Zone Eater, Naughty, L.X Magic, Phunbaba, Guardian, Merchant, Officer
+            if formation.big_enemy_ids[i] in [273, 293, 295, 296, 297, 299, 304, 306, 307, 313, 314, 315, 323, 355, 356,
+                                              357, 358, 362,
+                                              363, 364, 365, 369, 373, 381, 408, 418, 471, 512, 513, 514,
+                                              515]:  # don't do Zone Eater, Naughty, L.X Magic,
+                # Phunbaba, Guardian, Merchant, Officer, Banquet encounters,
+                # Warring Triad, Atma, Tier 1, 2, 3, Final Kefka
                 event_formations.add(formation.formid)
                 salt_formations.add((formation.formid - 1))
                 salt_formations.add((formation.formid - 2))
@@ -4788,7 +4792,7 @@ def manage_cursed_encounters(formations: List[Formation], fsets: List[FormationS
     for fset in fsets:
         if Options_.is_flag_active("cursedencounters"):  # code that applies FC flag to allow 16 encounters in all zones
             if fset.setid < 252 or fset.setid in good_event_fsets:  # only do regular enemies, don't do sets that can risk Zone Eater or get event encounters
-                if fset.setid != 58:  # don't add Narshe Cave encounters to FC formation list, to keep Narshe Cave safe when using cursed encounters
+                if fset.setid not in bad_event_fsets:  # don't add Narshe Cave encounters to FC formation list, to keep Narshe Cave safe when using cursed encounters
                     if not [value for value in fset.formids if
                             value in event_formations]:
                         fset.sixteen_pack = True

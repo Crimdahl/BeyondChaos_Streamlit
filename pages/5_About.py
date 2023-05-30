@@ -831,6 +831,19 @@ def main():
         # Populate the Changelog tab
         #
         with tabs[2].expander(
+                label='Version 0.2.2.1: Tweaked cursedencounters.',
+                expanded=False,
+
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>The cursedencounters flag should now be safer and less volatile in Narshe Cave, Magitek'
+                ' Factory Escape, and Collapsing House.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
                 label='Version 0.2.2.0: Ported over espercutegf code.',
                 expanded=False,
 
