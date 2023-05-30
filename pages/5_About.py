@@ -831,6 +831,19 @@ def main():
         # Populate the Changelog tab
         #
         with tabs[2].expander(
+                label='Version 0.2.2.3: Added penultima flag.',
+                expanded=False,
+
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>The new penultima flag under the Characters tab allows you to completely ban the spell'
+                ' Ultima from being naturally learned, taught by Espers, or taught by items.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
                 label='Version 0.2.2.2: Added Guaranteed Hidon Drop.',
                 expanded=False,
 

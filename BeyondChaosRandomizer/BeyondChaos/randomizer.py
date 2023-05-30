@@ -1023,6 +1023,7 @@ def manage_commands_new(commands: Dict[str, CommandBlock]):
     # the first free block above
     freespaces.append(FreeBlock(0x28A70, 0x2A659))
 
+    allow_ultima = not Options_.is_flag_active("penultima")
     multibannedlist = [0x63, 0x58, 0x5B]
 
     def multibanned(spells: List[SpellBlock]) -> List[SpellBlock]:
@@ -1105,6 +1106,8 @@ def manage_commands_new(commands: Dict[str, CommandBlock]):
                         return False
                     if s.spellid in used:
                         return False
+                    if s.name == 'Ultima' and not allow_ultima:
+                        return False
                     return s.rank() <= power
 
                 valid_spells = list(filter(spell_is_valid, all_spells))
@@ -1169,6 +1172,9 @@ def manage_commands_new(commands: Dict[str, CommandBlock]):
                 c.set_retarget(outfile_rom_buffer)
                 valid_spells = [v for v in all_spells if
                                 v.spellid <= 0xED and v.valid]
+                if not allow_ultima:
+                    valid_spells = [v for v in valid_spells if v.name != 'Ultima']
+
                 if Options_.is_flag_active('desperation'):
                     for spell in all_spells:
                         if spell.name == "Sabre Soul":
@@ -1253,6 +1259,8 @@ def manage_commands_new(commands: Dict[str, CommandBlock]):
 
                 def spell_is_valid(s, p) -> bool:
                     if not s.valid:
+                        return False
+                    if s.name == 'Ultima' and not allow_ultima:
                         return False
                     # if multibanned(s.spellid):
                     #    return False
@@ -1598,6 +1606,8 @@ def manage_natural_magic():
             level = max(level, 1)
 
             newspell = spellids[index]
+            if Options_.is_flag_active('penultima') and get_spell(newspell).name == 'Ultima':
+                continue
             if newspell in used:
                 continue
             break
@@ -2463,6 +2473,7 @@ def manage_items(items: List[ItemBlock], changed_commands: Set[int] = None) -> L
     wild_breaks = Options_.is_flag_active('electricboogaloo')
     no_breaks = Options_.is_flag_active('nobreaks')
     unbreakable = Options_.is_flag_active('unbreakable')
+    allow_ultima = not Options_.is_flag_active('penultima')
 
     set_item_changed_commands(changed_commands)
     unhardcode_tintinabar(outfile_rom_buffer)
@@ -2473,7 +2484,7 @@ def manage_items(items: List[ItemBlock], changed_commands: Set[int] = None) -> L
 
     for i in items:
         i.mutate(always_break=always_break, crazy_prices=crazy_prices, extra_effects=extra_effects,
-                 wild_breaks=wild_breaks, no_breaks=no_breaks, unbreakable=unbreakable)
+                 wild_breaks=wild_breaks, no_breaks=no_breaks, unbreakable=unbreakable, allow_ultima=allow_ultima)
         i.unrestrict()
         i.write_stats(outfile_rom_buffer)
         if i.features['special2'] & 0x38 and i.is_relic:
@@ -2802,7 +2813,8 @@ def manage_espers(freespaces: List[FreeBlock], replacements: dict = None) -> Lis
     espers = get_espers(infile_rom_buffer)
     random.shuffle(espers)
     for e in espers:
-        e.generate_spells(tierless=Options_.is_flag_active('madworld'))
+        e.generate_spells(tierless=Options_.is_flag_active('madworld'),
+            allow_ultima=not Options_.is_flag_active('penultima'))
         e.generate_bonus()
 
     if replacements:
@@ -4806,7 +4818,7 @@ def manage_cursed_encounters(formations: List[Formation], fsets: List[FormationS
 
 def nerf_paladin_shield():
     paladin_shield = get_item(0x67)
-    paladin_shield.mutate_learning()
+    paladin_shield.mutate_learning(not Options_.is_flag_active('penultima'))
     paladin_shield.write_stats(outfile_rom_buffer)
 
 
