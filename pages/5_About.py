@@ -831,6 +831,19 @@ def main():
         # Populate the Changelog tab
         #
         with tabs[2].expander(
+                label='Version 0.2.2.2: Added Guaranteed Hidon Drop.',
+                expanded=False,
+
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>Ported over the change from BCEX 5.0 that guarantees a Magus Rod from Hidon when boss'
+                ' abilities are randomized.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
                 label='Version 0.2.2.1: Tweaked cursedencounters.',
                 expanded=False,
 

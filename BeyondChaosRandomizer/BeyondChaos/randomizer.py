@@ -2851,13 +2851,14 @@ def manage_espers(freespaces: List[FreeBlock], replacements: dict = None) -> Lis
     return freespaces
 
 
-def manage_treasure(monsters: List[MonsterBlock], shops=True, no_charm_drops=False, katnFlag=False):
+def manage_treasure(monsters: List[MonsterBlock], shops=True, no_charm_drops=False, katnFlag=False,
+        guarantee_hidon_drop=False):
     for mm in get_metamorphs():
         mm.mutate_items()
         mm.write_data(outfile_rom_buffer)
 
     for m in monsters:
-        m.mutate_items(katnFlag)
+        m.mutate_items(katnFlag, guarantee_hidon_drop)
         if no_charm_drops:
             charms = [222, 223]
             while any(x in m.items for x in charms):
@@ -5642,7 +5643,9 @@ def randomize(connection: Pipe = None, **kwargs) -> str:
 
             # do this after hidden formations
             katn = Options_.mode.name == 'katn'
-            manage_treasure(monsters, shops=True, no_charm_drops=katn, katnFlag=katn)
+            guarantee_hidon_drop = Options_.is_flag_active("random_enemy_stats")
+            manage_treasure(monsters, shops=True, no_charm_drops=katn, katnFlag=katn,
+                            guarantee_hidon_drop=guarantee_hidon_drop)
             if not Options_.is_flag_active('ancientcave'):
                 manage_chests()
                 mutate_event_items(outfile_rom_buffer, cutscene_skip=Options_.is_flag_active('notawaiter'),
