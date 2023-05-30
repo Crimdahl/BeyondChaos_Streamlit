@@ -5860,7 +5860,9 @@ def randomize(connection: Pipe = None, **kwargs) -> str:
         reseed()
 
         if has_music:
-            randomize_music(outfile_rom_buffer, Options_, opera=opera, form_music_overrides=form_music)
+            from BeyondChaosRandomizer.BeyondChaos.utils import custom_path
+            randomize_music(outfile_rom_buffer, Options_, playlist_path=custom_path, playlist_filename="songs.txt",
+                            opera=opera, form_music_overrides=form_music)
             log(get_music_spoiler(), section="music")
         reseed()
 
