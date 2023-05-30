@@ -2,18 +2,14 @@ import streamlit as sl
 from pages.util.util import initialize_states, DEFAULT_PRESETS
 
 try:
-    from BeyondChaosRandomizer.BeyondChaos.options import ALL_MODES, NORMAL_FLAGS, \
-        MAKEOVER_MODIFIER_FLAGS, get_makeover_groups
+    from BeyondChaosRandomizer.BeyondChaos.options import ALL_MODES, NORMAL_FLAGS, MAKEOVER_MODIFIER_FLAGS, Flag
 except ModuleNotFoundError:
     import sys
     sys.path.append("BeyondChaosRandomizer\\BeyondChaos")
-    from BeyondChaosRandomizer.BeyondChaos.options import ALL_MODES, NORMAL_FLAGS, \
-        MAKEOVER_MODIFIER_FLAGS, get_makeover_groups
+    from BeyondChaosRandomizer.BeyondChaos.options import ALL_MODES, NORMAL_FLAGS, MAKEOVER_MODIFIER_FLAGS, Flag
 
 flag_categories = []
-get_makeover_groups()
-SORTED_FLAGS = sorted(NORMAL_FLAGS + MAKEOVER_MODIFIER_FLAGS, key=lambda x: x.name)
-
+makeover_groups = []
 
 def set_stylesheet():
     # Streamlit doesn't currently allow the addition of HTML IDs or additional classes to elements.
@@ -63,6 +59,34 @@ def set_stylesheet():
         unsafe_allow_html=True
     )
 
+
+def get_makeover_groups():
+    added_makeover_groups = [str(flag.name).lower() for flag in MAKEOVER_MODIFIER_FLAGS]
+    for index, row in sl.session_state["sprite_replacements"].iterrows():
+        if row['Non-Unique Groups']:
+            for spritecategory in row['Non-Unique Groups'].split(","):
+                spritecategory = spritecategory.strip()
+                if spritecategory and str(spritecategory).lower() not in added_makeover_groups:
+                    added_makeover_groups.append(str(spritecategory).lower())
+                    makeover_groups.append(
+                        Flag(name=str(spritecategory).lower(),
+                             description="CUSTOM " + str(spritecategory).upper() + " FREQUENCY MODE",
+                             long_description="Adjust probability of selecting " + str(spritecategory).lower() +
+                                " sprites.",
+                             category="spriteCategories",
+                             inputtype="combobox",
+                             choices=("Normal", "No", "Hate", "Like", "Only"),
+                             default_value="Normal",
+                             default_index=0)
+                    )
+    for flag in makeover_groups:
+        if flag.name not in sl.session_state.keys():
+            sl.session_state[flag.name] = flag.default_value
+
+if "sprite_replacements_changed" in sl.session_state.keys() and sl.session_state["sprite_replacements_changed"]:
+    get_makeover_groups()
+    sl.session_state["sprite_replacements_changed"] = "False"
+SORTED_FLAGS = sorted(NORMAL_FLAGS + MAKEOVER_MODIFIER_FLAGS + makeover_groups, key=lambda x: x.name)
 
 def clear_selected_flags(clear_preset=False):
     for code in SORTED_FLAGS:
@@ -205,7 +229,7 @@ def main():
         flag_categories = {"Flags": 0, "Sprite": 0, "Sprite Categories": 0, "Aesthetic": 0,
                            "Battle": 0, "Field": 0, "Characters": 0, "Gamebreaking": 0, "Experimental": 0}
 
-        for flag in NORMAL_FLAGS + MAKEOVER_MODIFIER_FLAGS:
+        for flag in SORTED_FLAGS:
             for category in flag_categories:
                 if str(flag.category).lower() == category.lower().replace(" ", ""):
                     flag_categories[category] = flag_categories[category] + 1
@@ -351,7 +375,7 @@ def main():
                      on_change=apply_flagstring,
                      key="widget_flagstring",
                      disabled=True)
-    except KeyError:
+    except KeyError as e:
         initialize_states()
         sl.experimental_rerun()
 

@@ -1,6 +1,6 @@
 import streamlit as sl
 from json import loads
-from pages.util.util import initialize_states, DEFAULT_PRESETS
+from pages.util.util import initialize_states, DEFAULT_PRESETS, load_custom_sprite_replacements_from_csv
 
 
 def set_stylesheet():
@@ -45,8 +45,11 @@ def process_import():
             settings = loads(sl.session_state["imported_settings"].getvalue())
             for key, value in settings.items():
                 if key in ["female_names", "male_names",
-                           "moogle_names", "sprite_replacements"]:
-                    sl.session_state[key] = "\n".join(value).strip()
+                           "moogle_names"]:
+                    sl.session_state[key] = value
+                elif key == "sprite_replacements":
+                    sl.session_state["sprite_replacements"] = load_custom_sprite_replacements_from_csv(value)
+                    sl.session_state["sprite_replacements_changed"] = "True"
                 elif key == "batch":
                     try:
                         # Test if the value is a number
@@ -223,7 +226,8 @@ def process_import():
                             else:
                                 sl.session_state[key] = float(value)
                     except KeyError:
-                        print("Crimdahl forgot to check a key when validating the import: " + key)
+                        # Might be a custom spritecategory?
+                        sl.session_state[key] = value
                         continue
 
 
@@ -235,7 +239,7 @@ def main():
     )
     set_stylesheet()
     sl.title("Beyond Chaos: Web Edition")
-    sl.markdown('<p style="font-size: 14px; margin-top: -20px;font-family: Arial;">Version 0.2.0.1</p>',
+    sl.markdown('<p style="font-size: 14px; margin-top: -20px;font-family: Arial;">Version 0.2.1.0</p>',
                 unsafe_allow_html=True)
 
     if "initialized" not in sl.session_state.keys():

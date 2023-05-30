@@ -831,6 +831,19 @@ def main():
         # Populate the Changelog tab
         #
         with tabs[2].expander(
+                label='Version 0.2.1.0: Added character sprite category customization support.',
+                expanded=False,
+
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>Added an expander containing instructions and an experimental_data_editor object that allows a '
+                'user to customize sprite replacements using an interactive table.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
                 label='Version 0.2.0.1: Fixed gpboost code.',
                 expanded=False,
 

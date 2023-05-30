@@ -5,7 +5,7 @@ from time import time
 from io import BytesIO
 from multiprocessing import Process, Pipe
 from zipfile import ZipFile
-from pages.util.util import initialize_states
+from pages.util.util import initialize_states, convert_sprite_replacements_to_csv
 
 try:
     from BeyondChaosRandomizer.BeyondChaos.utils import WELL_KNOWN_ROM_HASHES
@@ -54,6 +54,7 @@ def lock_gui():
 
 
 def process_export():
+    from pandas import DataFrame
     skip_keys = [
         "FormSubmitter:Import Settings-Submit",
         "lock",
@@ -65,15 +66,21 @@ def process_export():
         "rom_file_name",
         "status",
         "flag_errors",
-        "import_results"
+        "import_results",
+        "sprite_replacements_changed",
+        "sprite_replacements_error"
     ]
     export_data = {}
     for key, value in sorted(sl.session_state.items()):
         if key not in skip_keys:
-            if isinstance(value, str) or isinstance(value, int) or isinstance(value, float):
+            if isinstance(value, str) or isinstance(value, int) or isinstance(value, float) or \
+                    isinstance(value, DataFrame):
                 if key in ["female_names", "male_names",
-                           "moogle_names", "sprite_replacements"]:
+                           "moogle_names"]:
                     export_data[key] = str(value).strip().split("\n")
+                if key == "sprite_replacements":
+                    export_data[key] = convert_sprite_replacements_to_csv(sl.session_state["sprite_replacements"])
+                    print("Sprite replacements exported.")
                 else:
                     export_data[key] = value
     return export_data
@@ -101,7 +108,8 @@ def generate_game():
                 "seed": bundle,
                 "moogle_names": sl.session_state["moogle_names"],
                 "male_names": sl.session_state["male_names"],
-                "female_names": sl.session_state["female_names"]
+                "female_names": sl.session_state["female_names"],
+                "sprite_replacements": convert_sprite_replacements_to_csv(sl.session_state["sprite_replacements"])
             }
             child = Process(
                 target=randomize,
@@ -171,7 +179,7 @@ def main():
 
         if sl.button(
             label="Export Settings as JSON",
-            disabled="lock" in sl.session_state.keys() and sl.session_state["lock"]
+            disabled=sl.session_state["lock"]
         ):
             export_data = process_export()
             if export_data and len(export_data) > 0:
@@ -180,7 +188,7 @@ def main():
                     data=dumps(export_data),
                     file_name="BeyondChaos_Settings_" + str(time()) + ".json",
                     mime="application/json",
-                    disabled="lock" in sl.session_state.keys() and sl.session_state["lock"]
+                    disabled=sl.session_state["lock"]
                 )
 
         sl.file_uploader(
@@ -217,7 +225,7 @@ def main():
                             min_value=0,
                             step=1,
                             key="seed",
-                            disabled="lock" in sl.session_state.keys() and sl.session_state["lock"])
+                            disabled=sl.session_state["lock"])
 
             sl.number_input(label="Number of randomized ROMs to create",
                             min_value=1,
@@ -225,22 +233,39 @@ def main():
                             step=1,
                             value=1,
                             key="batch",
-                            disabled="lock" in sl.session_state.keys() and sl.session_state["lock"])
+                            disabled=sl.session_state["lock"])
 
             sl.button(label="Generate!",
                       on_click=lock_gui,
-                      disabled=("lock" in sl.session_state.keys() and sl.session_state["lock"])
-                               or not (len(sl.session_state["selected_flags"]) > 0),
+                      disabled=sl.session_state["lock"]
+                               or len(sl.session_state["selected_flags"]) == 0
+                               or bool(sl.session_state["sprite_replacements_error"]),
                       key="generate_button")
+
+            if not len(sl.session_state["selected_flags"]) > 0 \
+                    or sl.session_state["sprite_replacements_error"]:
+                gen_error = "A game cannot yet be generated for the following reasons:<ul>"
+                if not len(sl.session_state["selected_flags"]) > 0:
+                    gen_error += "<li>No flags have been selected."
+                if sl.session_state["sprite_replacements_error"]:
+                    gen_error += "<li>There is an error in the sprite replacements table on the customization page. "
+                    gen_error += sl.session_state["sprite_replacements_error"]
+                gen_error += "</ul>"
+                sl.markdown(
+                    '<div style="color: red;">'
+                        + gen_error +
+                    '</div>',
+                    unsafe_allow_html=True
+                )
+
+
 
         if "status" in sl.session_state.keys():
             sl.session_state["status_control"] = sl.text(sl.session_state["status"])
         else:
             sl.session_state["status_control"] = sl.text("")
 
-        if "lock" not in sl.session_state.keys():
-            sl.session_state["lock"] = False
-        elif sl.session_state["lock"]:
+        if sl.session_state["lock"]:
             # Hide the file uploader. We cannot disable that without losing the file.
             sl.markdown(
                 '<style>'
@@ -276,7 +301,6 @@ def main():
                                             sl.session_state["input_rom_data"].name[
                                                 str(sl.session_state["input_rom_data"].name).rindex("."):
                                             ],
-                        #".smc",
                                             output_file["output_rom_data"].getvalue())
                         if output_file["output_spoiler_log"]:
                             output_zip.writestr(sl.session_state["rom_file_name"][:sl.session_state["rom_file_name"].
@@ -290,8 +314,9 @@ def main():
                                              "-" + str(first_output_seed) + ".zip",
                                    mime="application/zip",
                                    key="output_romfile",
-                                   disabled="lock" in sl.session_state.keys() and sl.session_state["lock"])
-    except KeyError:
+                                   disabled=sl.session_state["lock"]
+                                   )
+    except KeyError as e:
         initialize_states()
         sl.experimental_rerun()
 

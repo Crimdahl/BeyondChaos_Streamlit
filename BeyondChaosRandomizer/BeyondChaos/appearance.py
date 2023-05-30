@@ -27,9 +27,9 @@ class SpriteReplacement:
         self.size = 0x16A0 if riding is not None and riding.lower() == "true" else 0x1560
         self.uniqueids = [s.strip() for s in uniqueids.split('|')] if uniqueids else []
         self.groups = [s.strip() for s in groups.split('|')] if groups else []
-        if self.gender == "female":
+        if self.gender == "female" and "girls" not in self.groups:
             self.groups.append("girls")
-        if self.gender == "male":
+        if self.gender == "male" and "boys" not in self.groups:
             self.groups.append("boys")
         self.weight = 1.0
 
@@ -58,7 +58,11 @@ class SpriteReplacement:
         return False
 
 
-def get_sprite_replacements():
+def get_sprite_replacements(sprite_replacements=None):
+    if sprite_replacements:
+        return [SpriteReplacement(*line.strip().split(',')) for
+                                   line in sprite_replacements.split("\n")]
+
     global sprite_replacement_list
     if sprite_replacement_list:
         return sprite_replacement_list
@@ -386,7 +390,7 @@ def get_free_portrait_ids(swap_to, change_to, char_ids, char_portraits):
     return free_portrait_ids, merchant
 
 
-def get_sprite_swaps(char_ids, male, female, vswaps):
+def get_sprite_swaps(char_ids, male, female, vswaps, sprite_replacements=None):
     sprite_swap_mode = options.Options_.is_flag_active('makeover')
     wild = options.Options_.is_flag_active('partyparty')
     clone_mode = options.Options_.is_flag_active('cloneparty')
@@ -396,7 +400,7 @@ def get_sprite_swaps(char_ids, male, female, vswaps):
     if not sprite_swap_mode:
         return []
 
-    known_replacements = get_sprite_replacements()
+    known_replacements = get_sprite_replacements(sprite_replacements)
 
     # uniqueids for sprites pulled from rom
     vuids = {0: "terra", 1: "locke", 2: "cyan", 3: "shadow", 4: "edgar", 5: "sabin", 6: "celes", 7: "strago", 8: "relm",
@@ -512,7 +516,8 @@ def get_sprite_swaps(char_ids, male, female, vswaps):
     return swap_to
 
 
-def manage_character_appearance(fout, preserve_graphics=False, moogle_names=None, male_names=None, female_names=None):
+def manage_character_appearance(fout, preserve_graphics=False, moogle_names=None, male_names=None, female_names=None,
+        sprite_replacements=None):
     characters = get_characters()
     wild = options.Options_.is_flag_active('partyparty')
     sabin_mode = options.Options_.is_flag_active('suplexwrecks')
@@ -600,7 +605,7 @@ def manage_character_appearance(fout, preserve_graphics=False, moogle_names=None
 
     manage_character_names(fout, change_to, male, moogle_names, male_names, female_names)
 
-    swap_to = get_sprite_swaps(char_ids, male, female, change_to)
+    swap_to = get_sprite_swaps(char_ids, male, female, change_to, sprite_replacements)
 
     for c in characters:
         if c.id < 14:

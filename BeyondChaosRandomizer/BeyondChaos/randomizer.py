@@ -4084,7 +4084,6 @@ def manage_opening():
     def replace_credits_text(address: int, text: str, split=False):
         original = d.get_bytestring(address, 0x40)
         length = original.index(0)
-        # print_to_connection("Length of line: " + str(length) + ". Length of credit:  " + str(len(text)) + ".")
         original = original[:length]
         if 0xFE in original and not split:
             linebreak = original.index(0xFE)
@@ -4784,8 +4783,6 @@ def manage_cursed_encounters(formations: List[Formation], fsets: List[FormationS
 
     salt_formations = [id for id in salt_formations if id not in event_formations]
 
-    # print_to_connection("EVENT FORMATIONS: " + str(event_formations))
-    # print_to_connection("SALT FORMATIONS: " + str(salt_formations))
 
     for fset in fsets:
         if Options_.is_flag_active("cursedencounters"):  # code that applies FC flag to allow 16 encounters in all zones
@@ -5468,7 +5465,8 @@ def randomize(connection: Pipe = None, **kwargs) -> str:
                 preserve_graphics=preserve_graphics,
                 moogle_names=kwargs.get("moogle_names", None),
                 male_names=kwargs.get("male_names", None),
-                female_names=kwargs.get("female_names", None)
+                female_names=kwargs.get("female_names", None),
+                sprite_replacements=kwargs.get("sprite_replacements", None)
             )
             log(s, "aesthetics")
             show_original_names(outfile_rom_buffer)
