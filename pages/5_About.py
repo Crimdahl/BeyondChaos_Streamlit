@@ -831,6 +831,19 @@ def main():
         # Populate the Changelog tab
         #
         with tabs[2].expander(
+                label='Version 0.2.2.0: Ported over espercutegf code.',
+                expanded=False,
+
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>The experimental new espercutegf code allows your characters to randomly proc spells associated '
+                'with the character\'s equipped esper whenever attacking, using items, and other actions.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
                 label='Version 0.2.1.0: Added character sprite category customization support.',
                 expanded=False,
 

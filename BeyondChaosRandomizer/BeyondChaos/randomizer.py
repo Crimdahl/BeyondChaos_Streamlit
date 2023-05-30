@@ -35,6 +35,7 @@ from BeyondChaosRandomizer.BeyondChaos.itemrandomizer import (reset_equippable, 
                                                               reset_special_relics, reset_rage_blizzard,
                                                               reset_cursed_shield, unhardcode_tintinabar,
                                                               ItemBlock)
+from BeyondChaosRandomizer.BeyondChaos.bcg_junction import JunctionManager
 from BeyondChaosRandomizer.BeyondChaos.locationrandomizer import (get_locations, get_location, get_zones,
                                                                   get_npcs, randomize_forest, NPCBlock)
 from BeyondChaosRandomizer.BeyondChaos.menufeatures import (improve_item_display, improve_gogo_status_menu,
@@ -4981,6 +4982,10 @@ def diverge(outfile_rom_buffer: BytesIO):
         outfile_rom_buffer.seek(address)
         outfile_rom_buffer.write(data)
 
+def junction_esper_procs(outfile_rom_buffer):
+    jm = JunctionManager(outfile_rom_buffer, 'bcg_junction_manifest.json')
+    jm.add_junction(None, 'junction_esper_magic', 'whitelist')
+    jm.execute()
 
 def randomize(connection: Pipe = None, **kwargs) -> str:
     """
@@ -6033,6 +6038,9 @@ def randomize(connection: Pipe = None, **kwargs) -> str:
 
         if Options_.is_flag_active("sprint"):
             sprint_shoes_hint()
+
+        if Options_.is_flag_active('espercutegf'):
+            junction_esper_procs(outfile_rom_buffer)
 
         if Options_.mode.name == "katn":
             the_end_comes_beyond_katn()
