@@ -1187,9 +1187,11 @@ def main():
             "<p><b>Note: Changes listed on this tab are not guarantees nor promises.</b></p>"
             "<ul>"
             '<li><b>Randomization</b>: Alphabetical sorting of rages in the Rage menu.</li>'
-            '<li><b>Web Interface</b>: Filling out the Community tab on the About page.</li>'
+            '<li><b>Randomization</b>: Alphabetical sorting of rages in the battle Rage menu.</li>'
+            '<li><b>Randomization</b>: Item and rage locking</li>'
+            '<li><b>Randomization</b>: Expanded Esper junctioning codes.</li>'
             '<li><b>Web Interface</b>: The ability to customize additional aspects of randomization, including '
-            'coral names, dance names, move names, South Figaro passwords, and character sprite replacements.</li>'
+            'dance names and move names.</li>'
             '<li><b>Web Interface</b>: Add additional status messages during the randomization process '
             'detailing progress.</li>'
             '<li><b>Web Interface</b>: Add caching for base Remonsterate sprites so the sprites do not '
