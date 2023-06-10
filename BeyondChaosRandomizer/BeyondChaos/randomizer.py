@@ -5485,10 +5485,10 @@ def randomize(connection: Pipe = None, **kwargs) -> str:
             s = manage_character_appearance(
                 outfile_rom_buffer,
                 preserve_graphics=preserve_graphics,
-                moogle_names=kwargs.get("moogle_names", None),
-                male_names=kwargs.get("male_names", None),
-                female_names=kwargs.get("female_names", None),
-                sprite_replacements=kwargs.get("sprite_replacements", None)
+                moogle_names=kwargs.get("web_custom_moogle_names", None),
+                male_names=kwargs.get("web_custom_male_names", None),
+                female_names=kwargs.get("web_custom_female_names", None),
+                sprite_replacements=kwargs.get("web_custom_sprite_replacements", None)
             )
             log(s, "aesthetics")
             show_original_names(outfile_rom_buffer)
@@ -5869,7 +5869,7 @@ def randomize(connection: Pipe = None, **kwargs) -> str:
 
         has_music = Options_.is_any_flag_active(['johnnydmad', 'johnnyachaotic'])
         if has_music:
-            music_init()
+            music_init(playlist=kwargs.get("web_custom_playlist", None))
 
         if Options_.is_flag_active('alasdraco'):
             opera = manage_opera(outfile_rom_buffer, has_music)
@@ -5897,7 +5897,7 @@ def randomize(connection: Pipe = None, **kwargs) -> str:
         reseed()
 
         randomize_poem(outfile_rom_buffer)
-        randomize_passwords()
+        randomize_passwords(custom_web_passwords=kwargs.get("web_custom_passwords", None))
         reseed()
         namingway()
         if Options_.is_flag_active('thescenarionottaken'):
@@ -6039,7 +6039,7 @@ def randomize(connection: Pipe = None, **kwargs) -> str:
         if Options_.is_flag_active("cursepower"):
             change_cursed_shield_battles(outfile_rom_buffer, Options_.get_flag_value("cursepower"))
 
-        s = manage_coral(outfile_rom_buffer)
+        s = manage_coral(outfile_rom_buffer, kwargs.get("web_custom_coral_names", None))
         log(s, "aesthetics")
 
         # TODO Does not work currently - needs fixing to allow Lenophis' esper bonus patch to work correctly
@@ -6182,7 +6182,8 @@ def randomize(connection: Pipe = None, **kwargs) -> str:
             })
         return outfile_rom_path
     except Exception as e:
-        pipe_print(e)
+        import sys, traceback
+        pipe_print(traceback.format_exc())
 
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 import streamlit as sl
-from pages.util.util import initialize_states, validate_sprite_replacements
+from pages.util.util import initialize_states, validate_sprite_replacements, load_default_sprite_replacements_from_csv
 
 sprite_replacement_changes = []
 
@@ -33,6 +33,26 @@ def update_moogle_names():
     sl.session_state["moogle_names"] = sl.session_state["widget_moogle_names"]
 
 
+def update_songs():
+    sl.session_state["songs"] = sl.session_state["widget_songs"]
+
+
+def update_top_passwords():
+    sl.session_state["passwords_top"] = sl.session_state["widget_top_passwords"]
+
+
+def update_middle_passwords():
+    sl.session_state["passwords_middle"] = sl.session_state["widget_middle_passwords"]
+
+
+def update_bottom_passwords():
+    sl.session_state["passwords_bottom"] = sl.session_state["widget_bottom_passwords"]
+
+
+def update_coral_names():
+    sl.session_state["coral_names"] = sl.session_state["widget_coral_names"]
+
+
 def log_sprite_replacements_change():
     if sl.session_state["widget_sprite_replacements"]["edited_cells"]:
         sprite_replacement_changes.append(sl.session_state["widget_sprite_replacements"]["edited_cells"])
@@ -40,6 +60,7 @@ def log_sprite_replacements_change():
         sprite_replacement_changes.append(sl.session_state["widget_sprite_replacements"]["deleted_rows"])
     if sl.session_state["widget_sprite_replacements"]["added_rows"]:
         sprite_replacement_changes.append(sl.session_state["widget_sprite_replacements"]["added_rows"])
+
 
 def update_sprite_replacements():
     sl.session_state["sprite_replacements_changed"] = True
@@ -72,7 +93,7 @@ def main():
             sl.experimental_rerun()
 
         with sl.expander(label="Female Character Names", expanded=False):
-            sl.text("List of default names for female characters.\nAll characters can still be renamed on acquisition "
+            sl.text("List of names for female characters.\nAll characters can still be renamed on acquisition "
                     "and by using the Namingway NPC on the airship.")
             sl.text_area(
                 label="Female Character Names",
@@ -83,8 +104,35 @@ def main():
                 height=300
             )
 
+            num_female_names = len(sl.session_state["female_names"].split("\n"))
+            sl.markdown(
+                "<div>Total female names: " + str(num_female_names) + ".</div>",
+                unsafe_allow_html=True
+            )
+            if num_female_names < 15:
+                sl.session_state["female_names_error"] = "The randomizer requires at least 14 female names."
+            else:
+                sl.session_state["female_names_error"] = ""
+            if "female_names_error" in sl.session_state.keys() and sl.session_state[
+                    "female_names_error"]:
+                sl.markdown(
+                '<div style="color: red">'
+                    + sl.session_state["female_names_error"] +
+                '</div><br>',
+                unsafe_allow_html=True
+                )
+
+            if sl.button(
+                label="Restore Defaults",
+                key="widget_reset_female_names"
+            ):
+                from pages.util.util import load_female_character_names
+                load_female_character_names()
+                sl.experimental_rerun()
+
+
         with sl.expander(label="Male Character Names", expanded=False):
-            sl.text("List of default names for male characters.\nAll characters can still be renamed on acquisition "
+            sl.text("List of names for male characters.\nAll characters can still be renamed on acquisition "
                     "and by using the Namingway NPC on the airship.")
             sl.text_area(
                 label="Male Character Names",
@@ -95,8 +143,36 @@ def main():
                 height=300
             )
 
+            num_male_names = len(sl.session_state["male_names"].split("\n"))
+            sl.markdown(
+                "<div>Total male names: " + str(num_male_names) + ".</div>",
+                unsafe_allow_html=True
+            )
+            if num_male_names < 15:
+                sl.session_state["male_names_error"] = "The randomizer requires at least 14 male names."
+            else:
+                sl.session_state["male_names_error"] = ""
+
+            if "male_names_error" in sl.session_state.keys() and sl.session_state[
+                    "male_names_error"]:
+                sl.markdown(
+                '<div style="color: red">'
+                    + sl.session_state["male_names_error"] +
+                '</div><br>',
+                unsafe_allow_html=True
+                )
+
+            if sl.button(
+                label="Restore Defaults",
+                key="widget_reset_male_names"
+            ):
+                from pages.util.util import load_male_character_names
+                load_male_character_names()
+                sl.experimental_rerun()
+
+
         with sl.expander(label="Moogle Character Names", expanded=False):
-            sl.text("List of default names for non-human characters.\nAll characters can still be renamed on acquisition "
+            sl.text("List of names for non-human characters.\nAll characters can still be renamed on acquisition "
                     "and by using the Namingway NPC on the airship.")
             sl.text_area(
                 label="Moogle Character Names",
@@ -106,6 +182,86 @@ def main():
                 key="widget_moogle_names",
                 height=300
             )
+
+            num_moogle_names = len(sl.session_state["moogle_names"].split("\n"))
+            sl.markdown(
+                "<div>Total moogle names: " + str(num_moogle_names) + ".</div>",
+                unsafe_allow_html=True
+            )
+            if num_moogle_names == 0:
+                sl.session_state["moogle_names_error"] = "The randomizer requires at least 1 moogle name."
+            else:
+                sl.session_state["moogle_names_error"] = ""
+
+            if "moogle_names_error" in sl.session_state.keys() and sl.session_state[
+                    "moogle_names_error"]:
+                sl.markdown(
+                '<div style="color: red">'
+                    + sl.session_state["moogle_names_error"] +
+                '</div><br>',
+                unsafe_allow_html=True
+                )
+
+            if sl.button(
+                label="Restore Defaults",
+                key="widget_reset_moogle_names"
+            ):
+                from pages.util.util import load_moogle_character_names
+                load_moogle_character_names()
+                sl.experimental_rerun()
+
+
+        with sl.expander(label="South Figaro Passwords (Experimental)", expanded=False):
+            sl.text("List of passwords that can appear in Locke's scenario.")
+            sl.text_area(
+                label="Top Passwords",
+                # label_visibility='collapsed',
+                value=sl.session_state["passwords_top"],
+                on_change=update_top_passwords,
+                key="widget_passwords_top",
+                height=200
+            )
+            sl.text_area(
+                label="Middle Passwords",
+                # label_visibility='collapsed',
+                value=sl.session_state["passwords_middle"],
+                on_change=update_middle_passwords,
+                key="widget_passwords_middle",
+                height=200
+            )
+            sl.text_area(
+                label="Bottom Passwords",
+                # label_visibility='collapsed',
+                value=sl.session_state["passwords_bottom"],
+                on_change=update_bottom_passwords,
+                key="widget_passwords_bottom",
+                height=200
+            )
+            if sl.button(
+                label="Restore Defaults",
+                key="widget_reset_passwords"
+            ):
+                from pages.util.util import load_passwords
+                load_passwords()
+                sl.experimental_rerun()
+
+        with sl.expander(label="Coral Names (Experimental)", expanded=False):
+            sl.text("List of replacement names for the coral in Hidon's cave.")
+            sl.text_area(
+                label="Coral Names",
+                label_visibility='collapsed',
+                value=sl.session_state["coral_names"],
+                on_change=update_coral_names,
+                key="widget_coral_names",
+                height=300
+            )
+            if sl.button(
+                label="Restore Defaults",
+                key="widget_reset_coral_names"
+            ):
+                from pages.util.util import load_coral_names
+                load_coral_names()
+                sl.experimental_rerun()
 
         with sl.expander(
             label="Character Sprite Replacements (Experimental)",
@@ -136,7 +292,7 @@ def main():
                         '<li><b>Non-Unique Groups</b>: General group(s) that the custom sprite belongs to. Each'
                         ' group will have a flag under Sprite Categories on the Flags screen. The flags can be used'
                         ' to adjust the probability that sprites from specific groups will appear in your game.'
-                        ' Adding a new group to this column will automatically create a new flag.'
+                        ' <b>Adding a new group to this column will automatically create a new flag.</b>'
                     '</ul><br>'
                     'To delete a row, select the row by clicking the leftmost column and hit the delete key. '
                     'Multi-select rows with the Shift or Ctrl keys.<br>'
@@ -160,6 +316,14 @@ def main():
                 on_click=update_sprite_replacements
             )
 
+            if sl.button(
+                label="Restore Defaults",
+                key="widget_reset_sprite_replacements"
+            ):
+                from pages.util.util import load_default_sprite_replacements_from_csv
+                load_default_sprite_replacements_from_csv()
+                sl.experimental_rerun()
+
             if "sprite_replacements_error" in sl.session_state.keys() and sl.session_state[
                     "sprite_replacements_error"]:
                 sl.markdown(
@@ -168,6 +332,24 @@ def main():
                 '</div><br>',
                 unsafe_allow_html=True
                 )
+
+        with sl.expander(label="Music Playlist (Experimental)", expanded=False):
+            sl.text("List of songs used by the johnnydmad and johnnyachaotic flags.")
+            sl.text_area(
+                label="Music Playlist",
+                label_visibility='collapsed',
+                value=sl.session_state["songs"],
+                on_change=update_songs,
+                key="widget_songs",
+                height=300
+            )
+            if sl.button(
+                label="Restore Defaults",
+                key="widget_reset_playlist"
+            ):
+                from pages.util.util import load_song_playlist
+                load_song_playlist()
+                sl.experimental_rerun()
 
     except KeyError as e:
         initialize_states()

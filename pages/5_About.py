@@ -831,6 +831,23 @@ def main():
         # Populate the Changelog tab
         #
         with tabs[2].expander(
+                label='Version 0.2.3.0: Added Passwords and Playlist customizations.',
+                expanded=False,
+
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>Added the ability to customize South Figaro passwords.</li>'
+                '<li>Added the ability to customize Hidon Cave coral names.</li>'
+                '<li>Added the ability to customize the johnnydmad and johnnyachaotic playlist. Customizing the '
+                    'playlist is not straightforward.</li>'
+                '<li>Added "Restore Defaults" buttons for each customization.</li>'
+                '<li>Improved exception messages from generation.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
                 label='Version 0.2.2.3: Added penultima flag.',
                 expanded=False,
 

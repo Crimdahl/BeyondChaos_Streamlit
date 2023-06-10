@@ -51,19 +51,24 @@ TABLE_PATH = os.path.join(BASE_PATH, 'tables')
 DEFAULT_PLAYLIST_FILE = 'default.txt'
 LEGACY_LOADBRR_PATH = "../../samples/"
 
+custom_web_playlist = None
 
 # For LEGACY_LOADBRR_PATH, note that the filenames from tables/legacy.txt that
 #   are appended to this already contain the "legacy/" bit. Path is relative
 #   to LEGACY_MUSIC_PATH. OS-specific separators are handled later, '/' is
 #   fine here.
 
-def initialize(rng=pyrandom):
+def initialize(rng=pyrandom, playlist=None):
     global BASEPATH, SUBPATH
     global used_sample_ids, used_song_names, track_id_names, track_name_ids
     global windy_intro, SFXTRACKS, APPENDTRACKS, LONGTRACKS
     global tracklist_spoiler
     global instmap, legacy_instmap
     global random
+
+    if playlist:
+        global custom_web_playlist
+        custom_web_playlist = playlist
 
     BASEPATH = os.getcwd()
     SUBPATH = ""
@@ -298,17 +303,25 @@ def init_playlist(path=PLAYLIST_PATH, fn=DEFAULT_PLAYLIST_FILE):
     if fn is None:
         fn = DEFAULT_PLAYLIST_FILE
     playlist_parser = configparser.ConfigParser()
-    plfile = playlist_parser.read(fallback_path(os.path.join(path, fn)))
-    if not plfile:
-        plfile = playlist_parser.read(fallback_path(os.path.join(path, fn + ".txt")))
+
+    global custom_web_playlist
+    if custom_web_playlist:
+        print(str("A custom playlist has been received: " + str(custom_web_playlist)))
+        from io import StringIO
+        playlist_parser.read_file(StringIO(custom_web_playlist))
+    else:
+        plfile = playlist_parser.read(fallback_path(os.path.join(path, fn)))
         if not plfile:
-            print(f"Playlist file {fn} empty or not found, falling back to {DEFAULT_PLAYLIST_FILE}")
-            playlist_parser.read(fallback_path(os.path.join(PLAYLIST_PATH, DEFAULT_PLAYLIST_FILE)))
+            plfile = playlist_parser.read(fallback_path(os.path.join(path, fn + ".txt")))
+            if not plfile:
+                print(f"Playlist file {fn} empty or not found, falling back to {DEFAULT_PLAYLIST_FILE}")
+                playlist_parser.read(fallback_path(os.path.join(PLAYLIST_PATH, DEFAULT_PLAYLIST_FILE)))
+
     playlist_map = {}
     tierboss_pool = set()
     for section in playlist_parser:
         for k, v in playlist_parser[section].items():
-            if section == "tierboss":
+            if str(section).lower() == "tierboss":
                 tierboss_pool.update([s.strip() for s in v.split(',')])
             elif k in playlist_map:
                 playlist_map[k] += f", {v}"

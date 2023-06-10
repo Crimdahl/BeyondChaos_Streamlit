@@ -1,3 +1,5 @@
+import traceback
+
 import streamlit as sl
 from hashlib import md5
 from json import dumps
@@ -68,7 +70,11 @@ def process_export():
         "flag_errors",
         "import_results",
         "sprite_replacements_changed",
-        "sprite_replacements_error"
+        "sprite_replacements_error",
+        "female_names_error",
+        "male_names_error",
+        "moogle_names_error",
+        "generate_button"
     ]
     export_data = {}
     for key, value in sorted(sl.session_state.items()):
@@ -80,7 +86,6 @@ def process_export():
                     export_data[key] = str(value).strip().split("\n")
                 if key == "sprite_replacements":
                     export_data[key] = convert_sprite_replacements_to_csv(sl.session_state["sprite_replacements"])
-                    print("Sprite replacements exported.")
                 else:
                     export_data[key] = value
     return export_data
@@ -106,10 +111,15 @@ def generate_game():
                 "infile_rom_buffer": BytesIO(sl.session_state["input_rom_data"].getvalue()),
                 "outfile_rom_buffer": BytesIO(sl.session_state["input_rom_data"].getvalue()),
                 "seed": bundle,
-                "moogle_names": sl.session_state["moogle_names"],
-                "male_names": sl.session_state["male_names"],
-                "female_names": sl.session_state["female_names"],
-                "sprite_replacements": convert_sprite_replacements_to_csv(sl.session_state["sprite_replacements"])
+                "web_custom_moogle_names": sl.session_state["moogle_names"],
+                "web_custom_male_names": sl.session_state["male_names"],
+                "web_custom_female_names": sl.session_state["female_names"],
+                "web_custom_passwords": sl.session_state["top_passwords"] + "\n----------------\n"
+                                + sl.session_state["middle_passwords"] + "\n----------------\n"
+                                + sl.session_state["bottom_passwords"],
+                "web_custom_coral_names": sl.session_state["coral_names"],
+                "web_custom_playlist": sl.session_state["songs"],
+                "web_custom_sprite_replacements": convert_sprite_replacements_to_csv(sl.session_state["sprite_replacements"])
             }
             child = Process(
                 target=randomize,
@@ -134,6 +144,10 @@ def generate_game():
                     if item:
                         if isinstance(item, str):
                             # Status update
+                            if str(item).startswith("Traceback"):
+                                sl.session_state["status"] = item
+                                sl.session_state["status_control"].text(sl.session_state["status"])
+                                break
                             sl.session_state["status"] += "\n" + item
                             sl.session_state["status_control"].text(sl.session_state["status"])
                         elif isinstance(item, dict):
@@ -235,30 +249,40 @@ def main():
                             key="batch",
                             disabled=sl.session_state["lock"])
 
+            gen_error = ""
+            if not len(sl.session_state["selected_flags"]) > 0 \
+                    or sl.session_state["sprite_replacements_error"]\
+                    or ("female_names_error" in sl.session_state.keys() and sl.session_state["female_names_error"])\
+                    or ("male_names_error" in sl.session_state.keys() and sl.session_state["male_names_error"])\
+                    or ("moogle_names_error" in sl.session_state.keys() and sl.session_state["moogle_names_error"]):
+                gen_error = "A game cannot yet be generated for the following reasons:<ul>"
+                if "selected_flags" not in sl.session_state.keys() or not len(sl.session_state["selected_flags"]) > 0:
+                    gen_error += "<li>No flags have been selected.</li>"
+                if "female_names_error" in sl.session_state.keys() and sl.session_state["female_names_error"]:
+                    gen_error += "<li>The customization page requires additional female names.</li>"
+                if "male_names_error" in sl.session_state.keys() and sl.session_state["male_names_error"]:
+                    gen_error += "<li>The customization page requires additional male names.</li>"
+                if "moogle_names_error" in sl.session_state.keys() and sl.session_state["moogle_names_error"]:
+                    gen_error += "<li>The customization page requires additional moogle names.</li>"
+                if "sprite_replacements_error" in sl.session_state.keys() and sl.session_state["sprite_replacements_error"]:
+                    gen_error += "<li>There is an error in the sprite replacements table on the customization page. "
+                    gen_error += sl.session_state["sprite_replacements_error"]
+                    gen_error += "</li>"
+                gen_error += "</ul>"
+
             sl.button(label="Generate!",
                       on_click=lock_gui,
                       disabled=sl.session_state["lock"]
-                               or len(sl.session_state["selected_flags"]) == 0
-                               or bool(sl.session_state["sprite_replacements_error"]),
+                               or not gen_error == "",
                       key="generate_button")
 
-            if not len(sl.session_state["selected_flags"]) > 0 \
-                    or sl.session_state["sprite_replacements_error"]:
-                gen_error = "A game cannot yet be generated for the following reasons:<ul>"
-                if not len(sl.session_state["selected_flags"]) > 0:
-                    gen_error += "<li>No flags have been selected."
-                if sl.session_state["sprite_replacements_error"]:
-                    gen_error += "<li>There is an error in the sprite replacements table on the customization page. "
-                    gen_error += sl.session_state["sprite_replacements_error"]
-                gen_error += "</ul>"
+            if not gen_error == "":
                 sl.markdown(
                     '<div style="color: red;">'
                         + gen_error +
                     '</div>',
                     unsafe_allow_html=True
                 )
-
-
 
         if "status" in sl.session_state.keys():
             sl.session_state["status_control"] = sl.text(sl.session_state["status"])
@@ -317,6 +341,7 @@ def main():
                                    disabled=sl.session_state["lock"]
                                    )
     except KeyError as e:
+        raise e
         initialize_states()
         sl.experimental_rerun()
 

@@ -191,11 +191,14 @@ def sanitize_coral(names):
     return [name[:12] for name in names if name != ""]
 
 
-def manage_coral(fout):
+def manage_coral(fout, web_custom_coral_names=None):
     from BeyondChaosRandomizer.BeyondChaos.dialoguemanager import set_dialogue_var, load_patch_file
-    f = open_mei_fallback(CORAL_TABLE)
-    coralnames = sorted(set(sanitize_coral([line.strip() for line in f.readlines()])))
-    f.close()
+    if not web_custom_coral_names:
+        f = open_mei_fallback(CORAL_TABLE)
+        coralnames = sorted(set(sanitize_coral([line.strip() for line in f.readlines()])))
+        f.close()
+    else:
+        coralnames = sorted(set(sanitize_coral([line.strip() for line in web_custom_coral_names.split("\n")])))
 
     sprite_log = ""
 
@@ -310,9 +313,15 @@ def manage_character_names(fout, change_to, male, moogle_names=None, male_names=
                 choose_male = True
 
             if choose_male:
-                name = random.choice(malenames)
+                try:
+                    name = random.choice(malenames)
+                except IndexError:
+                    raise IndexError("There were not enough male names supplied. The game requires up to 14 names.")
             else:
-                name = random.choice(femalenames)
+                try:
+                    name = random.choice(femalenames)
+                except IndexError:
+                    raise IndexError("There were not enough female names supplied. The game requires up to 14 names.")
 
             if name in malenames:
                 malenames.remove(name)

@@ -48,6 +48,7 @@ def process_import():
                            "moogle_names"]:
                     sl.session_state[key] = value
                 elif key == "sprite_replacements":
+                    print("Importing sprite replacements.")
                     sl.session_state["sprite_replacements"] = load_custom_sprite_replacements_from_csv(value)
                     sl.session_state["sprite_replacements_changed"] = "True"
                 elif key == "batch":

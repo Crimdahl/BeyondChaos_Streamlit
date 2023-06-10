@@ -53,37 +53,79 @@ DEFAULT_PRESETS = ({
     ]
 })
 
-@sl.cache_data
+
 def load_female_character_names():
     names = ""
     with open(os.path.join(os.getcwd(),
                            "BeyondChaosRandomizer", "BeyondChaos", "custom", "femalenames.txt")) as namefile:
         for line in namefile:
             names += line
-    return names.strip()
+
+    sl.session_state["female_names"] = names.strip()
 
 
-@sl.cache_data
 def load_male_character_names():
     names = ""
     with open(os.path.join(os.getcwd(),
                            "BeyondChaosRandomizer", "BeyondChaos", "custom", "malenames.txt")) as namefile:
         for line in namefile:
             names += line
-    return names.strip()
+
+    sl.session_state["male_names"] = names.strip()
 
 
-@sl.cache_data
 def load_moogle_character_names():
     names = ""
     with open(os.path.join(os.getcwd(),
                            "BeyondChaosRandomizer", "BeyondChaos", "custom", "mooglenames.txt")) as namefile:
         for line in namefile:
             names += line
-    return names.strip()
+
+    sl.session_state["moogle_names"] = names.strip()
 
 
-@sl.cache_data
+def load_coral_names():
+    names = ""
+    with open(os.path.join(os.getcwd(),
+                           "BeyondChaosRandomizer", "BeyondChaos", "custom", "coralnames.txt")) as namefile:
+        for line in namefile:
+            names += line
+
+    sl.session_state["coral_names"] = names.strip()
+
+def load_song_playlist():
+    names = ""
+    with open(os.path.join(os.getcwd(),
+                           "BeyondChaosRandomizer", "BeyondChaos", "custom", "songs.txt")) as namefile:
+        for line in namefile:
+            names += line
+
+    sl.session_state["songs"] = names.strip()
+
+
+def load_passwords():
+    mode = 0
+    top_passwords = ""
+    middle_passwords = ""
+    bottom_passwords = ""
+    with open(os.path.join(os.getcwd(),
+                           "BeyondChaosRandomizer", "BeyondChaos", "custom", "passwords.txt")) as namefile:
+        for line in namefile:
+            if line.strip().startswith("--"):
+                mode += 1
+                continue
+            if mode == 0:
+                top_passwords += line
+            elif mode == 1:
+                middle_passwords += line
+            else:
+                bottom_passwords += line
+
+    sl.session_state["passwords_top"] = top_passwords.strip()
+    sl.session_state["passwords_middle"] = middle_passwords.strip()
+    sl.session_state["passwords_bottom"] = bottom_passwords.strip()
+
+
 def load_default_sprite_replacements_from_csv():
     from pandas import DataFrame
     from BeyondChaosRandomizer.BeyondChaos.appearance import SpriteReplacement
@@ -111,7 +153,7 @@ def load_default_sprite_replacements_from_csv():
         columns=SPRITEREPLACMENT_COLUMN_LABELS
     )
 
-    return sprite_dataframe
+    sl.session_state["sprite_replacements"] = sprite_dataframe
 
 
 def load_custom_sprite_replacements_from_csv(csv_data):
@@ -121,6 +163,7 @@ def load_custom_sprite_replacements_from_csv(csv_data):
     spritereplacements = [SpriteReplacement(*line.strip().split(',')) for line in csv_data.split("\n")]
 
     for replacement in spritereplacements:
+        print(str(replacement.file))
         sprite_data.append(
             {
                 "Filename": replacement.file if not replacement.file == "None" else None,
@@ -180,8 +223,9 @@ def convert_sprite_replacements_to_csv(data: DataFrame):
                 csv_output += str(value)
             if not key == "Non-Unique Groups":
                 csv_output += ","
-            elif index + 1 <= len(data.index) - 1:
+            else:
                 csv_output += "\n"
+    csv_output = csv_output.strip()
     return csv_output
 
 def initialize_states():
@@ -199,10 +243,13 @@ def initialize_states():
     sl.session_state["initialized"] = True
     sl.session_state["input_rom_data"] = None
     sl.session_state["output_files"] = None
-    sl.session_state["female_names"] = load_female_character_names()
-    sl.session_state["male_names"] = load_male_character_names()
-    sl.session_state["moogle_names"] = load_moogle_character_names()
-    sl.session_state["sprite_replacements"] = load_default_sprite_replacements_from_csv()
+    load_female_character_names()
+    load_male_character_names()
+    load_moogle_character_names()
+    load_song_playlist()
+    load_passwords()
+    load_default_sprite_replacements_from_csv()
+    load_coral_names()
     sl.session_state["sprite_replacements_error"] = None
     sl.session_state["batch"] = 1
     sl.session_state["seed"] = 0

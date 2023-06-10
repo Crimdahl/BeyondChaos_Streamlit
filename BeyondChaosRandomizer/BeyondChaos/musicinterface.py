@@ -25,8 +25,8 @@ BC_MUSIC_FREESPACE = ["53C5F-9FDFF", "310000-37FFFF", "410000-4FFFFF"]
 opera_log = ""
 
 
-def music_init():
-    johnnydmad_initialize(rng=random)
+def music_init(playlist=None):
+    johnnydmad_initialize(rng=random, playlist=playlist)
 
 
 def randomize_music(fout, Options_, playlist_path, playlist_filename, opera=None, form_music_overrides={}):
