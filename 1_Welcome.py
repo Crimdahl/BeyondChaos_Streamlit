@@ -242,7 +242,7 @@ def main():
         sl.title("Beyond Chaos: Web Edition (Dev)")
         sl.markdown(
             '<p style="font-size: 14px; margin-top: -20px;font-family: Arial;">'
-                'Version 0.2.2.3 '
+                'Version 0.3.0.0 '
                 '<span style="color:red;">'
                     'Dev Branch'
                 '</span>'
