@@ -353,7 +353,8 @@ def main():
 
     except KeyError as e:
         import os
-        sl.text(os.getcwd(e))
+        sl.text(os.getcwd())
+        sl.text(str(e))
         raise e
         initialize_states()
         sl.experimental_rerun()
