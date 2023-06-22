@@ -352,7 +352,7 @@ def main():
                 sl.experimental_rerun()
 
     except KeyError as e:
-
+        import os
         sl.text(os.getcwd(e))
         raise e
         initialize_states()
