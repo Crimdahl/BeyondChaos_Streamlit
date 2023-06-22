@@ -106,7 +106,7 @@ def main():
 
             num_female_names = len(sl.session_state["female_names"].split("\n"))
             sl.markdown(
-                "<div>Total female names: " + str(num_female_names) + ".</div>",
+                "<div>Total female names: " + str(num_female_names) + ".</div><br>",
                 unsafe_allow_html=True
             )
             if num_female_names < 15:
@@ -145,7 +145,7 @@ def main():
 
             num_male_names = len(sl.session_state["male_names"].split("\n"))
             sl.markdown(
-                "<div>Total male names: " + str(num_male_names) + ".</div>",
+                "<div>Total male names: " + str(num_male_names) + ".</div><br>",
                 unsafe_allow_html=True
             )
             if num_male_names < 15:
@@ -172,8 +172,16 @@ def main():
 
 
         with sl.expander(label="Moogle Character Names", expanded=False):
-            sl.text("List of names for non-human characters.\nAll characters can still be renamed on acquisition "
-                    "and by using the Namingway NPC on the airship.")
+            sl.markdown(
+                '<div>'
+                    'List of names for non-human characters.\nAll characters can still be renamed on acquisition '
+                    'and by using the Namingway NPC on the airship.'
+                '</div>'
+                '<div>'
+                    '<b>Note: Moogle names are only used if the "kupokupo" flag is on</b>'
+                '</div><br>',
+                unsafe_allow_html=True
+            )
             sl.text_area(
                 label="Moogle Character Names",
                 label_visibility='collapsed',
@@ -185,7 +193,7 @@ def main():
 
             num_moogle_names = len(sl.session_state["moogle_names"].split("\n"))
             sl.markdown(
-                "<div>Total moogle names: " + str(num_moogle_names) + ".</div>",
+                "<div>Total moogle names: " + str(num_moogle_names) + ".</div><br>",
                 unsafe_allow_html=True
             )
             if num_moogle_names == 0:
@@ -237,6 +245,15 @@ def main():
                 key="widget_passwords_bottom",
                 height=200
             )
+            num_passwords = len(
+                sl.session_state["passwords_top"].split("\n") +
+                sl.session_state["passwords_middle"].split("\n") +
+                sl.session_state["passwords_bottom"].split("\n")
+            )
+            sl.markdown(
+                "<div>Total passwords: " + str(num_passwords) + ".</div><br>",
+                unsafe_allow_html=True
+            )
             if sl.button(
                 label="Restore Defaults",
                 key="widget_reset_passwords"
@@ -254,6 +271,11 @@ def main():
                 on_change=update_coral_names,
                 key="widget_coral_names",
                 height=300
+            )
+            num_coral_names = len(sl.session_state["coral_names"].split("\n"))
+            sl.markdown(
+                "<div>Total coral names: " + str(num_coral_names) + ".</div><br>",
+                unsafe_allow_html=True
             )
             if sl.button(
                 label="Restore Defaults",
@@ -352,10 +374,6 @@ def main():
                 sl.experimental_rerun()
 
     except KeyError as e:
-        import os
-        sl.text(str(os.listdir(os.getcwd())))
-        sl.text(str(e))
-        raise e
         initialize_states()
         sl.experimental_rerun()
 
