@@ -233,15 +233,35 @@ def process_import():
 
 
 def main():
-    sl.set_page_config(
-        layout="wide",
-        page_icon="images/favicon.png",
-        page_title="Beyond Chaos Web"
-    )
+    if "branch" in sl.session_state.keys() and sl.session_state["branch"] == "dev":
+        sl.set_page_config(
+            layout="wide",
+            page_icon="images/favicon.png",
+            page_title="Beyond Chaos Web - Dev Version"
+        )
+        sl.title("Beyond Chaos: Web Edition (Dev)")
+        sl.markdown(
+            '<p style="font-size: 14px; margin-top: -20px;font-family: Arial;">'
+                'Version 0.2.2.3 '
+                '<span style="color:red;">'
+                    'Dev Branch'
+                '</span>'
+            '</p>',
+            unsafe_allow_html=True)
+    else:
+        sl.set_page_config(
+            layout="wide",
+            page_icon="images/favicon.png",
+            page_title="Beyond Chaos Web"
+        )
+        sl.title("Beyond Chaos: Web Edition")
+        sl.markdown(
+            '<p style="font-size: 14px; margin-top: -20px;font-family: Arial;">'
+                'Version 0.2.2.3'
+            '</p>',
+            unsafe_allow_html=True)
+
     set_stylesheet()
-    sl.title("Beyond Chaos: Web Edition")
-    sl.markdown('<p style="font-size: 14px; margin-top: -20px;font-family: Arial;">Version 0.2.2.3</p>',
-                unsafe_allow_html=True)
 
     if "initialized" not in sl.session_state.keys():
         initialize_states()
@@ -249,8 +269,12 @@ def main():
 
     try:
         sl.markdown(
-            "<p>Welcome to Beyond Chaos, a randomizer for Final Fantasy VI!</p>"
-            "<p>What does Beyond Chaos randomize? Let's start with what <i>isn't</i> randomized:</p>"
+            '<p>'
+                'Welcome to Beyond Chaos, a randomizer for Final Fantasy VI! '
+            '</p>'
+            "<p>"
+                "What does Beyond Chaos randomize? Let's start with what <i>isn't</i> randomized:"
+            "</p>"
             "<ul>"
             "<li>Boss locations.</li>"
             "<li>The storyline.</li>"

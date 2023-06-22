@@ -45,7 +45,7 @@ def write_flags(name, flags):
     try:
         config.add_section('Flags')    
     except Exception:
-        print("Config Section Flags already exists, skipping writing new section.")
+        pass
     
     config.set('Flags', name, flags)
     with open('config.ini', 'w') as f:
@@ -139,7 +139,7 @@ def check_custom():
             missing_files.append('/custom/opera/')
         # Put opera files here, if the opera files are required
 
-        #character_sprites_directory = Path(os.path.join(custom_directory, 'Sprites'))
+        #character_sprites_directory = Path(os.path.join(custom_directory, 'sprites'))
         #if not character_sprites_directory.is_dir():
         #    missing_files.append('/custom/Sprites/')
         # Put Sprite files here, if any are required
@@ -163,9 +163,9 @@ def check_player_sprites():
                 print("spritereplacements.txt is missing from the Custom directory. The SpriteReplacements category "
                       "and custom character sprite flags will be unavailable.")
 
-    character_sprites_directory = Path(os.path.join(custom_directory, 'Sprites'))
+    character_sprites_directory = Path(os.path.join(custom_directory, 'sprites'))
     if not character_sprites_directory.is_dir():
-       missing_files.append('/custom/Sprites/')
+       missing_files.append('/custom/sprites/')
 
     return missing_files
 

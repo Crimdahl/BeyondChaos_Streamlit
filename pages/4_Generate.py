@@ -74,7 +74,8 @@ def process_export():
         "female_names_error",
         "male_names_error",
         "moogle_names_error",
-        "generate_button"
+        "generate_button",
+        "branch"
     ]
     export_data = {}
     for key, value in sorted(sl.session_state.items()):
@@ -114,9 +115,9 @@ def generate_game():
                 "web_custom_moogle_names": sl.session_state["moogle_names"],
                 "web_custom_male_names": sl.session_state["male_names"],
                 "web_custom_female_names": sl.session_state["female_names"],
-                "web_custom_passwords": sl.session_state["top_passwords"] + "\n----------------\n"
-                                + sl.session_state["middle_passwords"] + "\n----------------\n"
-                                + sl.session_state["bottom_passwords"],
+                "web_custom_passwords": sl.session_state["passwords_top"] + "\n----------------\n"
+                                + sl.session_state["passwords_middle"] + "\n----------------\n"
+                                + sl.session_state["passwords_bottom"],
                 "web_custom_coral_names": sl.session_state["coral_names"],
                 "web_custom_playlist": sl.session_state["songs"],
                 "web_custom_sprite_replacements": convert_sprite_replacements_to_csv(sl.session_state["sprite_replacements"])

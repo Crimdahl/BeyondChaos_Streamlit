@@ -46,19 +46,18 @@ CUSTOM_MUSIC_PATH = os.path.join(BASE_PATH, 'custom')
 TIERBOSS_MUSIC_PATH = os.path.join(BASE_PATH, CUSTOM_MUSIC_PATH, 'dm')
 LEGACY_MUSIC_PATH = os.path.join(CUSTOM_MUSIC_PATH, 'legacy')
 STATIC_MUSIC_PATH = os.path.join(BASE_PATH, 'static_music')
-PLAYLIST_PATH = os.path.join(BASE_PATH, 'playlists')
 TABLE_PATH = os.path.join(BASE_PATH, 'tables')
-DEFAULT_PLAYLIST_FILE = 'default.txt'
 LEGACY_LOADBRR_PATH = "../../samples/"
-
-custom_web_playlist = None
+PLAYLIST_PATH = os.path.join(BASE_PATH, 'playlists')
+DEFAULT_PLAYLIST_FILE = 'default.txt'
+web_custom_playlist = None
 
 # For LEGACY_LOADBRR_PATH, note that the filenames from tables/legacy.txt that
 #   are appended to this already contain the "legacy/" bit. Path is relative
 #   to LEGACY_MUSIC_PATH. OS-specific separators are handled later, '/' is
 #   fine here.
 
-def initialize(rng=pyrandom, playlist=None):
+def initialize(rng=pyrandom, custom_playlist=None):
     global BASEPATH, SUBPATH
     global used_sample_ids, used_song_names, track_id_names, track_name_ids
     global windy_intro, SFXTRACKS, APPENDTRACKS, LONGTRACKS
@@ -66,9 +65,9 @@ def initialize(rng=pyrandom, playlist=None):
     global instmap, legacy_instmap
     global random
 
-    if playlist:
-        global custom_web_playlist
-        custom_web_playlist = playlist
+    if custom_playlist:
+        global web_custom_playlist
+        web_custom_playlist = custom_playlist
 
     BASEPATH = os.getcwd()
     SUBPATH = ""
@@ -304,11 +303,10 @@ def init_playlist(path=PLAYLIST_PATH, fn=DEFAULT_PLAYLIST_FILE):
         fn = DEFAULT_PLAYLIST_FILE
     playlist_parser = configparser.ConfigParser()
 
-    global custom_web_playlist
-    if custom_web_playlist:
-        print(str("A custom playlist has been received: " + str(custom_web_playlist)))
+    global web_custom_playlist
+    if web_custom_playlist:
         from io import StringIO
-        playlist_parser.read_file(StringIO(custom_web_playlist))
+        playlist_parser.read_file(StringIO(web_custom_playlist))
     else:
         plfile = playlist_parser.read(fallback_path(os.path.join(path, fn)))
         if not plfile:
@@ -919,8 +917,23 @@ def process_music(inrom, meta={}, f_chaos=False, f_battle=True, opera=None, even
 
         if attempts >= 1000:
             print(
-                "Music randomization failed after 1000 attempts. Your custom music configuration files and/or filters may be too restrictive.")
-            return inrom
+                f"Music randomization failed after 1000 attempts. Your custom music configuration files and/or filters may be too restrictive. falling back to {DEFAULT_PLAYLIST_FILE}")
+            global web_custom_playlist
+            web_custom_playlist = None
+            return process_music(
+                inrom=inrom,
+                meta=meta,
+                f_chaos=f_chaos,
+                f_battle=f_battle,
+                opera=opera,
+                eventmodes=eventmodes,
+                playlist_path=PLAYLIST_PATH,
+                playlist_filename=DEFAULT_PLAYLIST_FILE,
+                subpath=subpath,
+                freespace=freespace,
+                pool_test=pool_test,
+                ext_rng=ext_rng
+          )
         attempts += 1
 
         # -- process special cases (battle, opera, tierboss) wrt. choosing tracks

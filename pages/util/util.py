@@ -1,5 +1,6 @@
 import streamlit as sl
 import os
+from configparser import ConfigParser
 from pandas import DataFrame
 
 try:
@@ -220,7 +221,10 @@ def convert_sprite_replacements_to_csv(data: DataFrame):
             if key in ["Unique Groups", "Non-Unique Groups"]:
                 csv_output += "|".join([group.strip() for group in value.split(",")])
             else:
-                csv_output += str(value)
+                if str(value).lower() == "none":
+                    csv_output += ""
+                else:
+                    csv_output += str(value)
             if not key == "Non-Unique Groups":
                 csv_output += ","
             else:
@@ -229,6 +233,15 @@ def convert_sprite_replacements_to_csv(data: DataFrame):
     return csv_output
 
 def initialize_states():
+    config = ConfigParser()
+    config.read(os.path.join(os.getcwd(), "config.ini"))
+    sl.session_state["branch"] = "unknown"
+    if config:
+        if config.has_section("version"):
+            if config.has_option("version", "branch"):
+                sl.session_state["branch"] = config.get(section="version", option="branch")
+
+
     for flag in SORTED_FLAGS:
         if flag.inputtype == "boolean":
             sl.session_state[flag.name] = False

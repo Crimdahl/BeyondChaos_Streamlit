@@ -166,6 +166,11 @@ def apply_flag_preset(flagset=None):
                     sl.session_state[flag.name] = True
                 continue
 
+    if "KAN" in sl.session_state["preset"]:
+        sl.session_state["gamemode"] = "Katn"
+    else:
+        sl.session_state["gamemode"] = "Normal"
+
     update_active_flags()
 
 
@@ -283,7 +288,8 @@ def main():
                             try:
                                 tabs[i].number_input(label=flag.name + " - " + flag.long_description,
                                                      value=float(sl.session_state[flag.name]),
-                                                     min_value=0.00,
+                                                     min_value=float(flag.minimum_value),
+                                                     max_value=float(flag.maximum_value),
                                                      step=0.01,
                                                      key="widget_" + flag.name,
                                                      disabled=False,
@@ -292,7 +298,8 @@ def main():
                             except ValueError as ex:
                                 tabs[i].number_input(label=flag.name + " - " + flag.long_description,
                                                      value=float(flag.default_value),
-                                                     min_value=0.00,
+                                                     min_value=float(flag.minimum_value),
+                                                     max_value=float(flag.maximum_value),
                                                      step=0.01,
                                                      key="widget_" + flag.name,
                                                      disabled=False,
@@ -303,7 +310,8 @@ def main():
                             try:
                                 tabs[i].number_input(label=flag.name + " - " + flag.long_description,
                                                      value=int(sl.session_state[flag.name]),
-                                                     min_value=0,
+                                                     min_value=int(flag.minimum_value),
+                                                     max_value=int(flag.maximum_value),
                                                      step=1,
                                                      key="widget_" + flag.name,
                                                      disabled=False,
@@ -312,7 +320,8 @@ def main():
                             except ValueError as ex:
                                 tabs[i].number_input(label=flag.name + " - " + flag.long_description,
                                                      value=int(flag.default_value),
-                                                     min_value=0,
+                                                     min_value=int(flag.minimum_value),
+                                                     max_value=int(flag.maximum_value),
                                                      step=1,
                                                      key="widget_" + flag.name,
                                                      disabled=False,

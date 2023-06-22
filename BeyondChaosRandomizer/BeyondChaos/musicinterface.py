@@ -25,11 +25,11 @@ BC_MUSIC_FREESPACE = ["53C5F-9FDFF", "310000-37FFFF", "410000-4FFFFF"]
 opera_log = ""
 
 
-def music_init(playlist=None):
-    johnnydmad_initialize(rng=random, playlist=playlist)
+def music_init(web_custom_playlist=None):
+    johnnydmad_initialize(rng=random, custom_playlist=web_custom_playlist)
 
 
-def randomize_music(fout, Options_, playlist_path, playlist_filename, opera=None, form_music_overrides={}):
+def randomize_music(fout, Options_, playlist_path, playlist_filename, opera=None, form_music_overrides={}, ):
     events = ""
     if Options_.is_flag_active('christmas'):
         events += "W"
@@ -293,10 +293,10 @@ def manage_opera(fout, affect_music):
     except IOError:
         try:
             with open(os.path.join(pathlib.Path(__file__).parent.absolute(),
-                                   "custom", "Sprites", f"{merge[4]}"), "rb") as f:
+                                   "custom", "sprites", f"{merge[4]}"), "rb") as f:
                 sprite = f.read()
         except:
-            print(f"failed to open custom/opera/{merge[4]} or custom/Sprites/{merge[4]}")
+            print(f"failed to open custom/opera/{merge[4]} or custom/sprites/{merge[4]}")
             sprite = None
     if sprite:
         # print(f"merge {merge}, pose {pose}")
@@ -317,10 +317,10 @@ def manage_opera(fout, affect_music):
         except IOError:
             try:
                 with open(os.path.join(pathlib.Path(__file__).parent.absolute(), "custom",
-                                       "Sprites", f"{c.sprite}.bin"), "rb") as f:
+                                       "sprites", f"{c.sprite}.bin"), "rb") as f:
                     sprite = f.read()
             except:
-                print(f"failed to open custom/opera/{c.sprite}.bin or custom/Sprites/{c.sprite}.bin")
+                print(f"failed to open custom/opera/{c.sprite}.bin or custom/sprites/{c.sprite}.bin")
                 continue
         offset, extra_tiles = char_offsets[cname]
         # tiles = list(range(0x28)) + extra_tiles

@@ -38,15 +38,15 @@ def update_songs():
 
 
 def update_top_passwords():
-    sl.session_state["passwords_top"] = sl.session_state["widget_top_passwords"]
+    sl.session_state["passwords_top"] = sl.session_state["widget_passwords_top"]
 
 
 def update_middle_passwords():
-    sl.session_state["passwords_middle"] = sl.session_state["widget_middle_passwords"]
+    sl.session_state["passwords_middle"] = sl.session_state["widget_passwords_middle"]
 
 
 def update_bottom_passwords():
-    sl.session_state["passwords_bottom"] = sl.session_state["widget_bottom_passwords"]
+    sl.session_state["passwords_bottom"] = sl.session_state["widget_passwords_bottom"]
 
 
 def update_coral_names():

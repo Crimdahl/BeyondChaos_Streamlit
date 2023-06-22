@@ -1,5 +1,6 @@
 import dataclasses
 
+from io import BytesIO
 from BeyondChaosRandomizer.BeyondChaos.chestrandomizer import get_event_items
 from BeyondChaosRandomizer.BeyondChaos.character import get_character, get_characters
 from BeyondChaosRandomizer.BeyondChaos.dialoguemanager import get_dialogue, set_dialogue
@@ -69,7 +70,7 @@ def _dir_to_camera_moves(dir):
     return out
 
 
-def recruit_mog_insert(fout, recruit_info):
+def recruit_mog_insert(outfile_rom_buffer: BytesIO, recruit_info):
     maybe_name_location = 0x304000
     maybe_name_low = maybe_name_location & 0xFF
     maybe_name_mid = (maybe_name_location >> 8) & 0xFF
@@ -80,21 +81,21 @@ def recruit_mog_insert(fout, recruit_info):
     name_mid = (name_location >> 8) & 0xFF
     name_high = name_location >> 16
 
-    fout.seek(recruit_info.name_pointer)
-    extra_bytes = fout.read(recruit_info.num_name_bytes)
+    outfile_rom_buffer.seek(recruit_info.name_pointer)
+    extra_bytes = outfile_rom_buffer.read(recruit_info.num_name_bytes)
     level_average_bytes = bytes([0x77, 0x0A]) if recruit_info.special == zone_eater_recruit else bytes([])
     maybe_name_sub = Substitution()
     maybe_name_sub.set_location(maybe_name_location)
     maybe_name_sub.bytestring = bytes([
         0xC0, 0x9F, 0x02, name_low, name_mid, name_high - 0x0A,
     ]) + extra_bytes + level_average_bytes + bytes([0xFE])
-    maybe_name_sub.write(fout)
+    maybe_name_sub.write(outfile_rom_buffer)
 
     name_jump = Substitution()
     name_jump.set_location(recruit_info.name_pointer)
     name_jump.bytestring = bytes(
         [0xB2, maybe_name_low, maybe_name_mid, maybe_name_high - 0x0A] + [0xFD] * (recruit_info.num_name_bytes - 4))
-    name_jump.write(fout)
+    name_jump.write(outfile_rom_buffer)
 
     palette = get_character(0xA).palette
     name_sub = Substitution()
@@ -132,57 +133,57 @@ def recruit_mog_insert(fout, recruit_info):
         show_party = [0x41, 0x31]
 
     name_sub.bytestring = bytes([
-                                    0x40, 0x0A, 0x0A,  # assign mog properties to mog
-                                    0x3D, 0x0A,  # create mog
-                                    0x37, 0x0A, 0x0A,  # assign mog graphics to mog
-                                    0x43, 0x0A, palette,  # assign mog palette to mog
-                                    0xD4, 0xEA,  # Add Mog to shops/Gogo
-                                    0x45,  # refresh objects
-                                    0x92,  # pause for 30 frames
-                                    mog_npc, 0x82,  # begin queue for mog npc
-                                    0x1F, 0xFF,  # Do graphic action 1F, end
-                                    0x94,  # pause for 60 frames
-                                    mog_npc, 0x82,  # begin queue for mog npc
-                                    0xCE, 0xFF,  # Turn down for what?, end
-                                ] + hide_party + hide_npcs + [
-                                    0xB2, 0x0F, 0xD0, 0x00,  # Darken background
-                                ] + name_camera + [
-                                    0x4B, 0xE0, 0xC6,  # SLAM-dancing Moogle text
-                                    0x92,  # Pause for 30 frames
-                                    mog_npc, 0x82,  # begin queue for mog npc
-                                    0x1D, 0xFF,  # do graphical action 1D, end
-                                    0x94,  # pause for 60 frames
-                                    0x97,  # fade to black
-                                    0x5C,  # Pause until fade is complete
-                                    0x7F, 0x0A, 0x0A,  # change mog's name to mog
-                                    0x98, 0x0A,  # name change screen for mog
-                                ] + show_party + show_npcs + recruit_info.name_extra + [
-                                    0x45,  # refresh objects
-                                    0x96,  # unfade
-                                    0x5C,  # wait until unfade is complete
-                                ] + name_camera_reverse + [
-                                    0xB2, 0x15, 0xD0, 0x00,  # Lighten background
-                                    0x92,  # pause for 30 frames
-                                    0x3E, 0x0A,  # Delete object 0A
-                                    0x45,  # refresh objects
-                                ]) + extra_bytes + bytes([0xFE])
-    name_sub.write(fout)
+        0x40, 0x0A, 0x0A, # assign mog properties to mog
+        0x3D, 0x0A, # create mog
+        0x37, 0x0A, 0x0A, # assign mog graphics to mog
+        0x43, 0x0A, palette, # assign mog palette to mog
+        0xD4, 0xEA, # Add Mog to shops/Gogo
+        0x45, # refresh objects
+        0x92, # pause for 30 frames
+        mog_npc, 0x82, # begin queue for mog npc
+        0x1F, 0xFF, # Do graphic action 1F, end
+        0x94, # pause for 60 frames
+        mog_npc, 0x82, # begin queue for mog npc
+        0xCE, 0xFF, # Turn down for what?, end
+    ] + hide_party + hide_npcs + [
+        0xB2, 0x0F, 0xD0, 0x00, # Darken background
+    ] + name_camera + [
+        0x4B, 0xE0, 0xC6, # SLAM-dancing Moogle text
+        0x92, # Pause for 30 frames
+        mog_npc, 0x82, # begin queue for mog npc
+        0x1D, 0xFF, # do graphical action 1D, end
+        0x94, # pause for 60 frames
+        0x97, # fade to black
+        0x5C, # Pause until fade is complete
+        0x7F, 0x0A, 0x0A, # change mog's name to mog
+        0x98, 0x0A, # name change screen for mog
+    ] + show_party + show_npcs + recruit_info.name_extra + [
+        0x45, # refresh objects
+        0x96, # unfade
+        0x5C, # wait until unfade is complete
+    ] + name_camera_reverse + [
+        0xB2, 0x15, 0xD0, 0x00, # Lighten background
+        0x92, # pause for 30 frames
+        0x3E, 0x0A, # Delete object 0A
+        0x45, # refresh objects
+    ]) + extra_bytes + bytes([0xFE])
+    name_sub.write(outfile_rom_buffer)
 
 
-def recruit_umaro_insert(fout, recruit_info):
+def recruit_umaro_insert(outfile_rom_buffer: BytesIO, recruit_info):
     name_location = 0x304400
     name_low = name_location & 0xFF
     name_mid = (name_location >> 8) & 0xFF
     name_high = name_location >> 16
 
-    fout.seek(recruit_info.name_pointer)
-    extra_bytes = fout.read(recruit_info.num_name_bytes)
+    outfile_rom_buffer.seek(recruit_info.name_pointer)
+    extra_bytes = outfile_rom_buffer.read(recruit_info.num_name_bytes)
 
     name_jump = Substitution()
     name_jump.set_location(recruit_info.name_pointer)
     name_jump.bytestring = bytes(
         [0xB2, name_low, name_mid, name_high - 0x0A] + [0xFD] * (recruit_info.num_name_bytes - 4))
-    name_jump.write(fout)
+    name_jump.write(outfile_rom_buffer)
 
     palette = get_character(0xD).palette
     name_sub = Substitution()
@@ -203,62 +204,62 @@ def recruit_umaro_insert(fout, recruit_info):
         show_npcs += [0x41, 0x10 + npc]
 
     name_sub.bytestring = bytes([
-                                    0x40, 0x0D, 0x0D,  # assign umaro properties to umaro
-                                    0x3D, 0x0D,  # create umaro
-                                    0x37, 0x0D, 0x0D,  # assign umaro graphics to umaro
-                                    0x43, 0x0D, palette,  # assign umaro palette to umaro
-                                    0xD4, 0xED,  # Add umaro to shops/Gogo
-                                    0x45,  # refresh objects
-                                    0x92,  # pause for 30 frames
-                                    umaro_npc, 0x82,  # begin queue for umaro npc
-                                    0xCE, 0xFF,  # Turn down for what?, end
-                                    0x42, 0x31,  # Hide party
-                                    0x42, 0x32,  # Hide party
-                                    0x42, 0x33,  # Hide party
-                                    0x42, 0x34,  # Hide party
-                                ] + hide_npcs + [
-                                    0xB2, 0x0F, 0xD0, 0x00,  # Darken background
-                                ] + name_camera + [
-                                    0x4B, 0xF9, 0xC5,  # Admirer of bone-carvings text
-                                    0x92,  # Pause for 30 frames
-                                    umaro_npc, 0x82,  # begin queue for umaro npc
-                                    0x16, 0xFF,  # do graphical action 16, end
-                                    0x92,  # pause for 30 frames
-                                    0x97,  # fade to black
-                                    0x5C,  # Pause until fade is complete
-                                    0x7F, 0x0D, 0x0D,  # change umaro's name to umaro
-                                    0x98, 0x0D,  # name change screen for umaro
-                                    0x41, 0x31,  # show party
-                                    # 0x41, 0x32, # show party
-                                    # 0x41, 0x33, # show party
-                                    # 0x41, 0x34, # show party ##commented out to fix ghosting when recruiting Umaro in other locations than his cave
-                                ] + show_npcs + recruit_info.name_extra + [
-                                    0x45,  # refresh objects
-                                    0x96,  # unfade
-                                    0x5C,  # wait until unfade is complete
-                                ] + name_camera_reverse + [
-                                    0xB2, 0x15, 0xD0, 0x00,  # Lighten background
-                                    0x92,  # pause for 30 frames
-                                    0x3E, 0x0D,  # Delete object 0D
-                                    0x45,  # refresh objects
-                                ]) + extra_bytes + bytes([0xFE])
-    name_sub.write(fout)
+        0x40, 0x0D, 0x0D, # assign umaro properties to umaro
+        0x3D, 0x0D, # create umaro
+        0x37, 0x0D, 0x0D, # assign umaro graphics to umaro
+        0x43, 0x0D, palette, # assign umaro palette to umaro
+        0xD4, 0xED, # Add umaro to shops/Gogo
+        0x45, # refresh objects
+        0x92, # pause for 30 frames
+        umaro_npc, 0x82, # begin queue for umaro npc
+        0xCE, 0xFF, # Turn down for what?, end
+        0x42, 0x31, # Hide party
+        0x42, 0x32, # Hide party
+        0x42, 0x33, # Hide party
+        0x42, 0x34, # Hide party
+    ] + hide_npcs + [
+        0xB2, 0x0F, 0xD0, 0x00, # Darken background
+    ] + name_camera + [
+        0x4B, 0xF9, 0xC5, # Admirer of bone-carvings text
+        0x92, # Pause for 30 frames
+        umaro_npc, 0x82, # begin queue for umaro npc
+        0x16, 0xFF, # do graphical action 16, end
+        0x92, # pause for 30 frames
+        0x97, # fade to black
+        0x5C, # Pause until fade is complete
+        0x7F, 0x0D, 0x0D, # change umaro's name to umaro
+        0x98, 0x0D, # name change screen for umaro
+        0x41, 0x31, # show party
+        #0x41, 0x32, # show party
+        #0x41, 0x33, # show party
+        #0x41, 0x34, # show party ##commented out to fix ghosting when recruiting Umaro in other locations than his cave
+    ] + show_npcs + recruit_info.name_extra + [
+        0x45, # refresh objects
+        0x96, # unfade
+        0x5C, # wait until unfade is complete
+    ] + name_camera_reverse + [
+        0xB2, 0x15, 0xD0, 0x00, # Lighten background
+        0x92, # pause for 30 frames
+        0x3E, 0x0D, # Delete object 0D
+        0x45, # refresh objects
+    ]) + extra_bytes + bytes([0xFE])
+    name_sub.write(outfile_rom_buffer)
 
 
-def recruit_gogo_insert(fout, recruit_info):
+def recruit_gogo_insert(outfile_rom_buffer: BytesIO, recruit_info):
     name_location = 0x304800
     name_low = name_location & 0xFF
     name_mid = (name_location >> 8) & 0xFF
     name_high = name_location >> 16
 
-    fout.seek(recruit_info.name_pointer)
-    extra_bytes = fout.read(recruit_info.num_name_bytes)
+    outfile_rom_buffer.seek(recruit_info.name_pointer)
+    extra_bytes = outfile_rom_buffer.read(recruit_info.num_name_bytes)
 
     name_jump = Substitution()
     name_jump.set_location(recruit_info.name_pointer)
     name_jump.bytestring = bytes(
         [0xB2, name_low, name_mid, name_high - 0x0A] + [0xFD] * (recruit_info.num_name_bytes - 4))
-    name_jump.write(fout)
+    name_jump.write(outfile_rom_buffer)
 
     palette = get_character(0xD).palette
     name_sub = Substitution()
@@ -279,40 +280,40 @@ def recruit_gogo_insert(fout, recruit_info):
         show_npcs += [0x41, 0x10 + npc]
 
     name_sub.bytestring = bytes([
-                                    gogo_npc, 0x82,  # begin queue for gogo npc
-                                    0xCE, 0xFF,  # Turn down for what?, end
-                                    0x42, 0x31,  # Hide party
-                                    0x42, 0x32,  # Hide party
-                                    0x42, 0x33,  # Hide party
-                                    0x42, 0x34,  # Hide party
-                                ] + hide_npcs + [
-                                    0xB2, 0x0F, 0xD0, 0x00,  # Darken background
-                                ] + name_camera + [
-                                    0x4B, 0x0D, 0xCA,  # Shrouded in odd clothing text
-                                    0x92,  # Pause for 30 frames
-                                    0x40, 0x0C, 0x0C,  # assign gogo properties to gogo
-                                    0x3D, 0x0C,  # create gogo
-                                    0x37, 0x0C, 0x0C,  # assign gogo graphics to gogo
-                                    0x43, 0x0C, palette,  # assign gogo palette to gogo
-                                    0xD4, 0xEC,  # Add gogo to shops/Gogo
-                                    0x7F, 0x0C, 0x0C,  # change gogo's name to gogo
-                                    0x98, 0x0C,  # name change screen for gogo
-                                    0x50, 0xBC,  # tint screen
-                                    0x59, 0x10,  # unfade screen at speed $10
-                                    0x92,  # pause for 30 frames
-                                    0xB2, 0x15, 0xD0, 0x00,  # Lighten background
-                                    0x41, 0x31,  # show party
-                                    0x41, 0x32,  # show party
-                                    0x41, 0x33,  # show party
-                                    0x41, 0x34,  # show party
-                                ] + show_npcs + recruit_info.name_extra + [
-                                    0x45,  # refresh objects
-                                ] + name_camera_reverse + [
-                                    0x93,  # pause for 45 frames
-                                    0x3E, 0x0C,  # Delete object 0C
-                                    0x45,  # refresh objects
-                                ]) + extra_bytes + bytes([0xFE])
-    name_sub.write(fout)
+        gogo_npc, 0x82, # begin queue for gogo npc
+        0xCE, 0xFF, # Turn down for what?, end
+        0x42, 0x31, # Hide party
+        0x42, 0x32, # Hide party
+        0x42, 0x33, # Hide party
+        0x42, 0x34, # Hide party
+    ] + hide_npcs + [
+        0xB2, 0x0F, 0xD0, 0x00, # Darken background
+    ] + name_camera + [
+        0x4B, 0x0D, 0xCA, # Shrouded in odd clothing text
+        0x92, # Pause for 30 frames
+        0x40, 0x0C, 0x0C, # assign gogo properties to gogo
+        0x3D, 0x0C, # create gogo
+        0x37, 0x0C, 0x0C, # assign gogo graphics to gogo
+        0x43, 0x0C, palette, # assign gogo palette to gogo
+        0xD4, 0xEC, # Add gogo to shops/Gogo
+        0x7F, 0x0C, 0x0C, # change gogo's name to gogo
+        0x98, 0x0C, # name change screen for gogo
+        0x50, 0xBC, # tint screen
+        0x59, 0x10, # unfade screen at speed $10
+        0x92, # pause for 30 frames
+        0xB2, 0x15, 0xD0, 0x00, # Lighten background
+        0x41, 0x31, # show party
+        0x41, 0x32, # show party
+        0x41, 0x33, # show party
+        0x41, 0x34, # show party
+    ] + show_npcs + recruit_info.name_extra + [
+        0x45, # refresh objects
+    ] + name_camera_reverse + [
+        0x93, # pause for 45 frames
+        0x3E, 0x0C, # Delete object 0C
+        0x45, # refresh objects
+    ]) + extra_bytes + bytes([0xFE])
+    name_sub.write(outfile_rom_buffer)
 
 
 class WoRRecruitInfo:
@@ -341,21 +342,21 @@ class WoRRecruitInfo:
         self.name_camera = name_camera
         self.name_show_full_party = name_show_full_party
 
-    def write_data(self, fout):
+    def write_data(self, outfile_rom_buffer: BytesIO):
         assert self.char_id is not None
         for event_pointer in self.event_pointers:
-            fout.seek(event_pointer)
-            fout.write(bytes([self.char_id]))
+            outfile_rom_buffer.seek(event_pointer)
+            outfile_rom_buffer.write(bytes([self.char_id]))
         for recruited_bit_pointer in self.recruited_bit_pointers:
-            fout.seek(recruited_bit_pointer)
-            fout.write(bytes([0xf0 + self.char_id]))
+            outfile_rom_buffer.seek(recruited_bit_pointer)
+            outfile_rom_buffer.write(bytes([0xf0 + self.char_id]))
         for shop_menu_bit_pointer in self.shop_menu_bit_pointers:
-            fout.seek(shop_menu_bit_pointer)
-            fout.write(bytes([0xe0 + self.char_id]))
+            outfile_rom_buffer.seek(shop_menu_bit_pointer)
+            outfile_rom_buffer.write(bytes([0xe0 + self.char_id]))
         palette = get_character(self.char_id).palette
         for palette_pointer in self.palette_pointers:
-            fout.seek(palette_pointer)
-            fout.write(bytes([palette]))
+            outfile_rom_buffer.seek(palette_pointer)
+            outfile_rom_buffer.write(bytes([palette]))
         for location_id, npc_id in self.location_npcs:
             location = get_location(location_id)
             npc = location.npcs[npc_id]
@@ -369,44 +370,42 @@ class WoRRecruitInfo:
             set_dialogue(index, text)
         if self.caseword_pointers:
             for location in self.caseword_pointers:
-                fout.seek(location)
-                byte = ord(fout.read(1))
-                fout.seek(location)
-                fout.write(bytes([byte & 0x0F | (self.char_id << 4)]))
+                outfile_rom_buffer.seek(location)
+                byte = ord(outfile_rom_buffer.read(1))
+                outfile_rom_buffer.seek(location)
+                outfile_rom_buffer.write(bytes([byte & 0x0F | (self.char_id << 4)]))
 
         if self.special:
-            self.special(fout, self.char_id)
+            self.special(outfile_rom_buffer, self.char_id)
 
         if self.char_id == 0xA and self.special != moogle_cave_recruit:
-            recruit_mog_insert(fout, self)
-        if self.char_id == 0xC and self.special not in [sasquatch_cave_recruit, moogle_cave_recruit,
-                                                        zone_eater_recruit]:
-            recruit_gogo_insert(fout, self)
-        if self.char_id == 0xD and self.special not in [sasquatch_cave_recruit, moogle_cave_recruit,
-                                                        zone_eater_recruit]:
-            recruit_umaro_insert(fout, self)
+            recruit_mog_insert(outfile_rom_buffer, self)
+        if self.char_id == 0xC and self.special not in [sasquatch_cave_recruit, moogle_cave_recruit, zone_eater_recruit]:
+            recruit_gogo_insert(outfile_rom_buffer, self)
+        if self.char_id == 0xD and self.special not in [sasquatch_cave_recruit, moogle_cave_recruit, zone_eater_recruit]:
+            recruit_umaro_insert(outfile_rom_buffer, self)
 
 
-def falcon_recruit(fout, char_id):
+def falcon_recruit(outfile_rom_buffer: BytesIO, char_id):
     falcon_recruit_sub = Substitution()
     falcon_recruit_sub.set_location(0xA4871)
     falcon_recruit_sub.bytestring = bytes([0xD4, 0xF0 + char_id])
-    falcon_recruit_sub.write(fout)
+    falcon_recruit_sub.write(outfile_rom_buffer)
 
     falcon_recruit_sub.set_location(0xA483F)
     falcon_recruit_sub.bytestring = bytes([0x97, 0x5C, 0x77, 0x00 + char_id])
-    falcon_recruit_sub.write(fout)
+    falcon_recruit_sub.write(outfile_rom_buffer)
 
-    # falcon_recruit_sub.set_location(0xA5324)
-    # falcon_recruit_sub.bytestring = bytes([0xD5, 0xFB])
-    # falcon_recruit_sub.write(fout)
+    #falcon_recruit_sub.set_location(0xA5324)
+    #falcon_recruit_sub.bytestring = bytes([0xD5, 0xFB])
+    #falcon_recruit_sub.write(outfile_rom_buffer)
 
-    # falcon_recruit_sub.set_location(0xA5310 + 2 * char_id - (2 if char_id > 6 else 0))
-    # falcon_recruit_sub.bytestring = bytes([0xD4, 0xF0 + char_id])
-    # falcon_recruit_sub.write(fout)
+    #falcon_recruit_sub.set_location(0xA5310 + 2 * char_id - (2 if char_id > 6 else 0))
+    #falcon_recruit_sub.bytestring = bytes([0xD4, 0xF0 + char_id])
+    #falcon_recruit_sub.write(outfile_rom_buffer)
 
 
-def moogle_cave_recruit(fout, char_id):
+def moogle_cave_recruit(outfile_rom_buffer: BytesIO, char_id):
     if char_id == 0x0A:
         return
 
@@ -416,39 +415,39 @@ def moogle_cave_recruit(fout, char_id):
         moogle_cave_recruit_sub = Substitution()
         moogle_cave_recruit_sub.set_location(0xC3975)
         moogle_cave_recruit_sub.bytestring = bytes([0x2F, 0x02])
-        moogle_cave_recruit_sub.write(fout)
+        moogle_cave_recruit_sub.write(outfile_rom_buffer)
 
         moogle_cave_recruit_sub.set_location(0xC3AA0)
         if char_id == 0x0C:
-            moogle_cave_recruit_sub.bytestring = bytes([0x4B, 0x0D, 0xCA])  # shrouded in odd clothing
+            moogle_cave_recruit_sub.bytestring = bytes([0x4B, 0x0D, 0xCA]) # shrouded in odd clothing
         else:
-            moogle_cave_recruit_sub.bytestring = bytes([0x4B, 0xF9, 0xC5])  # Admirer of bone-carvings text
-        moogle_cave_recruit_sub.write(fout)
+            moogle_cave_recruit_sub.bytestring = bytes([0x4B, 0xF9, 0xC5]) # Admirer of bone-carvings text
+        moogle_cave_recruit_sub.write(outfile_rom_buffer)
         return
 
     # Don't rename, stay in got-Mog-in-WoB part
     moogle_cave_recruit_sub = Substitution()
     moogle_cave_recruit_sub.set_location(0xC3974)
     moogle_cave_recruit_sub.bytestring = bytes([0xFD] * 7)
-    moogle_cave_recruit_sub.write(fout)
+    moogle_cave_recruit_sub.write(outfile_rom_buffer)
 
 
-def sasquatch_cave_recruit(fout, char_id):
+def sasquatch_cave_recruit(outfile_rom_buffer: BytesIO, char_id):
     assert char_id != 0x0A
 
     umaro_name = get_character(char_id).newname
     for umaro_id in [0x10f, 0x110]:
-        change_enemy_name(fout, umaro_id, umaro_name)
+        change_enemy_name(outfile_rom_buffer, umaro_id, umaro_name)
 
     if char_id == 0x0C:
         gogo_sub = Substitution()
         gogo_sub.set_location(0xCD811)
-        gogo_sub.bytestring = bytes([0x4B, 0x0D, 0xCA])  # shrouded in odd clothing
-        gogo_sub.write(fout)
+        gogo_sub.bytestring = bytes([0x4B, 0x0D, 0xCA]) # shrouded in odd clothing
+        gogo_sub.write(outfile_rom_buffer)
 
         gogo_sub.set_location(0xCD79A)
-        gogo_sub.bytestring = bytes([0x40, 0x0C, 0x0C])  # assign Gogo properties to Gogo
-        gogo_sub.write(fout)
+        gogo_sub.bytestring = bytes([0x40, 0x0C, 0x0C]) # assign Gogo properties to Gogo
+        gogo_sub.write(outfile_rom_buffer)
         return
 
     if char_id == 0x0D:
@@ -458,25 +457,25 @@ def sasquatch_cave_recruit(fout, char_id):
     # Level average character instead of setting Umaro's properties
     sasquatch_cave_recruit_sub.set_location(0xCD79A)
     sasquatch_cave_recruit_sub.bytestring = bytes([0x77, char_id, 0xFD])
-    sasquatch_cave_recruit_sub.write(fout)
+    sasquatch_cave_recruit_sub.write(outfile_rom_buffer)
 
     # Skip over rename
     sasquatch_cave_recruit_sub.set_location(0xCD7F5)
     sasquatch_cave_recruit_sub.bytestring = bytes([
 
-        0xC0, 0x27, 0x01, 0x40, 0xD8, 0x02  # jump
+        0xC0, 0x27, 0x01, 0x40, 0xD8, 0x02 # jump
     ])
-    sasquatch_cave_recruit_sub.write(fout)
+    sasquatch_cave_recruit_sub.write(outfile_rom_buffer)
 
 
-def zone_eater_recruit(fout, char_id):
+def zone_eater_recruit(outfile_rom_buffer: BytesIO, char_id):
     if char_id == 0x0C:
         return
 
     if char_id == 0x0D:
         umaro_sub = Substitution()
         umaro_sub.set_location(0xB81D6)
-        umaro_sub.bytestring = bytes([0x4B, 0xF9, 0xC5])  # Admirer of bone-carvings text
+        umaro_sub.bytestring = bytes([0x4B, 0xF9, 0xC5]) # Admirer of bone-carvings text
         return
 
     prefix = [0xFD] * 4 if char_id == 0x0A else [0x77, char_id]
@@ -485,62 +484,62 @@ def zone_eater_recruit(fout, char_id):
     zone_eater_recruit_sub = Substitution()
     zone_eater_recruit_sub.set_location(0xB81CF)
     zone_eater_recruit_sub.bytestring = bytes(prefix + [0x3D, char_id, 0xC0, 0x27, 0x01, 0x00, 0x82, 0x01])
-    zone_eater_recruit_sub.write(fout)
+    zone_eater_recruit_sub.write(outfile_rom_buffer)
 
 
 def collapsing_house_recruit(unused_fout, unused_char_id):
     pass
 
 
-def manage_wor_recruitment(fout, shuffle_wor, random_treasure, include_gau, alternate_gogo):
+def manage_wor_recruitment(outfile_rom_buffer: BytesIO, shuffle_wor, random_treasure, include_gau, alternate_gogo):
     if alternate_gogo:
-        _setup_alternate_zone_eater(fout, include_gau)
+        _setup_alternate_zone_eater(outfile_rom_buffer, include_gau)
 
         # Change Gogo's textbox if you don't have the right character
         gogo_text_sub = Substitution()
         gogo_text_sub.bytestring = bytes([0x4B, 0xE5, 0x00])
         gogo_text_sub.set_location(0xC33A6)
-        gogo_text_sub.write(fout)
+        gogo_text_sub.write(outfile_rom_buffer)
 
     if shuffle_wor:
-        wor_free_char, collapsing_house_char = _shuffle_recruit_locations(fout, random_treasure, include_gau,
-                                                                          alternate_gogo)
+        wor_free_char, collapsing_house_char = _shuffle_recruit_locations(outfile_rom_buffer, random_treasure,
+                                                                          include_gau, alternate_gogo)
     else:
         wor_free_char = 0x0B
         collapsing_house_char = 0x05
 
     if alternate_gogo:
-        _manage_gogo_recruitment(fout, collapsing_house_char)
+        _manage_gogo_recruitment(outfile_rom_buffer, collapsing_house_char)
 
-    _start_of_wor_event(fout, alternate_gogo)
+    _start_of_wor_event(outfile_rom_buffer, alternate_gogo)
 
     return wor_free_char
 
 
-def _start_of_wor_event(fout, alternate_gogo):
+def _start_of_wor_event(outfile_rom_buffer: BytesIO, alternate_gogo):
     new_events = [
         # Set names for Mog, Gogo, Umaro in case they appear in text
-        0x7F, 0x0C, 0x0C,  # Set name for GOGO
-        0x7F, 0x0D, 0x0D,  # Set name for UMARO
-        0xC0, 0x9F, 0x82, 0xB3, 0x5E, 0x00,  # If Mog recruited in WoB, jump to return
-        0x7F, 0x0A, 0x0A  # Set name for MOG
+        0x7F, 0x0C, 0x0C, # Set name for GOGO
+        0x7F, 0x0D, 0x0D, # Set name for UMARO
+        0xC0, 0x9F, 0x82, 0xB3, 0x5E, 0x00, # If Mog recruited in WoB, jump to return
+        0x7F, 0x0A, 0x0A # Set name for MOG
     ]
 
     if alternate_gogo:
-        new_events = [0xDA, 0x4B] + new_events  # Set Gogo NPC bit
+        new_events = [0xDA, 0x4B] + new_events # Set Gogo NPC bit
 
     # bits that get set at the start of the world of ruin
     wor_bits_sub = Substitution()
     wor_bits_sub.set_location(0x305280)
     wor_bits_sub.bytestring = [
-                                  # These bits are normally set in subroutine CB4B4B
-                                  # We could just call it as a subroutine, but we'll reuse the space later.
-                                  0xD9, 0xF2,
-                                  0xD8, 0x92,
-                              ] + new_events + [
-                                  0xFE,  # Return
-                              ]
-    wor_bits_sub.write(fout)
+        # These bits are normally set in subroutine CB4B4B
+        # We could just call it as a subroutine, but we'll reuse the space later.
+        0xD9, 0xF2,
+        0xD8, 0x92,
+    ] + new_events + [
+        0xFE, # Return
+    ]
+    wor_bits_sub.write(outfile_rom_buffer)
     next_event = wor_bits_sub.location + len(wor_bits_sub.bytestring)
 
     # call the new subroutine above in place of CB4B4B
@@ -550,10 +549,10 @@ def _start_of_wor_event(fout, alternate_gogo):
     wor_bits_sub2 = Substitution()
     wor_bits_sub2.set_location(0xA5334)
     wor_bits_sub2.bytestring = [0xB2, ptr_low, ptr_mid, ptr_high]
-    wor_bits_sub2.write(fout)
+    wor_bits_sub2.write(outfile_rom_buffer)
 
 
-def _shuffle_recruit_locations(fout, random_treasure, include_gau, alternate_gogo):
+def _shuffle_recruit_locations(outfile_rom_buffer: BytesIO, random_treasure, include_gau, alternate_gogo):
     candidates = [0x00, 0x01, 0x02, 0x05, 0x07, 0x08, 0x0A, 0x0D]
     locke_event_pointers = [0xc2c48, 0xc2c51, 0xc2c91, 0xc2c9d, 0xc2c9e, 0xc2caf, 0xc2cb8, 0xc2cc5, 0xc2cca, 0xc2cd8,
                             0xc2ce3, 0xc2ce9, 0xc2cee, 0xc2cf4, 0xc2cfa, 0xc2d0b, 0xc2d33, 0xc2e32, 0xc2e4a, 0xc2e80,
@@ -723,39 +722,39 @@ def _shuffle_recruit_locations(fout, random_treasure, include_gau, alternate_gog
         elif info.special == collapsing_house_recruit:
             collapsing_house_char = candidate
 
-        info.write_data(fout)
+        info.write_data(outfile_rom_buffer)
         get_character(candidate).wor_location = info.label
 
     return wor_free_char, collapsing_house_char
 
 
-def _manage_gogo_recruitment(fout, collapsing_house_char):
+def _manage_gogo_recruitment(outfile_rom_buffer: BytesIO, collapsing_house_char):
     character_specific_locations = {
-        0: {'map': 0xE2, 'x': 84, 'y': 17, 'facing': 0, 'move': True},  # Zozo tower top *Terra only*,
-        # 1: *Locke only*
-        2: {'map': 0x120, 'x': 56, 'y': 40, 'facing': 3},  # Maranda inn *Cyan only*,  No move
-        5: {'map': 0x80, 'x': 76, 'y': 31, 'facing': 1},  # Duncan's house *Sabin only*, No move
-        7: {'map': 0x158, 'x': 54, 'y': 18, 'facing': 0, 'move': True},  # Thamasa exterior *Strago only*,
-        8: {'map': 0x161, 'x': 27, 'y': 27, 'facing': 0, 'move': True},  # Cave in the Veldt *Relm only*
-        10: {'map': 0x83, 'x': 4, 'y': 11, 'facing': 3, 'move': True},  # Gau's dad's house *Gau only*,
-        # 11: # *Mog only*,
-        # 13: # *Umaro only*,
+        0: {'map': 0xE2, 'x': 84, 'y': 17, 'facing': 0, 'move': True}, # Zozo tower top *Terra only*,
+        #1: *Locke only*
+        2: {'map': 0x120, 'x': 56, 'y': 40, 'facing': 3}, # Maranda inn *Cyan only*,  No move
+        5: {'map': 0x80, 'x': 76, 'y': 31, 'facing': 1}, # Duncan's house *Sabin only*, No move
+        7: {'map': 0x158, 'x': 54, 'y': 18, 'facing': 0, 'move': True}, # Thamasa exterior *Strago only*,
+        8: {'map': 0x161, 'x': 27, 'y': 27, 'facing': 0, 'move': True}, # Cave in the Veldt *Relm only*
+        10: {'map': 0x83, 'x': 4, 'y': 11, 'facing': 3, 'move': True}, # Gau's dad's house *Gau only*,
+        #11: # *Mog only*,
+        #13: # *Umaro only*,
     }
 
     # Can't be used for collapsing_house_char
     pre_falcon_locations = [
-        {'map': 0x14A, 'x': 12, 'y': 24, 'facing': 1},  # Albrook pub No move
-        {'map': 0x4E, 'x': 72, 'y': 38, 'facing': 3},  # South Figaro pub, No move
-        {'map': 0x3C, 'x': 100, 'y': 16, 'facing': 0, 'move': True},  # Figaro castle library
+        {'map': 0x14A, 'x': 12, 'y': 24, 'facing': 1}, # Albrook pub No move
+        {'map': 0x4E, 'x': 72, 'y': 38, 'facing': 3}, # South Figaro pub, No move
+        {'map': 0x3C, 'x': 100, 'y': 16, 'facing': 0, 'move': True}, # Figaro castle library
     ]
 
     general_locations = [
-        {'map': 0x1C, 'x': 11, 'y': 39, 'facing': 2, 'move': True},  # Narshe inn
-        {'map': 0xCA, 'x': 51, 'y': 19, 'facing': 0, 'move': True},  # Jidoor relic shop
-        {'map': 0xEE, 'x': 99, 'y': 18, 'facing': 3, 'move': True},  # Opera house dressing room
+        {'map': 0x1C, 'x': 11, 'y': 39, 'facing': 2, 'move': True}, # Narshe inn
+        {'map': 0xCA, 'x': 51, 'y': 19, 'facing': 0, 'move': True}, # Jidoor relic shop
+        {'map': 0xEE, 'x': 99, 'y': 18, 'facing': 3, 'move': True}, # Opera house dressing room
     ]
 
-    candidates = list(set(range(0, 0xd)) - {0x3, 0x4, 0x6, 0x9, 0xc})  # Exclude mandatory chars, Shadow, and Gogo
+    candidates = list(set(range(0, 0xd)) - {0x3, 0x4, 0x6, 0x9, 0xc})    # Exclude mandatory chars, Shadow, and Gogo
     char_index = random.choice(candidates)
 
     location_candidates = [] + general_locations
@@ -773,20 +772,20 @@ def _manage_gogo_recruitment(fout, collapsing_house_char):
 
     gogo_npc.palette = get_character(char_index).palette
     gogo_npc.bg2_scroll = 0
-    gogo_npc.membit = 3  # Gogo
-    gogo_npc.memaddr = 0x49  # Gogo
+    gogo_npc.membit = 3 # Gogo
+    gogo_npc.memaddr = 0x49 # Gogo
     gogo_npc.event_addr = 0x2E5EF
     gogo_npc.x = location['x']
     gogo_npc.show_on_vehicle = 0
     gogo_npc.y = location['y']
-    gogo_npc.speed = 2  # Normal
+    gogo_npc.speed = 2 # Normal
     gogo_npc.graphics = char_index
-    gogo_npc.move_type = 0  # None
-    gogo_npc.sprite_priority = 0  # Normal
+    gogo_npc.move_type = 0 # None
+    gogo_npc.sprite_priority = 0 # Normal
     gogo_npc.vehicle = 0
     gogo_npc.facing = location['facing']
     gogo_npc.no_turn_when_speaking = 1
-    gogo_npc.layer_priority = 2  # Foreground
+    gogo_npc.layer_priority = 2 # Foreground
     gogo_npc.special_anim = 0
 
     show_npcs = []
@@ -802,317 +801,315 @@ def _manage_gogo_recruitment(fout, collapsing_house_char):
 
     if location.get('move', False):
         middle = [
-            0xC1,  # Slow
-            0x83,  # Move left 1
-            0xE0, 0x02,  # Pause for 4 * 2 (8) frames
-            0xCC,  # Turn up
-            0xE0, 0x02,  # Pause for 4 * 2 (8) frames
-            0xC3,  # Fast
-            0x85,  # Move right 2
-            0xCE,  # turn down
-            0xE0, 0x02,  # Pause for 4 * 2 (8) frames
-            0x20,  # front, head down,
-            0xE0, 0x02,  # Pause for 4 * 2 (8) frames
-            0x01,  # Front, standing
-            0xE0, 0x02,  # Pause for 4 * 2 (8) frames
-            0x20,  # front, head down,
-            0xE0, 0x02,  # Pause for 4 * 2 (8) frames
-            0xCD,  # turn right
-            0xE0, 0x0A,  # Pause for 4 * 10 (40) frames
-            0xC2,  # normal speed
-            0xC7,  # stay still while moving
-            0x46,  # walking, facing right
-            0x83,  # move left 1
-            0xE0, 0x02,  # Pause for 4 * 2 (8) frames
-            0x47,  # standing facing right
-            0xE0, 0x04,  # Pause for 4 * 4 (16) frames
-            0x48,  # walking, facing right 2
-            0x83,  # move left 1
-            0xE0, 0x02,  # Pause for 4 * 2 (8) frames
-            0x47,  # standing facing right
-            0xE0, 0x04,  # Pause for 4 * 4 (16) frames
-            0xDC,  # jump (low)
-            0x81,  # move right 1
-            0xE0, 0x02,  # Pause for 4 * 2 (8) frames
-            0xC6,  # walk while moving
-        ]
+            0xC1, # Slow
+            0x83, # Move left 1
+            0xE0, 0x02, # Pause for 4 * 2 (8) frames
+            0xCC, # Turn up
+            0xE0, 0x02, # Pause for 4 * 2 (8) frames
+            0xC3, # Fast
+            0x85, # Move right 2
+            0xCE, # turn down
+            0xE0, 0x02, # Pause for 4 * 2 (8) frames
+            0x20, # front, head down,
+            0xE0, 0x02, # Pause for 4 * 2 (8) frames
+            0x01, # Front, standing
+            0xE0, 0x02, # Pause for 4 * 2 (8) frames
+            0x20, # front, head down,
+            0xE0, 0x02, # Pause for 4 * 2 (8) frames
+            0xCD, # turn right
+            0xE0, 0x0A, # Pause for 4 * 10 (40) frames
+            0xC2, # normal speed
+            0xC7, # stay still while moving
+            0x46, # walking, facing right
+            0x83, # move left 1
+            0xE0, 0x02, # Pause for 4 * 2 (8) frames
+            0x47, # standing facing right
+            0xE0, 0x04, # Pause for 4 * 4 (16) frames
+            0x48, # walking, facing right 2
+            0x83, # move left 1
+            0xE0, 0x02, # Pause for 4 * 2 (8) frames
+            0x47, # standing facing right
+            0xE0, 0x04, # Pause for 4 * 4 (16) frames
+            0xDC, # jump (low)
+            0x81, # move right 1
+            0xE0, 0x02, # Pause for 4 * 2 (8) frames
+            0xC6, # walk while moving
+            ]
         middle2 = [
-            0xC1,  # Slow
-            0x83,  # Move left 1
-            0xE0, 0x02,  # Pause for 4 * 2 (8) frames
-            0xCE,  # Turn down
-            0xE0, 0x02,  # Pause for 4 * 2 (8) frames
-            0xC3,  # Fast
-            0x85,  # Move right 2
-            0xCC,  # turn up
-            0xE0, 0x02,  # Pause for 4 * 2 (8) frames
-            0x21,  # back, head down,
-            0xE0, 0x02,  # Pause for 4 * 2 (8) frames
-            0x04,  # back, standing
-            0xE0, 0x02,  # Pause for 4 * 2 (8) frames
-            0x21,  # back, head down,
-            0xE0, 0x02,  # Pause for 4 * 2 (8) frames
-            0xCD,  # turn right
-            0xE0, 0x0A,  # Pause for 4 * 10 (40) frames
-            0xC2,  # normal speed
-            0xC7,  # stay still while moving
-            0x46,  # walking, facing right
-            0x83,  # move left 1
-            0xE0, 0x02,  # Pause for 4 * 2 (8) frames
-            0x47,  # standing facing right
-            0xE0, 0x04,  # Pause for 4 * 4 (16) frames
-            0x48,  # walking, facing right 2
-            0x83,  # move left 1
-            0xE0, 0x02,  # Pause for 4 * 2 (8) frames
-            0x47,  # standing facing right
-            0xE0, 0x04,  # Pause for 4 * 4 (16) frames
-            0xDC,  # jump (low)
-            0x81,  # move right 1
-            0xE0, 0x02,  # Pause for 4 * 2 (8) frames
-            0xC6,  # walk while moving
-        ]
+            0xC1, # Slow
+            0x83, # Move left 1
+            0xE0, 0x02, # Pause for 4 * 2 (8) frames
+            0xCE, # Turn down
+            0xE0, 0x02, # Pause for 4 * 2 (8) frames
+            0xC3, # Fast
+            0x85, # Move right 2
+            0xCC, # turn up
+            0xE0, 0x02, # Pause for 4 * 2 (8) frames
+            0x21, # back, head down,
+            0xE0, 0x02, # Pause for 4 * 2 (8) frames
+            0x04, # back, standing
+            0xE0, 0x02, # Pause for 4 * 2 (8) frames
+            0x21, # back, head down,
+            0xE0, 0x02, # Pause for 4 * 2 (8) frames
+            0xCD, # turn right
+            0xE0, 0x0A, # Pause for 4 * 10 (40) frames
+            0xC2, # normal speed
+            0xC7, # stay still while moving
+            0x46, # walking, facing right
+            0x83, # move left 1
+            0xE0, 0x02, # Pause for 4 * 2 (8) frames
+            0x47, # standing facing right
+            0xE0, 0x04, # Pause for 4 * 4 (16) frames
+            0x48, # walking, facing right 2
+            0x83, # move left 1
+            0xE0, 0x02, # Pause for 4 * 2 (8) frames
+            0x47, # standing facing right
+            0xE0, 0x04, # Pause for 4 * 4 (16) frames
+            0xDC, # jump (low)
+            0x81, # move right 1
+            0xE0, 0x02, # Pause for 4 * 2 (8) frames
+            0xC6, # walk while moving
+            ]
 
     recruit_event = Substitution()
     recruit_event.set_location(0xCE5EF)
-    recruit_event.bytestring = [0xB2, 0x00, 0x50, 0x26, 0xFE]  # Call subroutine, return
-    recruit_event.write(fout)
+    recruit_event.bytestring = [0xB2, 0x00, 0x50, 0x26, 0xFE] # Call subroutine, return
+    recruit_event.write(outfile_rom_buffer)
 
     recruit_event = Substitution()
     recruit_event.set_location(0x305000)
     recruit_event.bytestring = [
-                                   0xDE,  # Load caseword with current party
-                                   0xC0, 0xA0 + char_index, 0x01, 0xA6, 0x33, 0x02,
-                                   # If target character is not in the party, jump to message blowing them off
-                                   0xB2, 0x8D, 0xCA, 0x00,  # move party to tile below gogo
-                                   0xB2, 0x34, 0x2E, 0x01,  # disable collision for party
-                                   0xB2, 0xAC, 0xC6, 0x00,  # Call subroutine CAC6AC
+        0xDE, # Load caseword with current party
+        0xC0, 0xA0 + char_index, 0x01, 0xA6, 0x33, 0x02, # If target character is not in the party, jump to message blowing them off
+        0xB2, 0x8D, 0xCA, 0x00, # move party to tile below gogo
+        0xB2, 0x34, 0x2E, 0x01, # disable collision for party
+        0xB2, 0xAC, 0xC6, 0x00, # Call subroutine CAC6AC
 
-                                   0x3C, char_index, 0xFF, 0xFF, 0xFF,  # Set up the party
-                                   0x45,  # Refresh objects
+        0x3C, char_index, 0xFF, 0xFF, 0xFF, # Set up the party
+        0x45, # Refresh objects
 
-                                   0x32, 0x04,
-                                   0xC2,  # Set vehicle/entity's event speed to normal
-                                   0xA1,  # move right/down 1x1
-                                   0xCC,  # turn up
-                                   0xFF,
+        0x32, 0x04,
+        0xC2,  # Set vehicle/entity's event speed to normal
+        0xA1,  # move right/down 1x1
+        0xCC,  # turn up
+        0xFF,
 
-                                   0x33, 0x04,
-                                   0xC2,  # Set vehicle/entity's event speed to normal
-                                   0xA2,  # move left/down 1x1
-                                   0xCC,  # turn up
-                                   0xFF,
+        0x33, 0x04,
+        0xC2,  # Set vehicle/entity's event speed to normal
+        0xA2,  # move left/down 1x1
+        0xCC,  # turn up
+        0xFF,
 
-                                   0x34, 0x04,
-                                   0xC2,  # Set vehicle/entity's event speed to normal
-                                   0x82,  # move down 1
-                                   0xCC,  # turn up
-                                   0xFF,
+        0x34, 0x04,
+        0xC2,  # Set vehicle/entity's event speed to normal
+        0x82,  # move down 1
+        0xCC,  # turn up
+        0xFF,
 
-                                   char_index, 0x84,
-                                   0xCC,
-                                   0xE0, 0x04,
-                                   0xFF,
+        char_index, 0x84,
+        0xCC,
+        0xE0, 0x04,
+        0xFF,
 
-                                   0x94,
+        0x94,
 
-                                   char_index, 0x8B,  # begin queue for party character 0,
-                                   0x13,  # blink
-                                   0xE0, 0x01,  # Pause for 4 * 1 (4) frames
-                                   0xCE,  # turn down
-                                   0xE0, 0x01,  # Pause for 4 * 1 (4) frames
-                                   0x13,  # blink
-                                   0xE0, 0x01,  # Pause for 4 * 1 (4) frames
-                                   0xCE,  # turn down
-                                   0xFF,  # end queue
+        char_index, 0x8B, # begin queue for party character 0,
+        0x13, # blink
+        0xE0, 0x01, # Pause for 4 * 1 (4) frames
+        0xCE, # turn down
+        0xE0, 0x01, # Pause for 4 * 1 (4) frames
+        0x13, # blink
+        0xE0, 0x01, # Pause for 4 * 1 (4) frames
+        0xCE, # turn down
+        0xFF, # end queue
 
-                                   0x91,  # Pause for 15 frames
+        0x91, # Pause for 15 frames
 
-                                         0x10 + gogo_npc.npcid, 0x8B,  # begin queue for gogo npc
-                                   0x13,  # blink
-                                   0xE0, 0x01,  # Pause for 4 * 1 (4) frames
-                                   0xCE,  # turn down
-                                   0xE0, 0x01,  # Pause for 4 * 1 (4) frames
-                                   0x13,  # blink
-                                   0xE0, 0x01,  # Pause for 4 * 1 (4) frames
-                                   0xCE,  # turn down
-                                   0xFF,  # end queue
+        0x10 + gogo_npc.npcid, 0x8B, # begin queue for gogo npc
+        0x13, # blink
+        0xE0, 0x01, # Pause for 4 * 1 (4) frames
+        0xCE, # turn down
+        0xE0, 0x01, # Pause for 4 * 1 (4) frames
+        0x13, # blink
+        0xE0, 0x01, # Pause for 4 * 1 (4) frames
+        0xCE, # turn down
+        0xFF, # end queue
 
-                                   0x94,  # Pause for 60 frames
+        0x94, # Pause for 60 frames
 
-                                   char_index, 0x44 + len(middle),  # begin queue for party character 0,
-                                   0x04,  # Facing up
-                                   0xE0, 0x04,  # Pause for 4 * 4 (16) frames
-                                   0x1B,  # Back, right arm raise
-                                   0xE0, 0x01,  # Pause for 4 * 1 (4) frames
-                                   0x1C,  # Back, right arm raise 2
-                                   0xE0, 0x01,  # Pause for 4 * 1 (4) frames
-                                   0x1B,  # Back, right arm raise
-                                   0xE0, 0x01,  # Pause for 4 * 1 (4) frames
-                                   0x1C,  # Back, right arm raise 2
-                                   0xE0, 0x01,  # Pause for 4 * 1 (4) frames
-                                   0x1B,  # Back, right arm raise
-                                   0xE0, 0x02,  # Pause for 4 * 2 (2) frames
-                                   0x04,  # Facing up
-                                   0xE0, 0x08,  # Pause for 4 * 8 (32) frames
-                                   0x5B,  # Back, left arm raise
-                                   0xE0, 0x01,  # Pause for 4 * 1 (4) frames
-                                   0x5C,  # Back, left arm raise 2
-                                   0xE0, 0x01,  # Pause for 4 * 1 (4) frames
-                                   0x5B,  # Back, left arm raise
-                                   0xE0, 0x01,  # Pause for 4 * 1 (4) frames
-                                   0x5C,  # Back, left arm raise 2
-                                   0xE0, 0x01,  # Pause for 4 * 1 (4) frames
-                                   0x5B,  # Back, left arm raise
-                                   0xE0, 0x02,  # Pause for 4 * 2 (2) frames
-                                   0x04,  # Facing up
-                                   0xE0, 0x10,  # Pause for 4 * 16 (64) frames
-                                   0x23,  # Front, head turned left
-                                   0xE0, 0x10,  # Pause for 4 * 16 (64) frames
-                               ] + middle + [
-                                   0x18,  # Mad/embarrassed
-                                   0xE0, 0x10,  # Pause for 4 * 16 (64) frames
-                                   0x0A,  # Attack pose
-                                   0xE0, 0x10,  # Pause for 4 * 16 (64) frames
-                                   0x17,  # back, arms raised
-                                   0xE0, 0x02,  # Pause for 4 * 2 (8) frames
-                                   0xDD,  # Jump (high)
-                                   0xE0, 0x08,  # Pause for 4 * 8 (32) frames
-                                   0x09,  # kneeling
-                                   0xE0, 0x10,  # Pause for 4 * 16 (64) frames
-                                   0x04,  # facing up
-                                   0xE0, 0x08,  # Pause for 4 * 8 (32) frames
-                                   0x04,  # facing up
-                                   0xE0, 0x01,  # Pause for 4 * 1 (4) frames
-                                   0x04,  # facing up
-                                   0xE0, 0x08,  # Pause for 4 * 8 (40) frames
+        char_index, 0x44 + len(middle), # begin queue for party character 0,
+        0x04, # Facing up
+        0xE0, 0x04, # Pause for 4 * 4 (16) frames
+        0x1B, # Back, right arm raise
+        0xE0, 0x01, # Pause for 4 * 1 (4) frames
+        0x1C, # Back, right arm raise 2
+        0xE0, 0x01, # Pause for 4 * 1 (4) frames
+        0x1B, # Back, right arm raise
+        0xE0, 0x01, # Pause for 4 * 1 (4) frames
+        0x1C, # Back, right arm raise 2
+        0xE0, 0x01, # Pause for 4 * 1 (4) frames
+        0x1B, # Back, right arm raise
+        0xE0, 0x02, # Pause for 4 * 2 (2) frames
+        0x04, # Facing up
+        0xE0, 0x08, # Pause for 4 * 8 (32) frames
+        0x5B, # Back, left arm raise
+        0xE0, 0x01, # Pause for 4 * 1 (4) frames
+        0x5C, # Back, left arm raise 2
+        0xE0, 0x01, # Pause for 4 * 1 (4) frames
+        0x5B, # Back, left arm raise
+        0xE0, 0x01, # Pause for 4 * 1 (4) frames
+        0x5C, # Back, left arm raise 2
+        0xE0, 0x01, # Pause for 4 * 1 (4) frames
+        0x5B, # Back, left arm raise
+        0xE0, 0x02, # Pause for 4 * 2 (2) frames
+        0x04, # Facing up
+        0xE0, 0x10, # Pause for 4 * 16 (64) frames
+        0x23, # Front, head turned left
+        0xE0, 0x10, # Pause for 4 * 16 (64) frames
+    ] + middle + [
+        0x18, # Mad/embarrassed
+        0xE0, 0x10, # Pause for 4 * 16 (64) frames
+        0x0A, # Attack pose
+        0xE0, 0x10, # Pause for 4 * 16 (64) frames
+        0x17, # back, arms raised
+        0xE0, 0x02, # Pause for 4 * 2 (8) frames
+        0xDD, # Jump (high)
+        0xE0, 0x08, # Pause for 4 * 8 (32) frames
+        0x09, # kneeling
+        0xE0, 0x10, # Pause for 4 * 16 (64) frames
+        0x04, # facing up
+        0xE0, 0x08, # Pause for 4 * 8 (32) frames
+        0x04, # facing up
+        0xE0, 0x01, # Pause for 4 * 1 (4) frames
+        0x04, # facing up
+        0xE0, 0x08, # Pause for 4 * 8 (40) frames
 
-                                   0x1F,  # shocked
-                                   0xFF,
+        0x1F, # shocked
+        0xFF,
 
-                                   0x10 + gogo_npc.npcid, 0xc4 + len(middle2),
-                                   # begin queue for gogo, wait until finished
-                                   0x01,  # Facing down
-                                   0xE0, 0x04,  # Pause for 4 * 4 (16) frames
-                                   0x59,  # Front, left arm raise
-                                   0xE0, 0x01,  # Pause for 4 * 1 (4) frames
-                                   0x5A,  # Front, left arm raise 2
-                                   0xE0, 0x01,  # Pause for 4 * 1 (4) frames
-                                   0x59,  # Front, left arm raise
-                                   0xE0, 0x01,  # Pause for 4 * 1 (4) frames
-                                   0x5A,  # Front, left arm raise 2
-                                   0xE0, 0x01,  # Pause for 4 * 1 (4) frames
-                                   0x59,  # Front, left arm raise
-                                   0xE0, 0x02,  # Pause for 4 * 2 (8) frames
-                                   0x01,  # Facing down
-                                   0xE0, 0x08,  # Pause for 4 * 8 (32) frames
-                                   0x19,  # Front, right arm raise
-                                   0xE0, 0x01,  # Pause for 4 * 1 (4) frames
-                                   0x1A,  # Front, right arm raise 2
-                                   0xE0, 0x01,  # Pause for 4 * 1 (4) frames
-                                   0x19,  # Front, right arm raise
-                                   0xE0, 0x01,  # Pause for 4 * 1 (4) frames
-                                   0x1A,  # Front, right arm raise 2
-                                   0xE0, 0x01,  # Pause for 4 * 1 (4) frames
-                                   0x19,  # Front, right arm raise
-                                   0xE0, 0x02,  # Pause for 4 * 2 (2) frames
-                                   0x01,  # Facing down
-                                   0xE0, 0x10,  # Pause for 4 * 16 (64) frames
-                                   0x04,  # Facing up
-                                   0xE0, 0x10,  # Pause for 4 * 16 (64) frames
-                               ] + middle2 + [
-                                   0x04,  # Facing up
-                                   0xE0, 0x10,  # Pause for 4 * 16 (64) frames
-                                   0x0A,  # Attack pose
-                                   0xE0, 0x10,  # Pause for 4 * 16 (64) frames
-                                   0x16,  # front, arms raised
-                                   0xE0, 0x02,  # Pause for 4 * 2 (8) frames
-                                   0xDD,  # Jump (high)
-                                   0xE0, 0x08,  # Pause for 4 * 8 (32) frames
-                                   0x09,  # kneeling
-                                   0xE0, 0x10,  # Pause for 4 * 16 (64) frames
-                                   0x01,  # facing down
-                                   0xE0, 0x08,  # Pause for 4 * 8 (32) frames
-                                   0x14,  # wink
-                                   0xE0, 0x01,  # Pause for 4 * 1 (4) frames
-                                   0x01,  # facing down
-                                   0xE0, 0x08,  # Pause for 4 * 8 (40) frames
-                                   0x1F,  # shocked
-                                   0xFF,
+        0x10 + gogo_npc.npcid, 0xc4 + len(middle2), # begin queue for gogo, wait until finished
+        0x01, # Facing down
+        0xE0, 0x04, # Pause for 4 * 4 (16) frames
+        0x59, # Front, left arm raise
+        0xE0, 0x01, # Pause for 4 * 1 (4) frames
+        0x5A, # Front, left arm raise 2
+        0xE0, 0x01, # Pause for 4 * 1 (4) frames
+        0x59, # Front, left arm raise
+        0xE0, 0x01, # Pause for 4 * 1 (4) frames
+        0x5A, # Front, left arm raise 2
+        0xE0, 0x01, # Pause for 4 * 1 (4) frames
+        0x59, # Front, left arm raise
+        0xE0, 0x02, # Pause for 4 * 2 (8) frames
+        0x01, # Facing down
+        0xE0, 0x08, # Pause for 4 * 8 (32) frames
+        0x19, # Front, right arm raise
+        0xE0, 0x01, # Pause for 4 * 1 (4) frames
+        0x1A, # Front, right arm raise 2
+        0xE0, 0x01, # Pause for 4 * 1 (4) frames
+        0x19, # Front, right arm raise
+        0xE0, 0x01, # Pause for 4 * 1 (4) frames
+        0x1A, # Front, right arm raise 2
+        0xE0, 0x01, # Pause for 4 * 1 (4) frames
+        0x19, # Front, right arm raise
+        0xE0, 0x02, # Pause for 4 * 2 (2) frames
+        0x01, # Facing down
+        0xE0, 0x10, # Pause for 4 * 16 (64) frames
+        0x04, # Facing up
+        0xE0, 0x10, # Pause for 4 * 16 (64) frames
+    ] + middle2 + [
+        0x04, # Facing up
+        0xE0, 0x10, # Pause for 4 * 16 (64) frames
+        0x0A, # Attack pose
+        0xE0, 0x10, # Pause for 4 * 16 (64) frames
+        0x16, # front, arms raised
+        0xE0, 0x02, # Pause for 4 * 2 (8) frames
+        0xDD, # Jump (high)
+        0xE0, 0x08, # Pause for 4 * 8 (32) frames
+        0x09, # kneeling
+        0xE0, 0x10, # Pause for 4 * 16 (64) frames
+        0x01, # facing down
+        0xE0, 0x08, # Pause for 4 * 8 (32) frames
+        0x14, # wink
+        0xE0, 0x01, # Pause for 4 * 1 (4) frames
+        0x01, # facing down
+        0xE0, 0x08, # Pause for 4 * 8 (40) frames
+        0x1F, # shocked
+        0xFF,
 
-                                   0x94,
+        0x94,
 
-                                   0x10 + gogo_npc.npcid, 0x1B,  # begin queue for gogo npc
-                                   0x1D,  # laugh 1
-                                   0xE0, 0x02,  # Pause for 4 * 2 (8) frames
-                                   0x1E,  # laugh 2
-                                   0xE0, 0x02,  # Pause for 4 * 2 (8) frames
-                                   0x1D,  # laugh 1
-                                   0xE0, 0x02,  # Pause for 4 * 2 (8) frames
-                                   0x1E,  # laugh 2
-                                   0xE0, 0x02,  # Pause for 4 * 2 (8) frames
-                                   0xCD,  # turn right
-                                   0xE0, 0x01,  # Pause for 4 * 1 (4) frames
-                                   0xCC,  # turn up
-                                   0xE0, 0x01,  # Pause for 4 * 1 (4) frames
-                                   0xCF,  # turn left
-                                   0xE0, 0x01,  # Pause for 4 * 1 (4) frames
-                                   0xCE,  # turn down
-                                   0xE0, 0x01,  # Pause for 4 * 1 (4) frames
-                                   0xFC, 0x0C,  # branch backward 12 bytes
-                                   0xFF,
+        0x10 + gogo_npc.npcid, 0x1B, # begin queue for gogo npc
+        0x1D,   #laugh 1
+        0xE0, 0x02, # Pause for 4 * 2 (8) frames
+        0x1E,   #laugh 2
+        0xE0, 0x02, # Pause for 4 * 2 (8) frames
+        0x1D,   #laugh 1
+        0xE0, 0x02, # Pause for 4 * 2 (8) frames
+        0x1E,   #laugh 2
+        0xE0, 0x02, # Pause for 4 * 2 (8) frames
+        0xCD, # turn right
+        0xE0, 0x01, # Pause for 4 * 1 (4) frames
+        0xCC, # turn up
+        0xE0, 0x01, # Pause for 4 * 1 (4) frames
+        0xCF, # turn left
+        0xE0, 0x01, # Pause for 4 * 1 (4) frames
+        0xCE, # turn down
+        0xE0, 0x01, # Pause for 4 * 1 (4) frames
+        0xFC, 0x0C, # branch backward 12 bytes
+        0xFF,
 
-                                   0x95,  # pause for 120 frames
-                                   0x37, 0x10 + gogo_npc.npcid, 0x0C,  # Change npc to gogo's sprite
-                                   0x92,  # pause 30 frames
-                                   0x10 + gogo_npc.npcid, 0x0D,  # begin queue for gogo npc
-                                   0xCD,  # turn right
-                                   0xE0, 0x02,  # Pause for 4 * 2 (8) frames
-                                   0xCC,  # turn up
-                                   0xE0, 0x02,  # Pause for 4 * 2 (8) frames
-                                   0xCF,  # turn left
-                                   0xE0, 0x02,  # Pause for 4 * 2 (8) frames
-                                   0xCE,  # turn down
-                                   0xE0, 0x02,  # Pause for 4 * 2 (8) frames
-                                   0xFF,
+        0x95, # pause for 120 frames
+        0x37, 0x10 + gogo_npc.npcid, 0x0C, # Change npc to gogo's sprite
+        0x92, # pause 30 frames
+        0x10 + gogo_npc.npcid, 0x0D, # begin queue for gogo npc
+        0xCD, # turn right
+        0xE0, 0x02, # Pause for 4 * 2 (8) frames
+        0xCC, # turn up
+        0xE0, 0x02, # Pause for 4 * 2 (8) frames
+        0xCF, # turn left
+        0xE0, 0x02, # Pause for 4 * 2 (8) frames
+        0xCE, # turn down
+        0xE0, 0x02, # Pause for 4 * 2 (8) frames
+        0xFF,
 
-                                   0x42, 0x31,
-                                   0x42, 0x32,
-                                   0x42, 0x33,
-                                   0x42, 0x34,
-                               ] + hide_npcs + [
-                                   0xB2, 0xD1, 0x81, 0x01,  # Branch to recruit gogo event
-                                   0x32, 0x03,
-                                   0xC2,
-                                   0x83,
-                                   0xFF,
+        0x42, 0x31,
+        0x42, 0x32,
+        0x42, 0x33,
+        0x42, 0x34,
+    ] + hide_npcs + [
+        0xB2, 0xD1, 0x81, 0x01, # Branch to recruit gogo event
+        0x32, 0x03,
+        0xC2,
+        0x83,
+        0xFF,
 
-                                   0x33, 0x03,
-                                   0xC2,
-                                   0x81,
-                                   0xFF,
+        0x33, 0x03,
+        0xC2,
+        0x81,
+        0xFF,
 
-                                   0x34, 0x03,
-                                   0xC2,
-                                   0x80,
-                                   0xFF,
+        0x34, 0x03,
+        0xC2,
+        0x80,
+        0xFF,
 
-                                   0x93,
+        0x93,
 
-                                   0x42, 0x32,
-                                   0x42, 0x33,
-                                   0x42, 0x34,
+        0x42, 0x32,
+        0x42, 0x33,
+        0x42, 0x34,
 
-                                   0xB2, 0x34, 0x2E, 0x01,  # enable collision
-                                   0xFE,  # Return
-                               ]
-    recruit_event.write(fout)
+        0xB2, 0x34, 0x2E, 0x01, # enable collision
+        0xFE, # Return
+    ]
+    recruit_event.write(outfile_rom_buffer)
     next_event = recruit_event.location + len(recruit_event.bytestring)
 
     recruit_event = Substitution()
     recruit_event.bytestring = [0x10 + gogo_npc.npcid]
     for location in [0xB81CA, 0xB8204, 0xB820E, 0xB821C, 0xB8221, 0xB822D, 0xB822F, 0xB8236]:
         recruit_event.set_location(location)
-        recruit_event.write(fout)
+        recruit_event.write(outfile_rom_buffer)
 
     # Called after naming Gogo
     ptr_low = next_event & 0xFF
@@ -1122,38 +1119,38 @@ def _manage_gogo_recruitment(fout, collapsing_house_char):
     recruit_event = Substitution()
     recruit_event.set_location(0xB81F9)
     recruit_event.bytestring = [
-        0xB2, ptr_low, ptr_mid, ptr_high,  # Call subroutine below
-        0xFD, 0xFD,  # NOP
+        0xB2, ptr_low, ptr_mid, ptr_high, # Call subroutine below
+        0xFD, 0xFD, # NOP
     ]
-    recruit_event.write(fout)
+    recruit_event.write(outfile_rom_buffer)
 
     recruit_event = Substitution()
     recruit_event.set_location(next_event)
     recruit_event.bytestring = [
-                                   0xB2, 0x15, 0xD0, 0x00,  # Call subroutine to lighten screen
-                                   0x41, 0x31,  # show party members 0-3
-                                   0x41, 0x32,
-                                   0x41, 0x33,
-                                   0x41, 0x34,
-                               ] + show_npcs + [
-                                   0xFE  # return
-                               ]
-    recruit_event.write(fout)
+        0xB2, 0x15, 0xD0, 0x00, # Call subroutine to lighten screen
+        0x41, 0x31, # show party members 0-3
+        0x41, 0x32,
+        0x41, 0x33,
+        0x41, 0x34,
+    ] + show_npcs + [
+        0xFE #return
+    ]
+    recruit_event.write(outfile_rom_buffer)
     next_event = recruit_event.location + len(recruit_event.bytestring)
 
     # Turn off Gogo bit at beginning of game
-    fout.seek(0xE0A0 + gogo_npc.memaddr)
-    value = ord(fout.read(1))
+    outfile_rom_buffer.seek(0xE0A0 + gogo_npc.memaddr)
+    value = ord(outfile_rom_buffer.read(1))
     value &= ~(1 << gogo_npc.membit)
-    fout.seek(0xE0A0 + gogo_npc.memaddr)
-    fout.write(bytes([value]))
+    outfile_rom_buffer.seek(0xE0A0 + gogo_npc.memaddr)
+    outfile_rom_buffer.write(bytes([value]))
 
 
-def _setup_alternate_zone_eater(fout, include_gau):
-    # replace zone eater gogo with gau, instead of giving him for free on the airship
+def _setup_alternate_zone_eater(outfile_rom_buffer: BytesIO, include_gau):
+     # replace zone eater gogo with gau, instead of giving him for free on the airship
     zone_eater_loc = get_location(0x116)
     gau_npc = zone_eater_loc.npcs[0]
-    gau_npc.graphics = 0xB  # Gau
+    gau_npc.graphics = 0xB # Gau
     gau_npc.palette = get_character(0xB).palette
     gau_npc.membit = 3
     gau_npc.memaddr = 0x4D
@@ -1164,11 +1161,11 @@ def _setup_alternate_zone_eater(fout, include_gau):
         return
 
     # Turn on Gau bit at beginning of game
-    fout.seek(0xE0A0 + gau_npc.memaddr)
-    value = ord(fout.read(1))
+    outfile_rom_buffer.seek(0xE0A0 + gau_npc.memaddr)
+    value = ord(outfile_rom_buffer.read(1))
     value |= (1 << gau_npc.membit)
-    fout.seek(0xE0A0 + gau_npc.memaddr)
-    fout.write(bytes([value]))
+    outfile_rom_buffer.seek(0xE0A0 + gau_npc.memaddr)
+    outfile_rom_buffer.write(bytes([value]))
 
     text = '<GAU>: Uwao, aooh!<wait 60 frames> I’m <GAU>!<wait 60 frames><line>I’m your friend!<wait 60 frames><line>Let’s travel together!'
     set_dialogue(0x286, text)
@@ -1176,33 +1173,33 @@ def _setup_alternate_zone_eater(fout, include_gau):
     gau_event = Substitution()
     gau_event.set_location(0x305200)
     bytes_1 = [
-        0x4B, 0x86, 0x02,  # Display text box
-        0xB2, 0xC1, 0xC5, 0x00,  # Set caseword to number of characters in party
-        0xC0, 0xA3, 0x81, 0xFF, 0xFF, 0xFF  # Jump to [bytes3, location to be computed shortly]
+        0x4B, 0x86, 0x02, # Display text box
+        0xB2, 0xC1, 0xC5, 0x00, # Set caseword to number of characters in party
+        0xC0, 0xA3, 0x81, 0xFF, 0xFF, 0xFF # Jump to [bytes3, location to be computed shortly]
     ]
 
     bytes_2 = [
-        0x3D, 0x0B,  # Create Gau
-        0x3F, 0x0B, 0x01,  # Add Gau to party
-        0x45,  # Refresh objects
+        0x3D, 0x0B, # Create Gau
+        0x3F, 0x0B, 0x01, # Add Gau to party
+        0x45, # Refresh objects
     ]
 
     bytes_3 = [
-        0x77, 0x0B,  # Level average Gau
-        0x8B, 0x0B, 0x7F,  # Set Gau's HP to max
-        0x8C, 0x0B, 0x7F,  # Set Gau's MP to max
-        0x88, 0x0B, 0x00, 0x00,  # Remove all status effects from Gau
-        0xD4, 0xFB,  # Set Gau as available
-        0x78, 0x10,  # Enable ability to pass through other objects for NPC $10
-        0x10, 0x04,  # queue for NPC $10
-        0xC2,  # Set vehicle/entity's event speed to normal
-        0x82,  # Move vehicle/entity down 1 tile
-        0xD1,  # Make vehicle/entity disappear
-        0xFF,  # End queue
-        0x3E, 0x10,  # Delete NPC $10
-        0xDB, 0x6B,  # Turn off NPC bit
-        0x45,  # Refresh objects
-        0xFE,  # Return
+        0x77, 0x0B, # Level average Gau
+        0x8B, 0x0B, 0x7F, # Set Gau's HP to max
+        0x8C, 0x0B, 0x7F, # Set Gau's MP to max
+        0x88, 0x0B, 0x00, 0x00, # Remove all status effects from Gau
+        0xD4, 0xFB, # Set Gau as available
+        0x78, 0x10, # Enable ability to pass through other objects for NPC $10
+        0x10, 0x04, # queue for NPC $10
+        0xC2,   # Set vehicle/entity's event speed to normal
+        0x82,   # Move vehicle/entity down 1 tile
+        0xD1,   # Make vehicle/entity disappear
+        0xFF,   # End queue
+        0x3E, 0x10, # Delete NPC $10
+        0xDB, 0x6B, # Turn off NPC bit
+        0x45, # Refresh objects
+        0xFE, # Return
     ]
 
     jump_location = gau_event.location + len(bytes_1) + len(bytes_2)
@@ -1210,7 +1207,7 @@ def _setup_alternate_zone_eater(fout, include_gau):
     ptr_mid = (jump_location & 0xFF00) >> 8
     ptr_high = ((jump_location - 0xA0000) & 0xFF0000) >> 16
     gau_event.bytestring = bytes_1[:-3] + [ptr_low, ptr_mid, ptr_high] + bytes_2 + bytes_3
-    gau_event.write(fout)
+    gau_event.write(outfile_rom_buffer)
 
     global alt_zone_eater_recruit
     alt_zone_eater_recruit = WoRRecruitInfo(
@@ -1219,7 +1216,7 @@ def _setup_alternate_zone_eater(fout, include_gau):
                         gau_event.location + len(bytes_1) + len(bytes_2) + 1,
                         gau_event.location + len(bytes_1) + len(bytes_2) + 3,
                         gau_event.location + len(bytes_1) + len(bytes_2) + 6,
-                        gau_event.location + len(bytes_1) + len(bytes_2) + 9, ],
+                        gau_event.location + len(bytes_1) + len(bytes_2) + 9,],
         recruited_bit_pointers=[gau_event.location + len(bytes_1) + len(bytes_2) + 13],
         location_npcs=[(0x116, 0)],
         dialogue_pointers=[0x286],
@@ -1239,11 +1236,11 @@ def _setup_alternate_zone_eater(fout, include_gau):
     gau_event_shim.bytestring = [
         0xB2, ptr_low, ptr_mid, ptr_high, 0xFE
     ]
-    gau_event_shim.write(fout)
+    gau_event_shim.write(outfile_rom_buffer)
 
 
-def manage_wor_skip(fout, wor_free_char=0xB, airship=False, dragon=False, alternate_gogo=False,
-                    esper_replacements=None):
+def manage_wor_skip(outfile_rom_buffer: BytesIO, wor_free_char=0xB, airship=False,
+                    dragon=False, alternate_gogo=False, esper_replacements=None):
     characters = get_characters()
 
     espers = [0x0, 0x1, 0x2, 0x3, 0x5, 0x6, 0x7, 0x8, 0x11, 0x13, 0x14, 0x17]
@@ -1255,12 +1252,12 @@ def manage_wor_skip(fout, wor_free_char=0xB, airship=False, dragon=False, altern
     startsub0 = Substitution()
     startsub0.bytestring = bytes([0xB2, 0x1E, 0xDD, 0x00, 0xFE])
     startsub0.set_location(0xC9A4F)
-    startsub0.write(fout)
+    startsub0.write(outfile_rom_buffer)
 
     # change code at start of game to warp to wor
     wor_sub = Substitution()
     wor_sub.bytestring = bytes([
-        0x6C, 0x01, 0x00, 0x91, 0xD3, 0x02,  # make WoR the parent map
+        0x6C, 0x01, 0x00, 0x91, 0xD3, 0x02, # make WoR the parent map
         0x88, 0x00, 0x00, 0x00,  # remove Magitek from Terra
         0xD5, 0xF0,  # flag Terra as unobtained
         0xD5, 0xE0,  # flag Terra as unobtained
@@ -1295,68 +1292,68 @@ def manage_wor_skip(fout, wor_free_char=0xB, airship=False, dragon=False, altern
         0x40, 0x07, 0x07,  # give Strago properties
         0x40, 0x0A, 0x0A,  # give Mog properties
         0x40, 0x07, 0x07,  # give Strago properties
-    ]) + bytes([0x40, 0x0A, 0x0A, ] if dragon else [
+    ]) + bytes([0x40, 0x0A, 0x0A,] if dragon else [
     ]) + bytes([
-                   0x40, 0x06, 0x06,  # give Celes properties
-                   0xD5, 0xF7,  # flag Strago as unobtained
-                   0xD5, 0xE7,  # flag Strago as unobtained
-                   0xD5, 0xFA,  # flag Mog as unobtained
-                   0xD5, 0xEA,  # flag Mog as unobtained
+        0x40, 0x06, 0x06,  # give Celes properties
+        0xD5, 0xF7,  # flag Strago as unobtained
+        0xD5, 0xE7,  # flag Strago as unobtained
+        0xD5, 0xFA,  # flag Mog as unobtained
+        0xD5, 0xEA,  # flag Mog as unobtained
 
-                   0xD4, 0xF6,  # flag Celes as obtained
-                   0xD4, 0xE6,  # flag Celes as obtained
-                   0x3D, 0x06,  # create Celes
-                   0x3F, 0x06, 0x01,  # add Celes to party
+        0xD4, 0xF6,  # flag Celes as obtained
+        0xD4, 0xE6,  # flag Celes as obtained
+        0x3D, 0x06,  # create Celes
+        0x3F, 0x06, 0x01,  # add Celes to party
 
-                   0x40, 0x0C, 0x1B,  # give Gogo the properties of Kamog
-                   0x40, 0x0D, 0x1C,  # give Umaro the properties of Mog (three scenario party selection)
-                   0x8D, 0x0C,  # unequip Kamog
-                   0x8D, 0x0D,  # unequip fake Mog
+        0x40, 0x0C, 0x1B,  # give Gogo the properties of Kamog
+        0x40, 0x0D, 0x1C,  # give Umaro the properties of Mog (three scenario party selection)
+        0x8D, 0x0C,  # unequip Kamog
+        0x8D, 0x0D,  # unequip fake Mog
 
-                   0x40, 0x01, 0x01,  # give Locke properties
-                   0x40, 0x02, 0x02,  # give Cyan properties
-                   0x40, 0x03, 0x03,  # give Shadow properties
-                   0x40, 0x04, 0x04,  # give Edgar properties
-                   0x40, 0x05, 0x05,  # give Sabin properties
-                   0x40, 0x07, 0x07,  # give Strago properties
-                   0x40, 0x08, 0x08,  # give Relm properties
-                   0x40, 0x09, 0x09,  # give Setzer properties
-                   0x40, 0x0A, 0x0A,  # give Mog properties
-                   0x40, 0x0B, 0x0B,  # give Gau properties
+        0x40, 0x01, 0x01,  # give Locke properties
+        0x40, 0x02, 0x02,  # give Cyan properties
+        0x40, 0x03, 0x03,  # give Shadow properties
+        0x40, 0x04, 0x04,  # give Edgar properties
+        0x40, 0x05, 0x05,  # give Sabin properties
+        0x40, 0x07, 0x07,  # give Strago properties
+        0x40, 0x08, 0x08,  # give Relm properties
+        0x40, 0x09, 0x09,  # give Setzer properties
+        0x40, 0x0A, 0x0A,  # give Mog properties
+        0x40, 0x0B, 0x0B,  # give Gau properties
 
-                   0x37, 0x01, 0x01,  # give Locke graphics
-                   0x37, 0x02, 0x02,  # give Cyan graphics
-                   0x37, 0x03, 0x03,  # give Shadow graphics
-                   0x37, 0x04, 0x04,  # give Edgar graphics
-                   0x37, 0x05, 0x05,  # give Sabin graphics
-                   0x37, 0x06, 0x06,  # give Celes graphics
-                   0x37, 0x07, 0x07,  # give Strago graphics
-                   0x37, 0x08, 0x08,  # give Relm graphics
-                   0x37, 0x09, 0x09,  # give Setzer graphics
-                   0x37, 0x0A, 0x0A,  # give Mog graphics
-                   0x37, 0x0B, 0x0B,  # give Gau graphics
+        0x37, 0x01, 0x01,  # give Locke graphics
+        0x37, 0x02, 0x02,  # give Cyan graphics
+        0x37, 0x03, 0x03,  # give Shadow graphics
+        0x37, 0x04, 0x04,  # give Edgar graphics
+        0x37, 0x05, 0x05,  # give Sabin graphics
+        0x37, 0x06, 0x06,  # give Celes graphics
+        0x37, 0x07, 0x07,  # give Strago graphics
+        0x37, 0x08, 0x08,  # give Relm graphics
+        0x37, 0x09, 0x09,  # give Setzer graphics
+        0x37, 0x0A, 0x0A,  # give Mog graphics
+        0x37, 0x0B, 0x0B,  # give Gau graphics
 
-                   0x7F, 0x00, 0x00,  # give Terra name
-                   0x7F, 0x01, 0x01,  # give Locke name
-                   0x7F, 0x02, 0x02,  # give Cyan name
-                   0x7F, 0x03, 0x03,  # give Shadow name
-                   0x7F, 0x04, 0x04,  # give Edgar name
-                   0x7F, 0x05, 0x05,  # give Sabin name
-                   0x7F, 0x06, 0x06,  # give Celes name
-                   0x7F, 0x07, 0x07,  # give Strago name
-                   0x7F, 0x08, 0x08,  # give Relm name
-                   0x7F, 0x09, 0x09,  # give Setzer name
-                   0x7F, 0x0A, 0x0A,  # give Mog name
-                   0x7F, 0x0B, 0x0B,  # give Gau name
+        0x7F, 0x00, 0x00,  # give Terra name
+        0x7F, 0x01, 0x01,  # give Locke name
+        0x7F, 0x02, 0x02,  # give Cyan name
+        0x7F, 0x03, 0x03,  # give Shadow name
+        0x7F, 0x04, 0x04,  # give Edgar name
+        0x7F, 0x05, 0x05,  # give Sabin name
+        0x7F, 0x06, 0x06,  # give Celes name
+        0x7F, 0x07, 0x07,  # give Strago name
+        0x7F, 0x08, 0x08,  # give Relm name
+        0x7F, 0x09, 0x09,  # give Setzer name
+        0x7F, 0x0A, 0x0A,  # give Mog name
+        0x7F, 0x0B, 0x0B,  # give Gau name
 
-                   0x84, 0x50, 0xC3,  # give party 50K Gil
-               ] + [i for e in espers for i in (0x86, e)] + [
-                   0xB8, 0x42,  # allow Morph
-                   0xB8, 0x43,  # display AP
-                   0xB8, 0x49,  # Gau handed Meat
-                   0xB8, 0x4B,  # Shadow can't leave
-                   0xE8, 0x06, 0x08, 0x00,  # set up 8 dragons
-               ])
+        0x84, 0x50, 0xC3,  # give party 50K Gil
+    ] + [i for e in espers for i in (0x86, e)] + [
+        0xB8, 0x42,  # allow Morph
+        0xB8, 0x43,  # display AP
+        0xB8, 0x49,  # Gau handed Meat
+        0xB8, 0x4B,  # Shadow can't leave
+        0xE8, 0x06, 0x08, 0x00,  # set up 8 dragons
+    ])
 
     # assign a palette to each character
     partymembers = [c for c in characters if 1 <= c.id <= 12]
@@ -1405,7 +1402,7 @@ def manage_wor_skip(fout, wor_free_char=0xB, airship=False, dragon=False, altern
         0xFE
     ])
     wor_sub.set_location(0xADD1E)
-    wor_sub.write(fout)
+    wor_sub.write(outfile_rom_buffer)
     wor_sub2 = Substitution()
     wor_sub2.bytestring = bytearray([])
 
@@ -1423,13 +1420,13 @@ def manage_wor_skip(fout, wor_free_char=0xB, airship=False, dragon=False, altern
         lastbyte = int(bit[1:], 16)
         wor_sub2.bytestring += bytearray([firstbyte, lastbyte])
     if alternate_gogo:
-        wor_sub2.bytestring += bytearray([0xDA, 0x4B])  # set event bit $54B
+        wor_sub2.bytestring += bytearray([0xDA, 0x4B]) # set event bit $54B
     # This is only necessary if the random wor recruitment is on, but it's harmless if not.
     wor_sub2.bytestring += bytearray([
-        0x7F, 0x0C, 0x0C,  # Set name for GOGO
-        0x7F, 0x0D, 0x0D,  # Set name for UMARO
-        0x7F, 0x0A, 0x0A  # Set name for MOG
-    ])
+        0x7F, 0x0C, 0x0C, # Set name for GOGO
+        0x7F, 0x0D, 0x0D, # Set name for UMARO
+        0x7F, 0x0A, 0x0A # Set name for MOG
+        ])
 
     if airship:
         wor_sub2.bytestring += bytearray([0xD2, 0xB9])  # airship appears in WoR
@@ -1490,7 +1487,7 @@ def manage_wor_skip(fout, wor_free_char=0xB, airship=False, dragon=False, altern
             0x41, 0x04,
             0x41, 0x06,
             0x41, 0x09,
-            0xB2, 0x7B, 0x47, 0x00,  # Falcon rising out of water
+            0xB2, 0x7B, 0x47, 0x00, # Falcon rising out of water
             0xFE,
         ])
 
@@ -1498,7 +1495,7 @@ def manage_wor_skip(fout, wor_free_char=0xB, airship=False, dragon=False, altern
         set_dialogue(0x9AF, text)
 
     else:
-        wor_sub2.bytestring += bytearray([0x6B, 0x01, 0x00, 0x91, 0xD3, 0x00])  # go to WoR
+        wor_sub2.bytestring += bytearray([0x6B, 0x01, 0x00, 0x91, 0xD3, 0x00]) # go to WoR
 
         if airship:
             wor_sub2.bytestring += bytearray([0xC7, 0x91, 0xD3])  # place airship
@@ -1506,29 +1503,29 @@ def manage_wor_skip(fout, wor_free_char=0xB, airship=False, dragon=False, altern
         wor_sub2.bytestring += bytearray([
             0xFF,  # end map script
             0xFE,  # return
-        ])
+            ])
 
     wor_sub2.set_location(0xA9749)
-    wor_sub2.write(fout)
+    wor_sub2.write(outfile_rom_buffer)
 
     # set more Lores as starting Lores
     odds = [True, True, False]
     address = 0x26F564
-    fout.seek(address)
-    extra_known_lores = read_multi(fout, length=3)
+    outfile_rom_buffer.seek(address)
+    extra_known_lores = read_multi(outfile_rom_buffer, length=3)
     for i in range(24):
         if random.choice(odds):
             extra_known_lores |= (1 << i)
         if random.choice([True, False, False]):
             odds.append(False)
-    fout.seek(address)
-    write_multi(fout, extra_known_lores, length=3)
+    outfile_rom_buffer.seek(address)
+    write_multi(outfile_rom_buffer, extra_known_lores, length=3)
 
     if dragon:
-        set_alternate_dragon_locations(fout)
+        set_alternate_dragon_locations(outfile_rom_buffer)
 
 
-def set_alternate_dragon_locations(fout):
+def set_alternate_dragon_locations(outfile_rom_buffer: BytesIO):
     # TODO: Add more locations and randomly pick two?
     # These NPCs happen to match the NPC numbers of the dragons
     # in Kefka's tower so we can jump into the same event.
@@ -1564,6 +1561,6 @@ def set_alternate_dragon_locations(fout):
     skull_dragon_event.set_location(0xB4B62)
     skull_dragon_event.bytestring = bytes([
         0xC0, 0xB4, 0x86, 0x20, 0x19, 0x02,  # If haven't beat this dragon, branch to $CC1920
-        0xFE  # return
+        0xFE # return
     ])
-    skull_dragon_event.write(fout)
+    skull_dragon_event.write(outfile_rom_buffer)

@@ -1247,7 +1247,7 @@ def randomize_fanatics(unused_locids, morefanatical=False):
     stairs = [get_location(i) for i in [363, 359, 360, 361]]
     pitstops = [get_location(i) for i in [365, 367, 368, 369]]
     if morefanatical:
-        num_new_levels = 3  # force the tallest tower with morefanatical
+        num_new_levels = 3 # force the tallest tower with morefanatical
     else:
         num_new_levels = random.randint(0, 1) + random.randint(1, 2)
     unused_locations = [get_location(l) for l in unused_locids]

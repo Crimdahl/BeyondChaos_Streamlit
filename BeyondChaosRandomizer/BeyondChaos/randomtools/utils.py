@@ -427,10 +427,10 @@ def get_snes_palette_transformer(use_luma=False, always=None, middle=True,
 
 def rewrite_snes_title(text, filename, version, lorom=False):
     f = open(filename, 'r+b')
-    while len(text) < 20:
+    while len(text) < 21:
         text += ' '
-    if len(text) > 20:
-        text = text[:19] + "?"
+    if len(text) > 21:
+        text = text[:20] + "?"
     if lorom:
         mask = 0x7FFF
     else:
@@ -521,6 +521,8 @@ def map_to_snes(address, lorom=False):
     if address < 0x400000:
         return address | 0xC00000
     elif address < 0x7E0000:
+        return address
+    elif 0x7E0000 <= address <= 0x7FFFFF and not address & 0x8000:
         return address
     else:
         # NOTE: Normally 7E and 7F can be accessed with banks 3E and 3F

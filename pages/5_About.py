@@ -831,6 +831,34 @@ def main():
         # Populate the Changelog tab
         #
         with tabs[2].expander(
+                label='Version 0.3.0.0: Merging with upcoming BCCE 5.0.',
+                expanded=False,
+
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>Added new dev server at https://beyondchaosweb-dev.streamlit.app/. Test out the new '
+                    'changes early!</li>'
+                '<li>Flag Presets for Kefka at Narshe now automatically set the Katn Game Mode.</li>'
+                '<li>Enhanced functionality for espercutegf. (credit: abyssonym)</li>'
+                '<li>New experimental codes related to espercutegf: espffect, effectmas, effectory, '
+                    'effectster, and treaffect. (credit: abyssonym)</li>'
+                '<li>Gogo is now capable of using espers. If you want to see this locked behind a flag, '
+                    'hop in Discord and give feedback. (credit: abyssonym)</li>'
+                '<li>MP healing and MP damage are now colored differently from HP healing and HP damage in battle.'
+                    ' (credit: abyssonym)</li>'
+                '<li>Dancingmaduin code now has a drop-down with customizations. Additionally, the code now ensures '
+                    'that each character has at least one esper, in addition to each esper having at least one '
+                    'character. (credit: DarkSlash88, abyssonym, Crimdahl)</li>'
+                '<li>Added item locking. (credit: myself086)</li>'
+                '<li>Alphabetized the in-battle rage menu. (credit: myself086)</li>'
+                '<li>Added rage locking, so your most used rages can show up at the top. (credit: myself086)</li>'
+                '<li>Tons of back-end changes, like variable renames, validation checks, and bug fixes.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
                 label='Version 0.2.3.0: Added Passwords and Playlist customizations.',
                 expanded=False,
 
