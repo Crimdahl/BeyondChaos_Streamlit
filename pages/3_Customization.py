@@ -310,9 +310,9 @@ def main():
 
             sl.button(
                 label="Apply Changes",
-                disabled=len(sl.session_state["widget_sprite_replacements"]["edited_cells"]) == 0 and
-                        len(sl.session_state["widget_sprite_replacements"]["added_rows"]) == 0 and
-                        len(sl.session_state["widget_sprite_replacements"]["deleted_rows"]) == 0,
+                disabled="edited_cells" in sl.session_state.keys() and len(sl.session_state["widget_sprite_replacements"]["edited_cells"]) == 0 and
+                        "added_rows" in sl.session_state.keys() and len(sl.session_state["widget_sprite_replacements"]["added_rows"]) == 0 and
+                        "deleted_rows" in sl.session_state.keys() and len(sl.session_state["widget_sprite_replacements"]["deleted_rows"]) == 0,
                 on_click=update_sprite_replacements
             )
 
@@ -353,7 +353,7 @@ def main():
 
     except KeyError as e:
         import os
-        sl.text(os.getcwd())
+        sl.text(str(os.listdir(os.getcwd())))
         sl.text(str(e))
         raise e
         initialize_states()
