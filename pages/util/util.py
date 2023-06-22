@@ -96,7 +96,6 @@ def load_coral_names():
 
 def load_song_playlist():
     names = ""
-    sl.text(os.getcwd())
     with open(os.path.join(os.getcwd(),
                            "BeyondChaosRandomizer", "BeyondChaos", "custom", "songs.txt")) as namefile:
         for line in namefile:
