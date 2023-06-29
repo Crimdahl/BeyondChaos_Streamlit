@@ -11,6 +11,7 @@ except ModuleNotFoundError:
 flag_categories = []
 makeover_groups = []
 
+
 def set_stylesheet():
     # Streamlit doesn't currently allow the addition of HTML IDs or additional classes to elements.
     #   This fact makes it difficult to customize the site extensively with CSS without hackery.
@@ -83,10 +84,12 @@ def get_makeover_groups():
         if flag.name not in sl.session_state.keys():
             sl.session_state[flag.name] = flag.default_value
 
+
 if "sprite_replacements_changed" in sl.session_state.keys() and sl.session_state["sprite_replacements_changed"]:
     get_makeover_groups()
     sl.session_state["sprite_replacements_changed"] = "False"
 SORTED_FLAGS = sorted(NORMAL_FLAGS + MAKEOVER_MODIFIER_FLAGS + makeover_groups, key=lambda x: x.name)
+
 
 def clear_selected_flags(clear_preset=False):
     for code in SORTED_FLAGS:

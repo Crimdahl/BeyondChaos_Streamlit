@@ -234,7 +234,7 @@ class Window(QMainWindow):
         # values to be sent to Randomizer
         self.romText = ""
         self.romOutputDirectory = ""
-        self.version = "CE-4.2.1"
+        self.version = "CE-5.0.0"
         self.mode = "normal"
         self.seed = ""
         self.flags = []
@@ -548,7 +548,7 @@ class Window(QMainWindow):
         middleRightGroupBox = QGroupBox("Flag Selection")
         tabVBoxLayout = QVBoxLayout()
         tabs = QTabWidget()
-        control_fixed_width = 65
+        control_fixed_width = 70
         control_fixed_height = 20
 
         # loop to add tab objects to 'tabs' TabWidget
@@ -610,14 +610,13 @@ class Window(QMainWindow):
                     nbox.flag = flag['object']
                     nbox.default = int(flag['object'].default_value)
                     nbox.setMinimum(int(flag['object'].minimum_value))
+                    nbox.setMaximum(int(flag['object'].maximum_value))
                     nbox.setFixedWidth(control_fixed_width)
                     nbox.setFixedHeight(control_fixed_height)
                     if flagname == "cursepower":
-                        nbox.setMaximum(255)
-                        nbox.default = 255
-                    if flagname == "randomboost":
-                        nbox.setMaximum(255)
-                        nbox.default = 0
+                        nbox.setSpecialValueText("Random")
+                    else:
+                        nbox.setSpecialValueText("Off")
                     nbox.setValue(nbox.default)
                     nbox.text = flagname
 
@@ -729,7 +728,9 @@ class Window(QMainWindow):
                                 child.setValue(int(str(v).split(":")[1]))
                                 self.flags.append(v)
                             except ValueError:
-                                pass
+                                if str(v).split(":")[1] == child.specialValueText().lower():
+                                    child.setValue(child.minimum())
+                                    self.flags.append(v)
                     elif type(child) in [QDoubleSpinBox] and str(v).startswith(child.text.lower()):
                         if ":" in v:
                             try:
@@ -1006,25 +1007,27 @@ class Window(QMainWindow):
         for mode in self.supportedPresets:
             if mode == "newplayer":
                 self.GamePresets['New Player'] = (
-                    "b c e f g i n o p q r s t w y z alasdraco capslockoff partyparty makeover "
-                    "johnnydmad questionablecontent dancelessons swdtechspeed:faster "
+                    "b c e f g i n o p q r s t w y z makeover partyparty dancelessons lessfanatical "
+                    "expboost:2.0 gpboost:2.0 mpboost:2.0 swdtechspeed:faster alasdraco capslockoff "
+                    "johnnydmad questionablecontent "
                 )
             elif mode == "intermediateplayer":
                 self.GamePresets['Intermediate Player'] = (
-                    "b c d e f g i j k m n o p q r s t u w y z alasdraco capslockoff partyparty makeover "
-                    "johnnydmad notawaiter mimetime electricboogaloo dancelessons remonsterate swdtechspeed:random "
+                    "b c d e f g i j k m n o p q r s t u w y z makeover partyparty dancelessons electricboogaloo "
+                    "swdtechspeed:faster alasdraco capslockoff johnnydmad notawaiter remonsterate "
                 )
             elif mode == "advancedplayer":
                 self.GamePresets['Advanced Player'] = (
-                    "b c d e f g h i j k m n o p q r s t u w y z alasdraco capslockoff partyparty makeover "
-                    "johnnydmad notawaiter dancingmaduin bsiab mimetime randombosses electricboogaloo dancelessons "
-                    "questionablecontent remonsterate swdtechspeed:random "
+                    "b c d e f g h i j k m n o p q r s t u w y z makeover partyparty dancelessons electricboogaloo "
+                    "randombosses dancingmaduin:1 swdtechspeed:random alasdraco capslockoff johnnydmad notawaiter "
+                    "remonsterate bsiab mimetime morefanatical questionablecontent "
                 )
             elif mode == "chaoticplayer":
                 self.GamePresets['Chaotic Player'] = (
-                    "b c d e f g h i j k m n o p q r s t u w y z alasdraco capslockoff partyparty makeover "
-                    "johnnyachaotic notawaiter electricboogaloo masseffect allcombos supernatural randomboost:2 "
-                    "bsiab mimetime thescenarionottaken questionablecontent dancelessons remonsterate swdtechspeed:random"
+                    "b c d e f g h i j k m n o p q r s t u w y z makeover partyparty dancelessons electricboogaloo "
+                    "masseffect randombosses dancingmaduin:chaos swdtechspeed:random alasdraco capslockoff "
+                    "johnnyachaotic notawaiter remonsterate bsiab mimetime questionablecontent randomboost:2 "
+                    "allcombos supernatural mementomori:random thescenarionottaken "
                 )
             elif mode == "raceeasy":
                 self.GamePresets['KaN Race - Easy'] = (

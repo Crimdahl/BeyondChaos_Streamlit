@@ -1,6 +1,7 @@
 from BeyondChaosRandomizer.BeyondChaos.utils import Substitution
 from io import BytesIO
 
+
 def myself_patches(output_rom_buffer: BytesIO):
     _sub = Substitution()
 

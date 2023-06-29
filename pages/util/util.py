@@ -19,22 +19,24 @@ DEFAULT_PRESETS = ({
     'New Player': [
         "b", "c", "e", "f", "g", "i", "n", "o", "p", "q", "r", "s", "t", "w", "y", "z",
         "alasdraco", "capslockoff", "partyparty", "makeover", "johnnydmad",
-        "questionablecontent", "dancelessons", "swdtechspeed:faster"
+        "questionablecontent", "dancelessons", "swdtechspeed:faster", "lessfanatical",
+        "expboost:2.0", "gpboost:2.0", "mpboost:2.0"
     ],
     'Intermediate Player': [
         "b", "c", "d", "e", "f", "g", "i", "j", "k", "m", "n", "o", "p", "q", "r", "s", "t", "u", "w", "y", "z",
-        "alasdraco", "capslockoff", "partyparty", "makeover", "johnnydmad", "notawaiter", "mimetime",
-        "electricboogaloo", "questionablecontent", "dancelessons", "remonsterate", "swdtechspeed:random"
+        "alasdraco", "capslockoff", "partyparty", "makeover", "johnnydmad", "notawaiter",
+        "electricboogaloo", "dancelessons", "remonsterate", "swdtechspeed:faster"
     ],
     'Advanced Player': [
         "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "m", "n", "o", "p", "q", "r", "s", "t", "u", "w", "y", "z",
-        "alasdraco", "capslockoff", "partyparty", "makeover", "johnnydmad", "notawaiter", "dancingmaduin", "bsiab",
+        "alasdraco", "capslockoff", "partyparty", "makeover", "johnnydmad", "notawaiter", "dancingmaduin:1", "bsiab",
         "mimetime", "randombosses", "electricboogaloo", "questionablecontent", "dancelessons", "remonsterate",
-        "swdtechspeed:random"
+        "swdtechspeed:random", "morefanatical"
     ],
     'Chaotic Player': [
         "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "m", "n", "o", "p", "q", "r", "s", "t", "u", "w", "y", "z",
-        "alasdraco", "capslockoff", "partyparty", "makeover", "johnnyachaotic", "notawaiter", "dancingmaduin", "bsiab",
+        "alasdraco", "capslockoff", "partyparty", "makeover", "johnnyachaotic", "notawaiter", "dancingmaduin:chaos",
+        "bsiab", "mementomori:random",
         "mimetime", "randombosses", "electricboogaloo", "questionablecontent", "dancelessons", "remonsterate",
         "swdtechspeed:random", "masseffect", "allcombos", "supernatural", "randomboost:2", "thescenarionottaken"
     ],
