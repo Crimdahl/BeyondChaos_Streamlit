@@ -73,7 +73,7 @@ def get_makeover_groups():
                         Flag(name=str(spritecategory).lower(),
                              description="CUSTOM " + str(spritecategory).upper() + " FREQUENCY MODE",
                              long_description="Adjust probability of selecting " + str(spritecategory).lower() +
-                                " sprites.",
+                                              " sprites.",
                              category="spriteCategories",
                              inputtype="combobox",
                              choices=("Normal", "No", "Hate", "Like", "Only"),
