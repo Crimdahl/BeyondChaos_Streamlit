@@ -1,7 +1,10 @@
-# Standard playlist, by emberling
-# This aims to define a fairly restrained set of music, where every song more or less matches the mood of the events occurring while it plays, within the general confines of the JRPG prog/orchestral genre grab bag as pioneered by Uematsu. Song placement will be less about what role it served in its original context and more about where it fits into the Final Fantasy music style.
+# Beyond Chaos playlist
+# In its default state the playlist aims to define a fairly restrained set of music, where every song more or less matches the mood of the events occurring while it plays, within the general confines of the JRPG prog/orchestral genre grab bag as pioneered by Uematsu. Song placement will be less about what role it served in its original context and more about where it fits into the Final Fantasy music style.
 # Included songs have been vetted and possibly edited to meet johnnydmad style and quality standards
 # All included songs are from video game sources. No original work, no classical or popular music, no film soundtrack, etc.
+
+# Customize your music by removing rows from the sections below, where sections are denoted by [words in brackets].
+# Do not remove entire sections, otherwise generation will likely crash.
 
 [default]
 7th_darkness:       grandfinale, engine*2

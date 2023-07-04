@@ -17,7 +17,7 @@ from BeyondChaosRandomizer.BeyondChaos.monsterrandomizer import MonsterBlock, so
 from BeyondChaosRandomizer.BeyondChaos.randomizers.characterstats import CharacterStats
 from BeyondChaosRandomizer.BeyondChaos.ancient import manage_ancient
 from BeyondChaosRandomizer.BeyondChaos.appearance import manage_character_appearance, manage_coral
-from BeyondChaosRandomizer.BeyondChaos.bcg_junction import JunctionManager, set_addressing_mode as jm_set_addressing_mode
+from BeyondChaosRandomizer.BeyondChaos.bcg_junction import JunctionManager
 from BeyondChaosRandomizer.BeyondChaos.character import get_characters, get_character, equip_offsets, character_list, load_characters
 from BeyondChaosRandomizer.BeyondChaos.chestrandomizer import mutate_event_items, get_event_items
 from BeyondChaosRandomizer.BeyondChaos.config import (get_input_path, get_output_path, save_input_path,
@@ -74,7 +74,7 @@ from BeyondChaosRandomizer.BeyondChaos.utils import (COMMAND_TABLE, LOCATION_TAB
 from BeyondChaosRandomizer.BeyondChaos.wor import manage_wor_recruitment, manage_wor_skip
 from BeyondChaosRandomizer.BeyondChaos.remonsterate.remonsterate import remonsterate
 
-VERSION = "CE-5.0.0"
+VERSION = "CE-5.0.1"
 BETA = False
 VERSION_ROMAN = "IV"
 if BETA:
@@ -120,7 +120,6 @@ JUNCTION_MANAGER_PARAMETERS = {
     'monster-equip-drop-enabled': 0,
     'esper-allocations-address': 0x3f858,
     }
-jm_set_addressing_mode('hirom')
 
 
 def log(text: str, section: str):
@@ -4967,7 +4966,7 @@ def junction_everything(jm: JunctionManager, outfile_rom_buffer: BytesIO):
         banned_equips = set()
         characters = get_characters()
         for c in characters:
-            if c.id >= 16:
+            if c.id >= 14:
                 continue
             for equiptype in ['weapon', 'shield', 'helm', 'armor',
                               'relic1', 'relic2']:
@@ -4998,6 +4997,36 @@ def junction_everything(jm: JunctionManager, outfile_rom_buffer: BytesIO):
                     item.mutate_name(character='!')
                     item.write_stats(outfile_rom_buffer)
         jm.activated = True
+
+        for equiptype in ['weapon', 'shield', 'helm', 'armor',
+                          'relic1', 'relic2']:
+            pool = [i for i in items if i.equippable
+                    and equiptype.startswith(i.equiptype)]
+            if equiptype == 'shield':
+                pool += [i for i in items if i.equippable
+                         and i.equiptype == 'weapon']
+            fallback = [
+                i for i in pool if not (i.has_disabling_status or
+                                        jm.equip_whitelist[i.itemid])]
+            pool = [i.itemid for i in pool]
+            fallback = [i.itemid for i in fallback]
+            pool.insert(0, 0xff)
+            fallback.insert(0, 0xff)
+            for c in characters:
+                if c.id != 15 and c.id < 29:
+                    continue
+                equip_address = c.address + equip_offsets[equiptype]
+                outfile_rom_buffer.seek(equip_address)
+                equipid = ord(outfile_rom_buffer.read(1))
+                junctions = jm.equip_whitelist[equipid]
+                if junctions:
+                    old_rank = pool.index(equipid) / (len(pool)-1)
+                    index = int(round(old_rank * (len(fallback)-1)))
+                    new_equip = fallback[index]
+                    old_item = [i for i in items if i.itemid == equipid][0]
+                    new_item = [i for i in items if i.itemid == new_equip][0]
+                    outfile_rom_buffer.seek(equip_address)
+                    outfile_rom_buffer.write(bytes([new_equip]))
 
     if Options_.is_flag_active('effectster'):
         monsters = get_monsters()
@@ -5050,15 +5079,10 @@ def randomize(connection: Pipe = None, **kwargs) -> str:
             infile_rom_path = kwargs.get('infile_rom_path')
             outfile_rom_path = kwargs.get('outfile_rom_path')
             pass
-        if application == "gui":
+        if application in ["gui", "web", "tester"]:
             # The gui (beyondchaos.py) should supply these kwargs
             infile_rom_path = kwargs.get('infile_rom_path')
             outfile_rom_path = kwargs.get('outfile_rom_path')
-            set_parent_pipe(connection)
-        if application == "web":
-            # The web interface should supply these kwargs
-            infile_rom_buffer = kwargs.get("infile_rom_buffer")
-            outfile_rom_buffer = kwargs.get("outfile_rom_buffer")
             set_parent_pipe(connection)
         fullseed = kwargs.get('seed')
 
@@ -6087,48 +6111,51 @@ def randomize(connection: Pipe = None, **kwargs) -> str:
                 expand_sub.bytestring = bytes([0x00] * (0x700000 - romsize))
                 expand_sub.write(outfile_rom_buffer)
 
-            jm.execute()
-            jm.verify()
-            log(jm.report, section='junctions')
+        if Options_.is_flag_active('playsitself'):
+            jm.patch_blacklist.add('patch_junction_focus_umaro.txt')
+        jm.execute()
+        jm.verify()
+        log(jm.report, section='junctions')
 
         rewrite_title(text="FF6 BCCE %s" % seed)
         validate_rom_expansion()
         rewrite_checksum()
         verify_patchlist(outfile_rom_buffer)
 
-        if not application or application != "web":
+        if not application or application in ["console", "gui"]:
             with open(outfile_rom_path, 'wb+') as f:
                 f.write(outfile_rom_buffer.getvalue())
             outfile_rom_buffer.close()
 
-        pipe_print("\nWriting log...")
+        if not application == "tester":
+            pipe_print("\nWriting log...")
 
-        for character in sorted(characters, key=lambda c: c.id):
-            character.associate_command_objects(list(commands.values()))
-            if character.id > 13:
-                continue
-            log(str(character), section="characters")
+            for character in sorted(characters, key=lambda c: c.id):
+                character.associate_command_objects(list(commands.values()))
+                if character.id > 13:
+                    continue
+                log(str(character), section="characters")
 
-        if options.Use_new_randomizer:
-            for character in sorted(character_list, key=lambda c: c.id):
-                if character.id <= 14:
-                    log(str(character), section="stats")
+            if options.Use_new_randomizer:
+                for character in sorted(character_list, key=lambda c: c.id):
+                    if character.id <= 14:
+                        log(str(character), section="stats")
 
-        for monster in sorted(get_monsters(), key=lambda m: m.display_name):
-            if monster.display_name:
-                log(monster.get_description(changed_commands=changed_commands),
-                    section="monsters")
+            for monster in sorted(get_monsters(), key=lambda m: m.display_name):
+                if monster.display_name:
+                    log(monster.get_description(changed_commands=changed_commands),
+                        section="monsters")
 
-        if not Options_.is_flag_active("ancientcave"):
-            log_chests()
-        log_item_mutations()
+            if not Options_.is_flag_active("ancientcave"):
+                log_chests()
+            log_item_mutations()
 
-        if not application or application != "web":
-            with open(outlog, 'w+') as f:
-                f.write(get_logstring(
-                    ["characters", "stats", "aesthetics", "commands", "blitz inputs", "magitek", "slots", "dances", "espers",
-                     "item magic", "item effects", "command-change relics", "colosseum", "monsters", "music",
-                     "remonsterate", "shops", "treasure chests", "junctions", "zozo clock", "secret items"]))
+            if not application or application in ["console", "gui"]:
+                with open(outlog, 'w+') as f:
+                    f.write(get_logstring(
+                        ["characters", "stats", "aesthetics", "commands", "blitz inputs", "magitek", "slots", "dances", "espers",
+                         "item magic", "item effects", "command-change relics", "colosseum", "monsters", "music",
+                         "remonsterate", "shops", "treasure chests", "junctions", "zozo clock", "secret items"]))
 
         if Options_.is_flag_active('bingoboingo'):
 
@@ -6182,7 +6209,10 @@ def randomize(connection: Pipe = None, **kwargs) -> str:
                          target_score=target_score)
             pipe_print("Bingo cards generated.")
 
-        if application != "web":
+        if application == "tester":
+            pipe_print("Randomization successful.")
+            pipe_print(True)
+        elif application in ["console", "gui"]:
             pipe_print("Randomization successful. Output filename: %s\n" % outfile_rom_path)
             if application == "gui":
                 pipe_print(True)
