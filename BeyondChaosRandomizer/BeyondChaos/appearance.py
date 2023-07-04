@@ -499,9 +499,9 @@ def get_sprite_swaps(char_ids, male, female, vswaps, web_custom_sprite_replaceme
         if wild:
             candidates = replace_candidates
         else:
-            if char_id in female:
+            if female and char_id in female:
                 candidates = female_candidates
-            elif char_id in male:
+            elif male and char_id in male:
                 candidates = male_candidates
             else:
                 candidates = neutral_candidates
@@ -728,13 +728,16 @@ def manage_character_appearance(outfile_rom_buffer: BytesIO, preserve_graphics=F
                 use_fallback = False
 
                 try:
-                    g = open_mei_fallback(os.path.join(os.getcwd(),
+                    current_working_directory = os.getcwd()
+                    if current_working_directory.endswith("BeyondChaosRandomizer\\BeyondChaos"):
+                        current_working_directory = pathlib.Path(current_working_directory).parent.parent.absolute()
+                    g = open_mei_fallback(os.path.join(current_working_directory,
                                                        "BeyondChaosRandomizer",
                                                        "BeyondChaos",
                                                        "custom",
                                                        "sprites",
                                                        swap_to[c].portrait_filename), "rb")
-                    h = open_mei_fallback(os.path.join(os.getcwd(),
+                    h = open_mei_fallback(os.path.join(current_working_directory,
                                                        "BeyondChaosRandomizer",
                                                        "BeyondChaos",
                                                        "custom",
