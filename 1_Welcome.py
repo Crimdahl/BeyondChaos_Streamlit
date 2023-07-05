@@ -19,6 +19,7 @@ def set_stylesheet():
 
 
 def process_import():
+    from pages.util.util import load_dance_names
     try:
         from BeyondChaosRandomizer.BeyondChaos.options import ALL_MODES, NORMAL_FLAGS, \
             MAKEOVER_MODIFIER_FLAGS, get_makeover_groups
@@ -44,13 +45,15 @@ def process_import():
         else:
             settings = loads(sl.session_state["imported_settings"].getvalue())
             for key, value in settings.items():
-                if key in ["female_names", "male_names",
-                           "moogle_names"]:
-                    sl.session_state[key] = value
+                if key in ["female_names", "male_names", "moogle_names",
+                           "passwords_bottom", "passwords_middle", "passwords_top",
+                           "songs", "coral_names"]:
+                    sl.session_state[key] = "\n".join(value)
                 elif key == "sprite_replacements":
-                    print("Importing sprite replacements.")
-                    sl.session_state["sprite_replacements"] = load_custom_sprite_replacements_from_csv(value)
+                    sl.session_state["sprite_replacements"] = load_custom_sprite_replacements_from_csv("\n".join(value))
                     sl.session_state["sprite_replacements_changed"] = "True"
+                elif key == "dance_names":
+                    load_dance_names("\n".join(value))
                 elif key == "batch":
                     try:
                         # Test if the value is a number

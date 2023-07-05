@@ -7,7 +7,7 @@ from time import time
 from io import BytesIO
 from multiprocessing import Process, Pipe
 from zipfile import ZipFile
-from pages.util.util import initialize_states, convert_sprite_replacements_to_csv
+from pages.util.util import initialize_states, convert_sprite_replacements_to_csv, convert_dance_names_to_string
 
 try:
     from BeyondChaosRandomizer.BeyondChaos.utils import WELL_KNOWN_ROM_HASHES
@@ -67,26 +67,34 @@ def process_export():
         "output_romfile",
         "rom_file_name",
         "status",
-        "flag_errors",
         "import_results",
         "sprite_replacements_changed",
-        "sprite_replacements_error",
-        "female_names_error",
-        "male_names_error",
-        "moogle_names_error",
         "generate_button",
-        "branch"
+        "branch",
+        "dance_prefixes_wind",
+        "dance_prefixes_forest",
+        "dance_prefixes_desert",
+        "dance_prefixes_love",
+        "dance_prefixes_earth",
+        "dance_prefixes_water",
+        "dance_prefixes_dark",
+        "dance_prefixes_ice"
     ]
     export_data = {}
     for key, value in sorted(sl.session_state.items()):
-        if key not in skip_keys:
+        if "error" in key:
+            skip_keys.append(key)
+        elif key not in skip_keys:
             if isinstance(value, str) or isinstance(value, int) or isinstance(value, float) or \
                     isinstance(value, DataFrame):
-                if key in ["female_names", "male_names",
-                           "moogle_names"]:
+                if key in ["female_names", "male_names", "moogle_names",
+                           "passwords_bottom", "passwords_middle", "passwords_top",
+                           "songs", "coral_names"]:
                     export_data[key] = str(value).strip().split("\n")
-                if key == "sprite_replacements":
-                    export_data[key] = convert_sprite_replacements_to_csv(sl.session_state["sprite_replacements"])
+                elif key == "sprite_replacements":
+                    export_data[key] = convert_sprite_replacements_to_csv(sl.session_state["sprite_replacements"]).split("\n")
+                elif key == "dance_suffixes":
+                    export_data["dance_names"] = convert_dance_names_to_string().split("\n")
                 else:
                     export_data[key] = value
     return export_data
@@ -120,7 +128,8 @@ def generate_game():
                                 + sl.session_state["passwords_bottom"],
                 "web_custom_coral_names": sl.session_state["coral_names"],
                 "web_custom_playlist": sl.session_state["songs"],
-                "web_custom_sprite_replacements": convert_sprite_replacements_to_csv(sl.session_state["sprite_replacements"])
+                "web_custom_sprite_replacements": convert_sprite_replacements_to_csv(sl.session_state["sprite_replacements"]),
+                "web_custom_dance_names": convert_dance_names_to_string()
             }
             child = Process(
                 target=randomize,
@@ -255,7 +264,8 @@ def main():
                     or sl.session_state["sprite_replacements_error"]\
                     or ("female_names_error" in sl.session_state.keys() and sl.session_state["female_names_error"])\
                     or ("male_names_error" in sl.session_state.keys() and sl.session_state["male_names_error"])\
-                    or ("moogle_names_error" in sl.session_state.keys() and sl.session_state["moogle_names_error"]):
+                    or ("moogle_names_error" in sl.session_state.keys() and sl.session_state["moogle_names_error"])\
+                    or ("dance_suffixes_error" in sl.session_state.keys() and sl.session_state["dance_suffixes_error"]):
                 gen_error = "A game cannot yet be generated for the following reasons:<ul>"
                 if "selected_flags" not in sl.session_state.keys() or not len(sl.session_state["selected_flags"]) > 0:
                     gen_error += "<li>No flags have been selected.</li>"
@@ -265,6 +275,8 @@ def main():
                     gen_error += "<li>The customization page requires additional male names.</li>"
                 if "moogle_names_error" in sl.session_state.keys() and sl.session_state["moogle_names_error"]:
                     gen_error += "<li>The customization page requires additional moogle names.</li>"
+                if "dance_suffixes_error" in sl.session_state.keys() and sl.session_state["dance_suffixes_error"]:
+                    gen_error += "<li>The customization page requires additional dance prefixes.</li>"
                 if "sprite_replacements_error" in sl.session_state.keys() and sl.session_state["sprite_replacements_error"]:
                     gen_error += "<li>There is an error in the sprite replacements table on the customization page. "
                     gen_error += sl.session_state["sprite_replacements_error"]

@@ -96,6 +96,7 @@ def load_coral_names():
 
     sl.session_state["coral_names"] = names.strip()
 
+
 def load_song_playlist():
     names = ""
     with open(os.path.join(os.getcwd(),
@@ -127,6 +128,43 @@ def load_passwords():
     sl.session_state["passwords_top"] = top_passwords.strip()
     sl.session_state["passwords_middle"] = middle_passwords.strip()
     sl.session_state["passwords_bottom"] = bottom_passwords.strip()
+
+
+def load_dance_names(dances=None):
+    if not dances:
+        with open(os.path.join(os.getcwd(), "BeyondChaosRandomizer", "BeyondChaos",
+                               "custom", "dancenames.txt")) as namefile:
+            dances = namefile.read()
+
+    index = 0
+    current_list = ""
+    session_state_list = ["dance_suffixes", "dance_prefixes_wind", "dance_prefixes_forest",
+                          "dance_prefixes_desert", "dance_prefixes_love", "dance_prefixes_earth",
+                          "dance_prefixes_water", "dance_prefixes_dark", "dance_prefixes_ice"]
+    for line in dances.split("\n"):
+        line = line.strip()
+        if line[0] == '*':
+            current_list = current_list.strip()
+            sl.session_state[session_state_list[index]] = current_list
+            current_list = ""
+            index += 1
+        else:
+            current_list += line + "\n"
+    current_list = current_list.strip()
+    sl.session_state[session_state_list[index]] = current_list
+
+
+def convert_dance_names_to_string():
+    dance_names = ""
+    session_state_list = ["dance_suffixes", "dance_prefixes_wind", "dance_prefixes_forest",
+                          "dance_prefixes_desert", "dance_prefixes_love", "dance_prefixes_earth",
+                          "dance_prefixes_water", "dance_prefixes_dark", "dance_prefixes_ice"]
+    for state in session_state_list:
+        dance_names += sl.session_state[state]
+        dance_names += "\n*****\n"
+
+    dance_names = dance_names.strip("\n*****\n")
+    return dance_names
 
 
 def load_default_sprite_replacements_from_csv():
@@ -166,7 +204,6 @@ def load_custom_sprite_replacements_from_csv(csv_data):
     spritereplacements = [SpriteReplacement(*line.strip().split(',')) for line in csv_data.split("\n")]
 
     for replacement in spritereplacements:
-        print(str(replacement.file))
         sprite_data.append(
             {
                 "Filename": replacement.file if not replacement.file == "None" else None,
@@ -215,6 +252,7 @@ def validate_sprite_replacements(data: DataFrame):
     else:
         sl.session_state["sprite_replacements_error"] = None
 
+
 def convert_sprite_replacements_to_csv(data: DataFrame):
     csv_output = ""
     validate_sprite_replacements(data)
@@ -234,6 +272,7 @@ def convert_sprite_replacements_to_csv(data: DataFrame):
     csv_output = csv_output.strip()
     return csv_output
 
+
 def initialize_states():
     config = ConfigParser()
     config.read(os.path.join(os.getcwd(), "config.ini"))
@@ -242,7 +281,6 @@ def initialize_states():
         if config.has_section("version"):
             if config.has_option("version", "branch"):
                 sl.session_state["branch"] = config.get(section="version", option="branch")
-
 
     for flag in SORTED_FLAGS:
         if flag.inputtype == "boolean":
@@ -265,6 +303,7 @@ def initialize_states():
     load_passwords()
     load_default_sprite_replacements_from_csv()
     load_coral_names()
+    load_dance_names()
     sl.session_state["sprite_replacements_error"] = None
     sl.session_state["batch"] = 1
     sl.session_state["seed"] = 0

@@ -53,9 +53,30 @@ def update_coral_names():
     sl.session_state["coral_names"] = sl.session_state["widget_coral_names"]
 
 
+def update_dances(dance_value):
+    if dance_value == "suffixes":
+        sl.session_state["dance_suffixes"] = sl.session_state["widget_dance_suffixes"]
+    elif dance_value == "wind":
+        sl.session_state["dance_prefixes_wind"] = sl.session_state["widget_dance_prefixes_wind"]
+    elif dance_value == "forest":
+        sl.session_state["dance_prefixes_forest"] = sl.session_state["widget_dance_prefixes_forest"]
+    elif dance_value == "desert":
+        sl.session_state["dance_prefixes_desert"] = sl.session_state["widget_dance_prefixes_desert"]
+    elif dance_value == "love":
+        sl.session_state["dance_prefixes_love"] = sl.session_state["widget_dance_prefixes_love"]
+    elif dance_value == "earth":
+        sl.session_state["dance_prefixes_earth"] = sl.session_state["widget_dance_prefixes_earth"]
+    elif dance_value == "water":
+        sl.session_state["dance_prefixes_water"] = sl.session_state["widget_dance_prefixes_water"]
+    elif dance_value == "dark":
+        sl.session_state["dance_prefixes_dark"] = sl.session_state["widget_dance_prefixes_dark"]
+    elif dance_value == "ice":
+        sl.session_state["dance_prefixes_ice"] = sl.session_state["widget_dance_prefixes_ice"]
+
+
 def log_sprite_replacements_change():
-    if sl.session_state["widget_sprite_replacements"]["edited_cells"]:
-        sprite_replacement_changes.append(sl.session_state["widget_sprite_replacements"]["edited_cells"])
+    if sl.session_state["widget_sprite_replacements"]["edited_rows"]:
+        sprite_replacement_changes.append(sl.session_state["widget_sprite_replacements"]["edited_rows"])
     if sl.session_state["widget_sprite_replacements"]["deleted_rows"]:
         sprite_replacement_changes.append(sl.session_state["widget_sprite_replacements"]["deleted_rows"])
     if sl.session_state["widget_sprite_replacements"]["added_rows"]:
@@ -64,17 +85,21 @@ def log_sprite_replacements_change():
 
 def update_sprite_replacements():
     sl.session_state["sprite_replacements_changed"] = True
-    for key, value in sl.session_state["widget_sprite_replacements"]["edited_cells"].items():
-        row, column = key.split(":")
-        sl.session_state["sprite_replacements"].iat[int(row), int(column) - 1] = value
+    # Edited Rows data structure: {row number: {column name: changed value}}
+    for key, value in sl.session_state["widget_sprite_replacements"]["edited_rows"].items():
+        row = key
+        for column_name, changed_value in value.items():
+            sl.session_state["sprite_replacements"][column_name].iat[int(row)] = changed_value
     for index in sl.session_state["widget_sprite_replacements"]["deleted_rows"]:
         sl.session_state["sprite_replacements"].drop(index, axis=0, inplace=True)
     for row in sl.session_state["widget_sprite_replacements"]["added_rows"]:
-        data=[None, None, None, False, None, None, None, None]
+        # Set defaults, then replace defaults with supplied data, then add to DataFrame
+        data = [None, None, None, False, None, None, None, None]
         for column_index, value in row.items():
             data[int(column_index) - 1] = value
         sl.session_state["sprite_replacements"].loc[len(sl.session_state["sprite_replacements"].index)] = data
     validate_sprite_replacements(sl.session_state["sprite_replacements"])
+
 
 def main():
     sl.set_page_config(
@@ -130,7 +155,6 @@ def main():
                 load_female_character_names()
                 sl.experimental_rerun()
 
-
         with sl.expander(label="Male Character Names", expanded=False):
             sl.text("List of names for male characters.\nAll characters can still be renamed on acquisition "
                     "and by using the Namingway NPC on the airship.")
@@ -169,7 +193,6 @@ def main():
                 from pages.util.util import load_male_character_names
                 load_male_character_names()
                 sl.experimental_rerun()
-
 
         with sl.expander(label="Moogle Character Names", expanded=False):
             sl.markdown(
@@ -217,7 +240,6 @@ def main():
                 from pages.util.util import load_moogle_character_names
                 load_moogle_character_names()
                 sl.experimental_rerun()
-
 
         with sl.expander(label="South Figaro Passwords (Experimental)", expanded=False):
             sl.text("List of passwords that can appear in Locke's scenario.")
@@ -285,6 +307,127 @@ def main():
                 load_coral_names()
                 sl.experimental_rerun()
 
+        with sl.expander(label="Dance Names (Experimental)", expanded=False):
+            sl.markdown(
+                'A list of text values used to randomize dance names.<br>'
+                'The first set of values are suffixes that can be paired with any of the sets of prefixes.<br>'
+                'One prefix followed by one suffix makes a dance name, such as the prefix "Leaf" and the '
+                'suffix "Shanty" would make "Leaf Shanty".<br>'
+                'A combined prefix and suffix can be no longer than 11 characters in-game. '
+                'As a result, a prefix or suffix longer than 6 characters is unlikely to ever appear.<br>'
+                'If the randomizer cannot find a valid combination of prefix and suffix for a dance, the '
+                'randomization process will crash. This is something to be fixed in the future, but for now '
+                'please ensure there are plenty of prefixes and suffixes of length 6 or less.'
+                ,
+                unsafe_allow_html=True
+            )
+            sl.text_area(
+                label="Dance Suffixes",
+                label_visibility='visible',
+                value=sl.session_state["dance_suffixes"],
+                on_change=update_dances,
+                args=["suffixes"],
+                key="widget_dance_suffixes",
+                height=300
+            )
+            num_dance_suffixes = len(sl.session_state["dance_suffixes"].split("\n"))
+            sl.markdown(
+                "<div>Total Dance Suffixes: " + str(num_dance_suffixes) + ".</div><br>",
+                unsafe_allow_html=True
+            )
+            if num_dance_suffixes < 8:
+                sl.session_state["dance_suffixes_error"] = "The randomizer requires at least 8 dance suffixes."
+            else:
+                sl.session_state["dance_suffixes_error"] = ""
+            if "dance_suffixes_error" in sl.session_state.keys() and sl.session_state[
+                    "dance_suffixes_error"]:
+                sl.markdown(
+                '<div style="color: red">'
+                    + sl.session_state["dance_suffixes_error"] +
+                '</div><br>',
+                unsafe_allow_html=True
+                )
+
+            sl.text_area(
+                label="Wind/Sky/Plains Prefixes",
+                label_visibility='visible',
+                value=sl.session_state["dance_prefixes_wind"],
+                on_change=update_dances,
+                args=["wind"],
+                key="widget_dance_prefixes_wind",
+                height=300
+            )
+            sl.text_area(
+                label="Forest/Nature Prefixes",
+                label_visibility='visible',
+                value=sl.session_state["dance_prefixes_forest"],
+                on_change=update_dances,
+                args=["forest"],
+                key="widget_dance_prefixes_forest",
+                height=300
+            )
+            sl.text_area(
+                label="Heat/Fire Prefixes",
+                label_visibility='visible',
+                value=sl.session_state["dance_prefixes_desert"],
+                on_change=update_dances,
+                args=["desert"],
+                key="widget_dance_prefixes_desert",
+                height=300
+            )
+            sl.text_area(
+                label="Life/Holy Prefixes",
+                label_visibility='visible',
+                value=sl.session_state["dance_prefixes_love"],
+                on_change=update_dances,
+                args=["love"],
+                key="widget_dance_prefixes_love",
+                height=300
+            )
+            sl.text_area(
+                label="Earth Prefixes",
+                label_visibility='visible',
+                value=sl.session_state["dance_prefixes_earth"],
+                on_change=update_dances,
+                args=["earth"],
+                key="widget_dance_prefixes_earth",
+                height=300
+            )
+            sl.text_area(
+                label="Water Prefixes",
+                label_visibility='visible',
+                value=sl.session_state["dance_prefixes_water"],
+                on_change=update_dances,
+                args=["water"],
+                key="widget_dance_prefixes_water",
+                height=300
+            )
+            sl.text_area(
+                label="Dark/Darkness Prefixes",
+                label_visibility='visible',
+                value=sl.session_state["dance_prefixes_dark"],
+                on_change=update_dances,
+                args=["dark"],
+                key="widget_dance_prefixes_dark",
+                height=300
+            )
+            sl.text_area(
+                label="Icy/Cold Prefixes",
+                label_visibility='visible',
+                value=sl.session_state["dance_prefixes_ice"],
+                on_change=update_dances,
+                args=["ice"],
+                key="widget_dance_prefixes_ice",
+                height=300
+            )
+            if sl.button(
+                label="Restore Defaults",
+                key="widget_reset_dances"
+            ):
+                from pages.util.util import load_dance_names
+                load_dance_names()
+                sl.experimental_rerun()
+
         with sl.expander(
             label="Character Sprite Replacements (Experimental)",
             expanded=False,
@@ -322,7 +465,7 @@ def main():
                     ,
                     unsafe_allow_html=True
             )
-            sl.experimental_data_editor(
+            sl.data_editor(
                 data=sl.session_state["sprite_replacements"],
                 height=400,
                 use_container_width=True,
@@ -332,7 +475,7 @@ def main():
 
             sl.button(
                 label="Apply Changes",
-                disabled="edited_cells" in sl.session_state.keys() and len(sl.session_state["widget_sprite_replacements"]["edited_cells"]) == 0 and
+                disabled="edited_rows" in sl.session_state.keys() and len(sl.session_state["widget_sprite_replacements"]["edited_rows"]) == 0 and
                         "added_rows" in sl.session_state.keys() and len(sl.session_state["widget_sprite_replacements"]["added_rows"]) == 0 and
                         "deleted_rows" in sl.session_state.keys() and len(sl.session_state["widget_sprite_replacements"]["deleted_rows"]) == 0,
                 on_click=update_sprite_replacements
