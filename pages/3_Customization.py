@@ -53,6 +53,10 @@ def update_coral_names():
     sl.session_state["coral_names"] = sl.session_state["widget_coral_names"]
 
 
+def update_monster_attack_names():
+    sl.session_state["monster_attack_names"] = sl.session_state["widget_monster_attack_names"]
+
+
 def update_dances(dance_value):
     if dance_value == "suffixes":
         sl.session_state["dance_suffixes"] = sl.session_state["widget_dance_suffixes"]
@@ -305,6 +309,36 @@ def main():
             ):
                 from pages.util.util import load_coral_names
                 load_coral_names()
+                sl.experimental_rerun()
+
+        with sl.expander(label="Monster Attack Names (Experimental)", expanded=False):
+            sl.markdown(
+                'List of replacement names for enemy moves.<br>'
+                'All entries should be between 3 and 10 characters. Less than 3 characters and '
+                'the entry is unlikely to ever show up. More than 10 characters and your skill name may '
+                'be truncated.<br>'
+                ,
+                unsafe_allow_html=True
+            )
+            sl.text_area(
+                label="Monster Attack Names",
+                label_visibility='collapsed',
+                value=sl.session_state["monster_attack_names"],
+                on_change=update_monster_attack_names,
+                key="widget_monster_attack_names",
+                height=300
+            )
+            num_monster_attack_names = len(sl.session_state["monster_attack_names"].split("\n"))
+            sl.markdown(
+                "<div>Total monster attack names: " + str(num_monster_attack_names) + ".</div><br>",
+                unsafe_allow_html=True
+            )
+            if sl.button(
+                label="Restore Defaults",
+                key="widget_reset_monster_attack_names"
+            ):
+                from pages.util.util import load_monster_attack_names
+                load_monster_attack_names()
                 sl.experimental_rerun()
 
         with sl.expander(label="Dance Names (Experimental)", expanded=False):

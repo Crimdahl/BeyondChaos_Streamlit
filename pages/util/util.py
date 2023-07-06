@@ -167,6 +167,16 @@ def convert_dance_names_to_string():
     return dance_names
 
 
+def load_monster_attack_names():
+    names = ""
+    with open(os.path.join(os.getcwd(),
+                           "BeyondChaosRandomizer", "BeyondChaos", "custom", "moves.txt")) as namefile:
+        for line in namefile:
+            names += line
+
+    sl.session_state["monster_attack_names"] = names.strip()
+
+
 def load_default_sprite_replacements_from_csv():
     from pandas import DataFrame
     from BeyondChaosRandomizer.BeyondChaos.appearance import SpriteReplacement
@@ -304,6 +314,7 @@ def initialize_states():
     load_default_sprite_replacements_from_csv()
     load_coral_names()
     load_dance_names()
+    load_monster_attack_names()
     sl.session_state["sprite_replacements_error"] = None
     sl.session_state["batch"] = 1
     sl.session_state["seed"] = 0

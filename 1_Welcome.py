@@ -47,7 +47,7 @@ def process_import():
             for key, value in settings.items():
                 if key in ["female_names", "male_names", "moogle_names",
                            "passwords_bottom", "passwords_middle", "passwords_top",
-                           "songs", "coral_names"]:
+                           "songs", "coral_names", "monster_attack_names"]:
                     sl.session_state[key] = "\n".join(value)
                 elif key == "sprite_replacements":
                     sl.session_state["sprite_replacements"] = load_custom_sprite_replacements_from_csv("\n".join(value))

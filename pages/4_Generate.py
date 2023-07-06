@@ -89,7 +89,7 @@ def process_export():
                     isinstance(value, DataFrame):
                 if key in ["female_names", "male_names", "moogle_names",
                            "passwords_bottom", "passwords_middle", "passwords_top",
-                           "songs", "coral_names"]:
+                           "songs", "coral_names", "monster_attack_names"]:
                     export_data[key] = str(value).strip().split("\n")
                 elif key == "sprite_replacements":
                     export_data[key] = convert_sprite_replacements_to_csv(sl.session_state["sprite_replacements"]).split("\n")
@@ -129,7 +129,8 @@ def generate_game():
                 "web_custom_coral_names": sl.session_state["coral_names"],
                 "web_custom_playlist": sl.session_state["songs"],
                 "web_custom_sprite_replacements": convert_sprite_replacements_to_csv(sl.session_state["sprite_replacements"]),
-                "web_custom_dance_names": convert_dance_names_to_string()
+                "web_custom_dance_names": convert_dance_names_to_string(),
+                "web_custom_monster_attack_names": sl.session_state["monster_attack_names"].split("\n")
             }
             child = Process(
                 target=randomize,
