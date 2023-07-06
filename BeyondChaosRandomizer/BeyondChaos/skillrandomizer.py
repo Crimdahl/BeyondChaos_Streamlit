@@ -158,7 +158,7 @@ class SpellBlock:
 
         if self.target_enemy_default or \
                 (self.target_everyone and not
-                self.target_one_side_only):
+                 self.target_one_side_only):
             if power:
                 if self.ignore_defense:
                     baseline = baseline * 2
@@ -444,7 +444,7 @@ def get_spellsets(spells=None):
     spellsets['Limit'] = ('Limit breaker', [l for l in limitSpellids])
 
     spellsets['Level'] = ('level-based skill',
-                          [s for s in spells if s.level_spell])
+                          [s for s in spells if s.level_spell or s.name in ["Flare Star", "Dischord", "Stone"]])
     spellsets['Miss'] = ('skill with low accuracy',
                          [s for s in spells if not s.unblockable and not s.level_spell and 0 < s.accuracy < 90])
 
@@ -470,9 +470,9 @@ class RandomSpellSub(Substitution):
         if self.wild:
             return self.get_wild()
         template = bytearray(
-            [0x20, 0x5A, 0x4B,  # get random number
-             0x29, 0x00,  # AND the result
-             0xAA,  # TAX
+            [0x20, 0x5A, 0x4B,        # get random number
+             0x29, 0x00,              # AND the result
+             0xAA,                    # TAX
              0xBF, 0x00, 0x00, 0x00,  # load byte from $addr + X
              0x85, 0xB6, 0xA9, 0x02, 0x85, 0xB5,
              0x64, 0xB8, 0x64, 0xB9,  # clear targets
@@ -484,13 +484,13 @@ class RandomSpellSub(Substitution):
 
     def get_wild(self):
         template = bytearray(
-            [0x20, 0x5A, 0x4B,  # get random number
+            [0x20, 0x5A, 0x4B,        # get random number
              0x85, 0xB6, 0xA9, 0x02, 0x85, 0xB5,
              0x64, 0xB8, 0x64, 0xB9,  # clear targets
              0x20, 0xC1, 0x19,  # JSR $19C1
              0x20, 0x51, 0x29,  # JSR $2951
              0x4C, 0x5F, 0x17,
-             ])
+            ])
         return template
 
     @property
@@ -511,8 +511,8 @@ class RandomSpellSub(Substitution):
         self.bytestring[7:10] = bytearray([c, b, a])
         self.bytestring += bytearray(sorted([s.spellid for s in self.spells]))
 
-    def write(self, fout):
-        super(RandomSpellSub, self).write(fout)
+    def write(self, outfile_rom_buffer):
+        super(RandomSpellSub, self).write(outfile_rom_buffer)
 
     def set_spells(self, valid_spells, spellclass=None, spellsets=None):
         spellsets = spellsets or get_spellsets(spells=valid_spells)
@@ -620,10 +620,10 @@ class ComboSpellSub(Substitution):
         self.bytestring.append(0x60)
         assert len(self.bytestring) == self.get_overhead()
 
-    def write(self, fout):
-        super(ComboSpellSub, self).write(fout)
+    def write(self, outfile_rom_buffer):
+        super(ComboSpellSub, self).write(outfile_rom_buffer)
         for s in self.spellsubs:
-            s.write(fout)
+            s.write(outfile_rom_buffer)
 
     def __repr__(self):
         return "Use the combo {0}.".format(
@@ -648,9 +648,9 @@ class MultiSpellSubMixin(Substitution):
             self.name = self.spellsub.name
             self.spells = self.spellsub.spells
 
-    def write(self, fout):
-        self.spellsub.write(fout)
-        super(MultiSpellSubMixin, self).write(fout)
+    def write(self, outfile_rom_buffer):
+        self.spellsub.write(outfile_rom_buffer)
+        super(MultiSpellSubMixin, self).write(outfile_rom_buffer)
 
 
 class ChainSpellSub(MultiSpellSubMixin):
@@ -667,14 +667,14 @@ class ChainSpellSub(MultiSpellSubMixin):
         self.bytestring = bytearray([
             0xA9, 0x01,
             0x04, 0xB2,
-            0x5A,  # PHY
-            0x20, low, high,  # call spell sub
-            0x7A,  # PLY
-            0x20, 0x5A, 0x4B,  # get random number
-            0x29, 0x01,  # AND the result
-            0xC9, 0x00,  # CMP #0
-            0xD0, 0x00,  # BNE start of bytestring
-        ])
+            0x5A,                           # PHY
+            0x20, low, high,                # call spell sub
+            0x7A,                           # PLY
+            0x20, 0x5A, 0x4B,               # get random number
+            0x29, 0x01,                     # AND the result
+            0xC9, 0x00,                     # CMP #0
+            0xD0, 0x00,                     # BNE start of bytestring
+            ])
         length = len(self.bytestring)
         self.bytestring[-1] = (0x100 - length)
         self.bytestring += bytearray([0x60])

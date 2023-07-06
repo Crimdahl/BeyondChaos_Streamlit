@@ -81,15 +81,22 @@ def main():
         # Populate the About tab
         #
         tabs[0].markdown(
-            "<p>Beyond Chaos is a closed-world randomizer for Final Fantasy VI.</p>"
-            "<p>Beyond Chaos was initially created by Abyssonym, developer of a variety of different randomizers, "
-            "including "
-            "<a href=https://github.com/abyssonym/terriblesecret>Mystic Quest (SNES)</a>, "
-            "<a href=https://github.com/abyssonym/aos_rando>Castlevania: Aria of Sorrow (DS)</a>, "
-            "<a href=https://github.com/abyssonym/eternalnightmare>Chrono Trigger (SNES)</a>, and "
-            "<a href=https://github.com/abyssonym/tmnt_rando>Teenage Mutant Ninja Turtles (NES)</a>.</p>"
-            "<p>Subsequently, development was handled by SubtractionSoup before finally arriving in the hands "
-            "of DarkSlash88, where it currently resides.</p>"
+            '<p>Beyond Chaos is a closed-world randomizer for Final Fantasy VI.</p>'
+            '<p>Beyond Chaos was initially created by Abyssonym, developer of a variety of different randomizers, '
+            'including:<ul> '
+            '<li><a href=https://github.com/abyssonym/terriblesecret>Mystic Quest (SNES)</a></li>'
+            '<li><a href=https://github.com/abyssonym/aos_rando>Castlevania: Aria of Sorrow (DS)</a></li>'
+            '<li><a href=https://github.com/abyssonym/eternalnightmare>Chrono Trigger (SNES)</a></li>'
+            '<li><a href=https://github.com/abyssonym/tmnt_rando>Teenage Mutant Ninja Turtles (NES)</a></li>'
+            '<li><a href=https://github.com/abyssonym/terrorwave>Lufia 2 Randomizer (SNES)</a> '
+            '<span style="color:orange;">(NEW!)</span></li></ul></p>'
+            '<p>Development of Beyond Chaos was eventually forked two additional times. First, by SubtractionSoup, '
+            'creating Beyond Chaos EX. Then, by DarkSlash88, creating Beyond Chaos CE (Community Edition). This web '
+            'randomizer is for Beyond Chaos CE, but please feel free to check out SubtractionSoup\'s Beyond Chaos '
+            'EX at the following GitHub repository: '
+            '<a href=https://github.com/subtractionsoup/beyondchaos>Beyond Chaos EX</a></p>'
+            '<p>Additionally, if you think you would enjoy a more open world FFVI randomizer experience, check out '
+            'Worlds Collide at the following link: <a href=https://ff6worldscollide.com/>FF6 Worlds Collide</a></p>'
             ,
             unsafe_allow_html=True
         )
@@ -114,7 +121,10 @@ def main():
                     '<b>Abyssonym</b>, original creator of Beyond Chaos.'
                 '</p>'
                 '<div class="pill first-pill">'
-                    'Code'
+                    'Python'
+                '</div>'
+                '<div class="pill">'
+                    'ASM'
                 '</div>'
                 '<br>'
                 '<p>'
@@ -133,14 +143,18 @@ def main():
                     '<a href="https://discord.gg/Vzk2tsm92A">'
                         '<img class="social" src=' + img_to_html("images/ico_discord.png") + '>'
                     '</a>'
+                    '&emsp;'
+                    '<a href="https://www.ff6hacking.com/forums/user-1908.html">'
+                        '<img class="social" src=' + img_to_html("images/favicon.png") + '>'
+                    '</a>'
                 '</p>'
                 '<hr>'
                                                                              
                 '<p class="username">'
-                    '<b>SubtractionSoup</b>, second creator of Beyond Chaos.'
+                    '<b>SubtractionSoup</b>, developer of Beyond Chaos EX.'
                 '</p>'
                 '<div class="pill first-pill">'
-                    'Code'
+                    'Python'
                 '</div>'
                 '<br>'
                 '<p>'
@@ -152,13 +166,13 @@ def main():
                 '<hr>'
                                                                 
                 '<p class="username">'
-                    '<b>DarkSlash88</b>, current Beyond Chaos project leader.'
+                    '<b>DarkSlash88</b>, Beyond Chaos CE project leader.'
                 '</p>'
                 '<div class="pill first-pill">'
                     'Project Lead'
                 '</div>'
                 '<div class="pill">'
-                    'Code'
+                    'Python'
                 '</div>'
                 '<br>'
                 '<p>'
@@ -178,10 +192,11 @@ def main():
                 '<hr>'
                          
                 '<p class="username">'
-                    '<b>fusoyeahhhh</b>, brain behind BC Fantasy, BC Flag Drafter, and FFVI Script Randomizer'
+                    '<b>fusoyeahhhh</b>, mastermind behind BC Fantasy, BC Flag Drafter, FFVI Script Randomizer, and '
+                                                                                            'other BC utilities.'
                 '</p>'
                 '<div class="pill first-pill">'
-                    'Code'
+                    'Python'
                 '</div>'
                 '<br>'
                 '<p>'
@@ -197,10 +212,10 @@ def main():
                 '<hr>'
                                                        
                 '<p class="username">'
-                    '<b>Crimdahl</b>, Python coder and creator of this web interface'
+                    '<b>Crimdahl</b>, BCCE helper, Python coder, and creator of this web interface'
                 '</p>'
                 '<div class="pill first-pill">'
-                    'Code'
+                    'Python'
                 '</div>'
                 '<div class="pill">'
                     'GUI'
@@ -218,12 +233,18 @@ def main():
                     '<b>CDude</b>, romhacker and ASM wizard'
                 '</p>'  
                 '<div class="pill first-pill">'
-                    'Code'
+                    'Python'
                 '</div>'
                 '<div class="pill">'
                     'ASM'
                 '</div>'
                 '<br>'
+                '<p>'
+                    '&emsp;'
+                    '<a href="https://www.ff6hacking.com/forums/user-2274.html">'
+                        '<img class="social" src=' + img_to_html("images/favicon.png") + '>'
+                    '</a>'
+                '</p>'
                 '<hr>'                     
                                                                 
                 '<p class="username">'
@@ -248,7 +269,7 @@ def main():
                     '<b>DoctorInsanoPhD</b>'
                 '</p>'
                 '<div class="pill first-pill">'
-                    'Code'
+                    'Python'
                 '</div>'     
                 '<br>'
                 '<p>'
@@ -289,6 +310,9 @@ def main():
                         '<img class="social" src=' + img_to_html("images/ico_github.png") + '>'
                     '</a>'
                     '&emsp;'
+                    '<a href="https://www.ff6hacking.com/forums/user-2252.html">'
+                        '<img class="social" src=' + img_to_html("images/favicon.png") + '>'
+                    '</a>'
                 '</p>'
                 '<hr>'
 
@@ -299,13 +323,12 @@ def main():
                     'Sprites'
                 '</div>'
                 '<br>'
-                # '<p>'
-                #     '&emsp;'
-                #     '<a href="">'
-                #         '<img class="social"'
-                #             'src=' + img_to_html("images/ico_.png") + '>'
-                #     '</a>'
-                # '</p>'
+                '<p>'
+                    '&emsp;'
+                    '<a href="https://www.ff6hacking.com/forums/user-2235.html">'
+                        '<img class="social" src=' + img_to_html("images/favicon.png") + '>'
+                    '</a>'
+                '</p>'
                 '<hr>'
 
                 '<p class="username">'
@@ -328,6 +351,9 @@ def main():
                         '<img class="social" src=' + img_to_html("images/ico_discord.png") + '>'
                     '</a>'
                     '&emsp;'
+                    '<a href="https://www.ff6hacking.com/forums/user-2300.html">'
+                        '<img class="social" src=' + img_to_html("images/favicon.png") + '>'
+                    '</a>'
                 '</p>'
                 '<hr>'
 
@@ -351,57 +377,45 @@ def main():
                     '<b>Lockirby2</b>'
                 '</p>'
                 '<div class="pill first-pill">'
-                    'Code'
+                    'Python'
                 '</div>'
                 '<div class="pill">'
                     'ASM'
                 '</div>'
                 '<br>'
-                # '<p>'
-                #     '&emsp;'
-                #     '<a href="">'
-                #         '<img class="social"'
-                #             'src=' + img_to_html("images/ico_.png") + '>'
-                #     '</a>'
-                # '</p>'
+                '<p>'
+                    '&emsp;'
+                    '<a href="https://www.ff6hacking.com/forums/user-827.html">'
+                        '<img class="social" src=' + img_to_html("images/favicon.png") + '>'
+                    '</a>'
+                '</p>'
                 '<hr>'
 
                 '<p class="username">'
-                    '<b>myself086</b>'
+                    '<b>myself086, creator of item locking, alphabetized rages, rage locking, and more.</b>'
                 '</p>'
                 '<div class="pill first-pill">'
                     'ASM'
                 '</div>'
                 '<div class="pill">'
-                    'Code'
+                    'Patches'
+                '</div>'
+                '<div class="pill">'
+                    'Python'
                 '</div>'
                 '<br>'
-                # '<p>'
-                #     '&emsp;'
-                #     '<a href="">'
-                #         '<img class="social"'
-                #             'src=' + img_to_html("images/ico_.png") + '>'
-                #     '</a>'
-                # '</p>'
                 '<hr>'
 
                 '<p class="username">'
                     '<b>Dracovious</b>'
                 '</p>'
                 '<div class="pill first-pill">'
-                    'Code'
+                    'Python'
                 '</div>'
                 '<div class="pill">'
                     'GUI'
                 '</div>'
                 '<br>'
-                # '<p>'
-                #     '&emsp;'
-                #     '<a href="">'
-                #         '<img class="social"'
-                #             'src=' + img_to_html("images/ico_.png") + '>'
-                #     '</a>'
-                # '</p>'
                 '<hr>'
 
                 '<p class="username">'
@@ -414,29 +428,15 @@ def main():
                     'Utilities'
                 '</div>'
                 '<br>'
-                # '<p>'
-                #     '&emsp;'
-                #     '<a href="">'
-                #         '<img class="social"'
-                #             'src=' + img_to_html("images/ico_.png") + '>'
-                #     '</a>'
-                # '</p>'
                 '<hr>'
 
                 '<p class="username">'
                     '<b>RazzleStorm</b>'
                 '</p>'
                 '<div class="pill first-pill">'
-                    'Code'
+                    'Python'
                 '</div>'
                 '<br>'
-                # '<p>'
-                #     '&emsp;'
-                #     '<a href="">'
-                #         '<img class="social"'
-                #             'src=' + img_to_html("images/ico_.png") + '>'
-                #     '</a>'
-                # '</p>'
                 '<hr>'
 
                 '<p class="username">'
@@ -446,13 +446,12 @@ def main():
                     'Patches'
                 '</div>'
                 '<br>'
-                # '<p>'
-                #     '&emsp;'
-                #     '<a href="">'
-                #         '<img class="social"'
-                #             'src=' + img_to_html("images/ico_.png") + '>'
-                #     '</a>'
-                # '</p>'
+                '<p>'
+                    '&emsp;'
+                    '<a href="https://www.ff6hacking.com/forums/user-1111.html">'
+                        '<img class="social" src=' + img_to_html("images/favicon.png") + '>'
+                    '</a>'
+                '</p>'
                 '<hr>'
 
                 '<p class="username">'
@@ -463,13 +462,6 @@ def main():
                     'Patches'
                 '</div>'
                 '<br>'
-                # '<p>'
-                #     '&emsp;'
-                #     '<a href="">'
-                #         '<img class="social"'
-                #             'src=' + img_to_html("images/ico_.png") + '>'
-                #     '</a>'
-                # '</p>'
                 '<hr>'
 
                 '<p class="username">'
@@ -479,13 +471,6 @@ def main():
                     'Patches'
                 '</div>'
                 '<br>'
-                # '<p>'
-                #     '&emsp;'
-                #     '<a href="">'
-                #         '<img class="social"'
-                #             'src=' + img_to_html("images/ico_.png") + '>'
-                #     '</a>'
-                # '</p>'
                 '<hr>'
 
                 '<p class="username">'
@@ -495,13 +480,12 @@ def main():
                     'Patches'
                 '</div>'
                 '<br>'
-                # '<p>'
-                #     '&emsp;'
-                #     '<a href="">'
-                #         '<img class="social"'
-                #             'src=' + img_to_html("images/ico_.png") + '>'
-                #     '</a>'
-                # '</p>'
+                '<p>'
+                    '&emsp;'
+                    '<a href="https://www.ff6hacking.com/forums/user-2052.html">'
+                        '<img class="social" src=' + img_to_html("images/favicon.png") + '>'
+                    '</a>'
+                '</p>'
                 '<hr>'
 
                 '<p class="username">'
@@ -511,13 +495,12 @@ def main():
                     'Patches'
                 '</div>'
                 '<br>'
-                # '<p>'
-                #     '&emsp;'
-                #     '<a href="">'
-                #         '<img class="social"'
-                #             'src=' + img_to_html("images/ico_.png") + '>'
-                #     '</a>'
-                # '</p>'
+                '<p>'
+                    '&emsp;'
+                    '<a href="https://www.ff6hacking.com/forums/user-2031.html">'
+                        '<img class="social" src=' + img_to_html("images/favicon.png") + '>'
+                    '</a>'
+                '</p>'
                 '<hr>'
 
                 '<p class="username">'
@@ -527,13 +510,12 @@ def main():
                     'Patches'
                 '</div>'
                 '<br>'
-                # '<p>'
-                #     '&emsp;'
-                #     '<a href="">'
-                #         '<img class="social"'
-                #             'src=' + img_to_html("images/ico_.png") + '>'
-                #     '</a>'
-                # '</p>'
+                '<p>'
+                    '&emsp;'
+                    '<a href="https://www.ff6hacking.com/forums/user-2151.html">'
+                        '<img class="social" src=' + img_to_html("images/favicon.png") + '>'
+                    '</a>'
+                '</p>'
                 '<hr>'
 
                 '<p class="username">'
@@ -543,13 +525,12 @@ def main():
                     'Patches'
                 '</div>'
                 '<br>'
-                # '<p>'
-                #     '&emsp;'
-                #     '<a href="">'
-                #         '<img class="social"'
-                #             'src=' + img_to_html("images/ico_.png") + '>'
-                #     '</a>'
-                # '</p>'
+                '<p>'
+                    '&emsp;'
+                    '<a href="https://www.ff6hacking.com/forums/user-1770.html">'
+                        '<img class="social" src=' + img_to_html("images/favicon.png") + '>'
+                    '</a>'
+                '</p>'
                 '<hr>'
 
                 '<p class="username">'
@@ -559,13 +540,12 @@ def main():
                     'Patches'
                 '</div>'
                 '<br>'
-                # '<p>'
-                #     '&emsp;'
-                #     '<a href="">'
-                #         '<img class="social"'
-                #             'src=' + img_to_html("images/ico_.png") + '>'
-                #     '</a>'
-                # '</p>'
+                '<p>'
+                    '&emsp;'
+                    '<a href="https://www.ff6hacking.com/forums/user-713.html">'
+                        '<img class="social" src=' + img_to_html("images/favicon.png") + '>'
+                    '</a>'
+                '</p>'
                 '<hr>'
 
                 '<p class="username">'
@@ -575,15 +555,42 @@ def main():
                     'Patches'
                 '</div>'
                 '<br>'
-                # '<p>'
-                #     '&emsp;'
-                #     '<a href="">'
-                #         '<img class="social"'
-                #             'src=' + img_to_html("images/ico_.png") + '>'
-                #     '</a>'
-                # '</p>'
+                '<p>'
+                    '&emsp;'
+                    '<a href="https://www.ff6hacking.com/forums/user-1175.html">'
+                        '<img class="social" src=' + img_to_html("images/favicon.png") + '>'
+                    '</a>'
+                '</p>'
                 '<hr>'
 
+                '<p class="username">'
+                    '<b>Imzogelmo, creator of the Color-Coded MP Digits Patch</b>'
+                '</p>'
+                '<div class="pill first-pill">'
+                    'Patches'
+                '</div>'
+                '<br>'
+                '<p>'
+                    '&emsp;'
+                    '<a href="https://www.ff6hacking.com/forums/user-81.html">'
+                        '<img class="social" src=' + img_to_html("images/favicon.png") + '>'
+                    '</a>'
+                '</p>'
+                '<hr>'
+
+                '<p class="username">'
+                    '<b>SilentEnigma, maintainer of the Color-Coded MP Digits Patch</b>'
+                '</p>'
+                '<div class="pill first-pill">'
+                    'Patches'
+                '</div>'
+                '<br>'
+                '<p>'
+                    '&emsp;'
+                    '<a href="https://www.ff6hacking.com/forums/user-2075.html">'
+                        '<img class="social" src=' + img_to_html("images/favicon.png") + '>'
+                    '</a>'
+                '</p>'
 
                 # '<p class="username">'
                 #     '<b></b>'
@@ -639,7 +646,30 @@ def main():
                     '</a>'
                 '</p>'
                 '<hr>'
-                                                                
+                        
+                '<p class="username">'
+                    '<b>DarkSlash88</b>, Beyond Chaos CE project leader.'
+                '</p>'
+                '<div class="pill first-pill">'
+                    'Permadeath'
+                '</div>'
+                '<br>'
+                '<p>'
+                    '&emsp;'
+                    '<a href="https://github.com/DarkSlash88">'
+                        '<img class="social" src=' + img_to_html("images/ico_github.png") + '>'
+                    '</a>'
+                    '&emsp;'
+                    '<a href="https://github.com/FF6BeyondChaos">'
+                        '<img class="social" src=' + img_to_html("images/ico_github.png") + '>'
+                    '</a>'
+                    '&emsp;'
+                    '<a href="https://www.twitch.tv/darkslash88">'
+                        '<img class="social" src=' + img_to_html("images/ico_twitch.png") + '>'
+                    '</a>'
+                '</p>'
+                '<hr>'
+                                                                                            
                 '<p class="username">'
                     '<b>Dyne_Nuitari</b>'
                 '</p>'
@@ -830,6 +860,174 @@ def main():
         #
         # Populate the Changelog tab
         #
+        with tabs[2].expander(
+                label='Version 0.3.1.2: Cosmetic adjustments to customizations.',
+                expanded=False,
+
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>Added totals and horizontal rules to the dance section.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
+                label='Version 0.3.1.1: Bumped version. Improved the About tab.',
+                expanded=False,
+
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>Added Imzogelmo and SilentEnigma to Developers for their work on the '
+                'Color-Coded MP Digits Patch.</li>'
+                '<li>Changed "Code" pills to say "Python".</li>'
+                '<li>Added FF6hacking social links to many developers.'
+                '<li>Added more historical information to the About tab.'
+                '</li>Added DarkSlash88 to Streamers as well as Developers.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
+                label='Version 0.3.1.0: Added additional customization. BCCE 5.0.1 merger.',
+                expanded=False,
+
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>Added support for customizing monster attack names.</li>'
+                '<li>Added support for customizing dance names.</li>'
+                '<li>Added additional sprites from the latest sprites release.</li>'
+                '<li>Tons of bug fixes.</li>'
+                '<li>Esper junctioning bug fixes and improvements (Thanks Abyssonym!).</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
+                label='Version 0.3.0.0: Merging with upcoming BCCE 5.0.',
+                expanded=False,
+
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>Added new dev server at https://beyondchaosweb-dev.streamlit.app/. Test out the new '
+                    'changes early!</li>'
+                '<li>Flag Presets for Kefka at Narshe now automatically set the Katn Game Mode.</li>'
+                '<li>Added mementomori flag where characters start with an innate relic effect (Thanks CDude!)</li>'
+                '<li>Added espercutegf flag where characters can proc equipped esper spells with basic '
+                'commands (Thanks Abyssonym!)</li>'
+                '<li>Added penultima code to disallow Ultima (Thanks SubtractionSoup!)</li>'
+                '<li>Added Junction flags (espffect, effectmas, effectopry, effectster, treaffect) that allow '
+                'Junction effects to be accessible in a variety of ways (Thanks Abyssonym!)</li>'
+                '<li>Added item locking, rage locking, and alphabetized and improved rage menu (Thanks Myself086!)</li>'
+                '<li>Added options to the dancingmaduin code, so you can choose how the code is implemented</li>'
+                '<li>Added Stone, Dischord, and Flare Star to R-Level</li>'
+                '<li>Fixed X-Zone/Runic potential softlock (Thanks CDude!)</li>'
+                '<li>Implemented Imp Skimp patch from Leet Sketcher, making enemies take the imp '
+                'appearance whenever they have the status (Thanks CDude!)</li>'
+                '<li>Tweaked cursedenouncters to not be quite as punishing</li>'
+                '<li>Added MP Damage colouring to differentiate MP gain/damage from regular '
+                'gain/damage (Thanks Abyssonym!)</li>'
+                '<li>Added 1 new secret item (Thanks OpnoPoint!)</li>'
+                '<li>Fix bug where Kefka at Thamasa would disappear without randomized final '
+                'dungeon (Thanks CDude!)</li>'
+                '<li>Make makeover genderless (like partyparty)</li>'
+                '<li>Add option to Removeflashing to only remove Bum Rush flashes (Thanks Crimdahl!)</li>'
+                '<li>Music Randomizer now looks at songs.txt so users can customze their '
+                'playlist (Thanks Crimdahl!)</li>'
+                '<li>Changed Hidon drop to be Magus Rod tier when stats are randomized (Thanks SubtractionSoup!)</li>'
+                '<li>Masseffect now has additional chance to break or teach a spell (Thanks SubtractionSoup!)</li>'
+                '<li>Added new sprites, changed some sprite categorization (Thanks HoxNorf and RiftDragonHaze!)</li>'
+                '<li>Gogo can now equip espers</li>'
+                '<li>Other minor clean up, tweaks, bug fixes, etc.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
+                label='Version 0.2.3.0: Added Passwords and Playlist customizations.',
+                expanded=False,
+
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>Added the ability to customize South Figaro passwords.</li>'
+                '<li>Added the ability to customize Hidon Cave coral names.</li>'
+                '<li>Added the ability to customize the johnnydmad and johnnyachaotic playlist. Customizing the '
+                    'playlist is not straightforward.</li>'
+                '<li>Added "Restore Defaults" buttons for each customization.</li>'
+                '<li>Improved exception messages from generation.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
+                label='Version 0.2.2.3: Added penultima flag.',
+                expanded=False,
+
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>The new penultima flag under the Characters tab allows you to completely ban the spell'
+                ' Ultima from being naturally learned, taught by Espers, or taught by items.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
+                label='Version 0.2.2.2: Added Guaranteed Hidon Drop.',
+                expanded=False,
+
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>Ported over the change from BCEX 5.0 that guarantees a Magus Rod from Hidon when boss'
+                ' abilities are randomized.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
+                label='Version 0.2.2.1: Tweaked cursedencounters.',
+                expanded=False,
+
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>The cursedencounters flag should now be safer and less volatile in Narshe Cave, Magitek'
+                ' Factory Escape, and Collapsing House.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
+                label='Version 0.2.2.0: Ported over espercutegf code.',
+                expanded=False,
+
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>The experimental new espercutegf code allows your characters to randomly proc spells associated '
+                'with the character\'s equipped esper whenever attacking, using items, and other actions.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
+                label='Version 0.2.1.0: Added character sprite category customization support.',
+                expanded=False,
+
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>Added an expander containing instructions and an experimental_data_editor object that allows a '
+                'user to customize sprite replacements using an interactive table.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
         with tabs[2].expander(
                 label='Version 0.2.0.1: Fixed gpboost code.',
                 expanded=False,
@@ -1105,9 +1303,11 @@ def main():
             "<p><b>Note: Changes listed on this tab are not guarantees nor promises.</b></p>"
             "<ul>"
             '<li><b>Randomization</b>: Alphabetical sorting of rages in the Rage menu.</li>'
-            '<li><b>Web Interface</b>: Filling out the Community tab on the About page.</li>'
+            '<li><b>Randomization</b>: Alphabetical sorting of rages in the battle Rage menu.</li>'
+            '<li><b>Randomization</b>: Item and rage locking</li>'
+            '<li><b>Randomization</b>: Expanded Esper junctioning codes.</li>'
             '<li><b>Web Interface</b>: The ability to customize additional aspects of randomization, including '
-            'coral names, dance names, move names, South Figaro passwords, and character sprite replacements.</li>'
+            'dance names and move names.</li>'
             '<li><b>Web Interface</b>: Add additional status messages during the randomization process '
             'detailing progress.</li>'
             '<li><b>Web Interface</b>: Add caching for base Remonsterate sprites so the sprites do not '

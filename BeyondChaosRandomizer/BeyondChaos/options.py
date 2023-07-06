@@ -57,7 +57,7 @@ class Flag:
                                           '',
                                           flag_string,
                                           re.IGNORECASE)
-                                          
+
         # The flag was not found. Is it a simple flag and needs to be turned on?
         # We need to account for the possibility of spaces or no spaces
         # spaces = '- p i e' - caught by re.search
@@ -84,7 +84,7 @@ class Options:
     def is_flag_active(self, flag_attribute: str):
         for flag in self.active_flags:
             if flag.name.lower() == flag_attribute.lower() or flag.description.lower() == flag_attribute.lower():
-                return True
+                return flag
 
     def is_any_flag_active(self, flag_names: List[str]):
         for flag in self.active_flags:
@@ -112,6 +112,12 @@ class Options:
                     self.activate_flag("frenchvanilla", True)
                 return
 
+    def deactivate_flag(self, flag_name: str):
+        for index, flag in enumerate(self.active_flags):
+            if flag.name == flag_name:
+                del self.active_flags[index]
+
+
     def activate_from_string(self, flag_string):
         s = ""
         flags = read_Options_from_string(flag_string, self.mode)
@@ -123,7 +129,7 @@ class Options:
                 pipe_print("The flag '" + flag.name + "' has been deactivated. It is incompatible with " +
                       self.mode.name + ".")
                 continue
-            if flag.name == 'sketch' and [f for f in flags if f.name == 'remonsterate']:
+            if flag.name == 'sketch' and 'remonsterate' in flags.keys():
                 pipe_print("The flag '" + flag.name + "' has been deactivated. It is incompatible with remonsterate.")
                 continue
 
@@ -406,8 +412,8 @@ NORMAL_FLAGS = [
     # battle codes
     Flag(name='collateraldamage',
          description="ITEM BREAK MODE",
-         long_description="All pieces of equipment break for spells. Characters only have the Fight and "
-                          "Item commands, and enemies will use items drastically more often than usual.",
+         long_description="All equipment break for spells. Characters only have Fight and "
+                          "Item commands. Enemies will use items drastically more often than usual.",
          category="battle",
          inputtype="boolean"),
     Flag(name='cursepower',
@@ -416,6 +422,7 @@ NORMAL_FLAGS = [
          category="battle",
          inputtype="integer",
          default_value="255",
+         minimum_value=0,
          maximum_value=255),
     Flag(name='dancelessons',
          description="NO DANCE FAILURES",
@@ -424,10 +431,14 @@ NORMAL_FLAGS = [
          inputtype="boolean"),
     Flag(name='dancingmaduin',
          description="RESTRICTED ESPERS MODE",
-         long_description="Restricts Esper usage such that most Espers can only be equipped by one character. "
-                          "Also usually changes what spell the Paladin Shld teaches.",
+         long_description="Espers can only be equipped by specific characters. Choose the minimum amount "
+                          "of characters per Esper. Usually changes Paladin Shld spell. "
+                          "\nRandom chooses the same random minimum for all Espers; Chaos chooses them separately.",
          category="battle",
-         inputtype="boolean"),
+         inputtype="combobox",
+         choices=("Off", "Chaos","Random", "1", "2", "3", "4", "5", "6", "7", "8", "10", "11", "12", "13"),
+         default_value="Off",
+         default_index=0),
     Flag(name='darkworld',
          description="SLASHER'S DELIGHT MODE",
          long_description="Drastically increases the difficulty of the seed, akin to a hard mode. "
@@ -450,13 +461,17 @@ NORMAL_FLAGS = [
          long_description="All battles will award multiplied exp.",
          category="battle",
          inputtype="float2",
-         default_value="1.00"),
+         default_value="1.00",
+         minimum_value=0,
+         maximum_value=50),
     Flag(name='gpboost',
          description="MULTIPLIED GP MODE",
          long_description="All battles will award multiplied gp.",
          category="battle",
          inputtype="float2",
-         default_value="1.00"),
+         default_value="1.00",
+         minimum_value=0,
+         maximum_value=50),
     Flag(name='lessfanatical',
          description="EASY FANATICS TOWER MODE",
          long_description="Disables forced magic command in Fanatic's Tower.",
@@ -478,7 +493,9 @@ NORMAL_FLAGS = [
          long_description="All battles will award multiplied magic points.",
          category="battle",
          inputtype="float2",
-         default_value="1.00"),
+         default_value="1.00",
+         minimum_value=0,
+         maximum_value=50),
     Flag(name='nobreaks',
          description="NO ITEM BREAKS MODE",
          long_description="Causes no items to break for spell effects.",
@@ -572,7 +589,9 @@ NORMAL_FLAGS = [
          long_description="Prompts for a multiplier, increasing the range of randomization. (0=uniform randomness)",
          category="field",
          inputtype="integer",
-         default_value="0"),
+         default_value="0",
+         minimum_value=0,
+         maximum_value=255),
     Flag(name='worringtriad',
          description="START IN WOR",
          long_description="The player will start in the World of Ruin, with all of the World of Balance "
@@ -634,6 +653,11 @@ NORMAL_FLAGS = [
          long_description="There will be no combo(dual) skills.",
          category="characters",
          inputtype="boolean"),
+    Flag(name='penultima',
+         description="PENULTIMATE MODE",
+         long_description="Ultima cannot be learned by any means.",
+         category="characters",
+         inputtype="boolean"),
     Flag(name='replaceeverything',
          description="REPLACE ALL SKILLS MODE",
          long_description="All vanilla skills that can be replaced, are replaced.",
@@ -680,11 +704,49 @@ NORMAL_FLAGS = [
          inputtype="boolean"),
     Flag(name='thescenarionottaken',
          description='DIVERGENT PATHS MODE',
-         long_description="Changes the way the 3 scenarios are split up, "
-                          "to resemble PowerPanda's "
+         long_description="Changes the way the 3 scenarios are split up, to resemble PowerPanda's "
                           "'Divergent Paths' mod.",
          category="experimental",
          inputtype="boolean"),
+    Flag(name='espercutegf',
+         description='SUMMONER MODE',
+         long_description='Characters gain the traits of equipped espers. '
+                          'Casters can change equipped esper mid-battle.',
+         category='experimental',
+         inputtype='boolean'),
+    Flag(name='espffect',
+         description='ESPER JUNCTION EFFECTS MODE',
+         long_description='Attach random effects from the "Junction" patch '
+                          'set to espers. Low potential for softlocks.',
+         category='experimental',
+         inputtype='boolean'),
+    Flag(name='effectmas',
+         description='EQUIPMENT JUNCTION EFFECTS MODE',
+         long_description='Attach random effects from the "Junction" patch '
+                          'set to equipment (excluding relics). Medium '
+                          'potential for softlocks.',
+         category='experimental',
+         inputtype='boolean'),
+    Flag(name='effectory',
+         description='RELIC JUNCTION EFFECTS MODE',
+         long_description='Attach random effects from the "Junction" patch '
+                          'set to relics. Medium potential for softlocks.',
+         category='experimental',
+         inputtype='boolean'),
+    Flag(name='effectster',
+         description='MONSTER JUNCTION EFFECTS MODE',
+         long_description='Attach random effects from the "Junction" patch '
+                          'set to monsters, rages, and some statuses. High '
+                          'potential for softlocks.',
+         category='experimental',
+         inputtype='boolean'),
+    Flag(name='treaffect',
+         description='MONSTER EQUIPMENT JUNCTION EFFECTS MODE',
+         long_description='Monsters inherit the "Junction" effects of held '
+                          'items. High potential for softlocks.',
+         category='experimental',
+         inputtype='boolean'),
+
 
     # beta codes
 

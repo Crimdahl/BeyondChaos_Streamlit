@@ -1,6 +1,8 @@
 import streamlit as sl
 from json import loads
-from pages.util.util import initialize_states, DEFAULT_PRESETS
+from pages.util.util import initialize_states, DEFAULT_PRESETS, load_custom_sprite_replacements_from_csv
+
+VERSION = "0.3.1.2"
 
 
 def set_stylesheet():
@@ -19,6 +21,7 @@ def set_stylesheet():
 
 
 def process_import():
+    from pages.util.util import load_dance_names
     try:
         from BeyondChaosRandomizer.BeyondChaos.options import ALL_MODES, NORMAL_FLAGS, \
             MAKEOVER_MODIFIER_FLAGS, get_makeover_groups
@@ -44,9 +47,15 @@ def process_import():
         else:
             settings = loads(sl.session_state["imported_settings"].getvalue())
             for key, value in settings.items():
-                if key in ["female_names", "male_names",
-                           "moogle_names", "sprite_replacements"]:
-                    sl.session_state[key] = "\n".join(value).strip()
+                if key in ["female_names", "male_names", "moogle_names",
+                           "passwords_bottom", "passwords_middle", "passwords_top",
+                           "songs", "coral_names", "monster_attack_names"]:
+                    sl.session_state[key] = "\n".join(value)
+                elif key == "sprite_replacements":
+                    sl.session_state["sprite_replacements"] = load_custom_sprite_replacements_from_csv("\n".join(value))
+                    sl.session_state["sprite_replacements_changed"] = "True"
+                elif key == "dance_names":
+                    load_dance_names("\n".join(value))
                 elif key == "batch":
                     try:
                         # Test if the value is a number
@@ -223,20 +232,41 @@ def process_import():
                             else:
                                 sl.session_state[key] = float(value)
                     except KeyError:
-                        print("Crimdahl forgot to check a key when validating the import: " + key)
+                        # Might be a custom spritecategory?
+                        sl.session_state[key] = value
                         continue
 
 
 def main():
-    sl.set_page_config(
-        layout="wide",
-        page_icon="images/favicon.png",
-        page_title="Beyond Chaos Web"
-    )
+    if "branch" in sl.session_state.keys() and sl.session_state["branch"] == "dev":
+        sl.set_page_config(
+            layout="wide",
+            page_icon="images/favicon.png",
+            page_title="Beyond Chaos Web - Dev Version"
+        )
+        sl.title("Beyond Chaos: Web Edition (Dev)")
+        sl.markdown(
+            '<p style="font-size: 14px; margin-top: -20px;font-family: Arial;">'
+                'Version ' + VERSION +
+                '<span style="color:red;">'
+                    ' Dev Branch'
+                '</span>'
+            '</p>',
+            unsafe_allow_html=True)
+    else:
+        sl.set_page_config(
+            layout="wide",
+            page_icon="images/favicon.png",
+            page_title="Beyond Chaos Web"
+        )
+        sl.title("Beyond Chaos: Web Edition")
+        sl.markdown(
+            '<p style="font-size: 14px; margin-top: -20px;font-family: Arial;">'
+                'Version ' + VERSION +
+            '</p>',
+            unsafe_allow_html=True)
+
     set_stylesheet()
-    sl.title("Beyond Chaos: Web Edition")
-    sl.markdown('<p style="font-size: 14px; margin-top: -20px;font-family: Arial;">Version 0.2.0.1</p>',
-                unsafe_allow_html=True)
 
     if "initialized" not in sl.session_state.keys():
         initialize_states()
@@ -244,8 +274,12 @@ def main():
 
     try:
         sl.markdown(
-            "<p>Welcome to Beyond Chaos, a randomizer for Final Fantasy VI!</p>"
-            "<p>What does Beyond Chaos randomize? Let's start with what <i>isn't</i> randomized:</p>"
+            '<p>'
+                'Welcome to Beyond Chaos, a randomizer for Final Fantasy VI! '
+            '</p>'
+            "<p>"
+                "What does Beyond Chaos randomize? Let's start with what <i>isn't</i> randomized:"
+            "</p>"
             "<ul>"
             "<li>Boss locations.</li>"
             "<li>The storyline.</li>"

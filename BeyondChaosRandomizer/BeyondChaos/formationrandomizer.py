@@ -323,7 +323,7 @@ class Formation():
     def exp(self):
         return sum(e.stats['xp'] for e in self.present_enemies)
 
-    def mutate(self, mp=False, mp_boost_value=None):
+    def mutate(self, mp=False, mp_boost_value=False):
         if mp and self.mp is not None and 0 < self.mp < 100:
             factor = self.levelrank() / 100
             self.mp += int(round(self.mp * factor))
@@ -399,14 +399,14 @@ class FormationSet():
         else:
             self.sixteen_pack = False
 
-    def write_data(self, fout):
-        fout.seek(self.pointer)
+    def write_data(self, outfile_rom_buffer: BytesIO):
+        outfile_rom_buffer.seek(self.pointer)
         for value in self.formids:
             if self.sixteen_pack:
                 value |= 0x8000
             else:
                 value &= 0x7FFF
-            write_multi(fout, value, length=2)
+            write_multi(outfile_rom_buffer, value, length=2)
 
     def remove_redundant_formation(self, fsets, replacement=None,
                                    check_only=False):

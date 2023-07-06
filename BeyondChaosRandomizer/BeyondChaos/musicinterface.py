@@ -25,11 +25,11 @@ BC_MUSIC_FREESPACE = ["53C5F-9FDFF", "310000-37FFFF", "410000-4FFFFF"]
 opera_log = ""
 
 
-def music_init():
-    johnnydmad_initialize(rng=random)
+def music_init(web_custom_playlist=None):
+    johnnydmad_initialize(rng=random, custom_playlist=web_custom_playlist)
 
 
-def randomize_music(fout, Options_, opera=None, form_music_overrides={}):
+def randomize_music(fout, Options_, playlist_path, playlist_filename, opera=None, form_music_overrides={}, ):
     events = ""
     if Options_.is_flag_active('christmas'):
         events += "W"
@@ -45,7 +45,8 @@ def randomize_music(fout, Options_, opera=None, form_music_overrides={}):
     ## For anyone who wants to add UI for playlist selection:
     ## If a playlist is selected, pass it as process_music(playlist_filename=...)
     data = process_music(data, metadata, f_chaos=f_chaos, eventmodes=events, opera=opera, subpath="music",
-                         freespace=BC_MUSIC_FREESPACE, ext_rng=random)
+                         freespace=BC_MUSIC_FREESPACE, ext_rng=random, playlist_path=playlist_path,
+                         playlist_filename=playlist_filename)
     if not Options_.is_any_flag_active(['ancientcave', 'speedcave', 'racecave']):
         data = process_map_music(data)
     data = process_formation_music_by_table(data, form_music_overrides=form_music_overrides, kan_mode=kan_mode)
@@ -292,10 +293,10 @@ def manage_opera(fout, affect_music):
     except IOError:
         try:
             with open(os.path.join(pathlib.Path(__file__).parent.absolute(),
-                                   "custom", "Sprites", f"{merge[4]}"), "rb") as f:
+                                   "custom", "sprites", f"{merge[4]}"), "rb") as f:
                 sprite = f.read()
         except:
-            print(f"failed to open custom/opera/{merge[4]} or custom/Sprites/{merge[4]}")
+            print(f"failed to open custom/opera/{merge[4]} or custom/sprites/{merge[4]}")
             sprite = None
     if sprite:
         # print(f"merge {merge}, pose {pose}")
@@ -316,10 +317,10 @@ def manage_opera(fout, affect_music):
         except IOError:
             try:
                 with open(os.path.join(pathlib.Path(__file__).parent.absolute(), "custom",
-                                       "Sprites", f"{c.sprite}.bin"), "rb") as f:
+                                       "sprites", f"{c.sprite}.bin"), "rb") as f:
                     sprite = f.read()
             except:
-                print(f"failed to open custom/opera/{c.sprite}.bin or custom/Sprites/{c.sprite}.bin")
+                print(f"failed to open custom/opera/{c.sprite}.bin or custom/sprites/{c.sprite}.bin")
                 continue
         offset, extra_tiles = char_offsets[cname]
         # tiles = list(range(0x28)) + extra_tiles
