@@ -2,6 +2,8 @@ import streamlit as sl
 from json import loads
 from pages.util.util import initialize_states, DEFAULT_PRESETS, load_custom_sprite_replacements_from_csv
 
+VERSION = "0.3.1.1"
+
 
 def set_stylesheet():
     sl.markdown(
@@ -245,7 +247,7 @@ def main():
         sl.title("Beyond Chaos: Web Edition (Dev)")
         sl.markdown(
             '<p style="font-size: 14px; margin-top: -20px;font-family: Arial;">'
-                'Version 0.3.0.0 '
+                'Version ' + VERSION +
                 '<span style="color:red;">'
                     'Dev Branch'
                 '</span>'
@@ -260,7 +262,7 @@ def main():
         sl.title("Beyond Chaos: Web Edition")
         sl.markdown(
             '<p style="font-size: 14px; margin-top: -20px;font-family: Arial;">'
-                'Version 0.2.2.3'
+                'Version ' + VERSION +
             '</p>',
             unsafe_allow_html=True)
 
