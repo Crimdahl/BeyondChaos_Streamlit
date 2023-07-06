@@ -249,7 +249,7 @@ def main():
             '<p style="font-size: 14px; margin-top: -20px;font-family: Arial;">'
                 'Version ' + VERSION +
                 '<span style="color:red;">'
-                    'Dev Branch'
+                    ' Dev Branch'
                 '</span>'
             '</p>',
             unsafe_allow_html=True)
