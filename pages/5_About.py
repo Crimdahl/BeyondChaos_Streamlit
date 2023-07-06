@@ -861,6 +861,18 @@ def main():
         # Populate the Changelog tab
         #
         with tabs[2].expander(
+                label='Version 0.3.1.2: Cosmetic adjustments to customizations.',
+                expanded=False,
+
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>Added totals and horizontal rules to the dance section.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
                 label='Version 0.3.1.1: Bumped version. Improved the About tab.',
                 expanded=False,
 

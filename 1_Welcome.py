@@ -2,7 +2,7 @@ import streamlit as sl
 from json import loads
 from pages.util.util import initialize_states, DEFAULT_PRESETS, load_custom_sprite_replacements_from_csv
 
-VERSION = "0.3.1.1"
+VERSION = "0.3.1.2"
 
 
 def set_stylesheet():

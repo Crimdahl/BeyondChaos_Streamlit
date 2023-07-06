@@ -366,7 +366,7 @@ def main():
             )
             num_dance_suffixes = len(sl.session_state["dance_suffixes"].split("\n"))
             sl.markdown(
-                "<div>Total Dance Suffixes: " + str(num_dance_suffixes) + ".</div><br>",
+                "<div>Total Dance Suffixes: " + str(num_dance_suffixes) + ".</div>",
                 unsafe_allow_html=True
             )
             if num_dance_suffixes < 8:
@@ -381,7 +381,7 @@ def main():
                 '</div><br>',
                 unsafe_allow_html=True
                 )
-
+            sl.markdown("<hr>",unsafe_allow_html=True)
             sl.text_area(
                 label="Wind/Sky/Plains Prefixes",
                 label_visibility='visible',
@@ -391,6 +391,12 @@ def main():
                 key="widget_dance_prefixes_wind",
                 height=300
             )
+            num_dance_prefixes = len(sl.session_state["dance_prefixes_wind"].split("\n"))
+            sl.markdown(
+                "<div>Wind/Sky/Plains Prefixes: " + str(num_dance_prefixes) + ".</div>",
+                unsafe_allow_html=True
+            )
+            sl.markdown("<hr>",unsafe_allow_html=True)
             sl.text_area(
                 label="Forest/Nature Prefixes",
                 label_visibility='visible',
@@ -400,6 +406,12 @@ def main():
                 key="widget_dance_prefixes_forest",
                 height=300
             )
+            num_dance_prefixes = len(sl.session_state["dance_prefixes_forest"].split("\n"))
+            sl.markdown(
+                "<div>Forest/Nature Prefixes: " + str(num_dance_prefixes) + ".</div>",
+                unsafe_allow_html=True
+            )
+            sl.markdown("<hr>",unsafe_allow_html=True)
             sl.text_area(
                 label="Heat/Fire Prefixes",
                 label_visibility='visible',
@@ -409,6 +421,12 @@ def main():
                 key="widget_dance_prefixes_desert",
                 height=300
             )
+            num_dance_prefixes = len(sl.session_state["dance_prefixes_desert"].split("\n"))
+            sl.markdown(
+                "<div>Heat/Fire Prefixes: " + str(num_dance_prefixes) + ".</div>",
+                unsafe_allow_html=True
+            )
+            sl.markdown("<hr>",unsafe_allow_html=True)
             sl.text_area(
                 label="Life/Holy Prefixes",
                 label_visibility='visible',
@@ -418,6 +436,12 @@ def main():
                 key="widget_dance_prefixes_love",
                 height=300
             )
+            num_dance_prefixes = len(sl.session_state["dance_prefixes_love"].split("\n"))
+            sl.markdown(
+                "<div>Life/Holy Prefixes: " + str(num_dance_prefixes) + ".</div>",
+                unsafe_allow_html=True
+            )
+            sl.markdown("<hr>",unsafe_allow_html=True)
             sl.text_area(
                 label="Earth Prefixes",
                 label_visibility='visible',
@@ -427,6 +451,12 @@ def main():
                 key="widget_dance_prefixes_earth",
                 height=300
             )
+            num_dance_prefixes = len(sl.session_state["dance_prefixes_earth"].split("\n"))
+            sl.markdown(
+                "<div>Earth Prefixes: " + str(num_dance_prefixes) + ".</div>",
+                unsafe_allow_html=True
+            )
+            sl.markdown("<hr>",unsafe_allow_html=True)
             sl.text_area(
                 label="Water Prefixes",
                 label_visibility='visible',
@@ -436,6 +466,12 @@ def main():
                 key="widget_dance_prefixes_water",
                 height=300
             )
+            num_dance_prefixes = len(sl.session_state["dance_prefixes_water"].split("\n"))
+            sl.markdown(
+                "<div>Water Prefixes: " + str(num_dance_prefixes) + ".</div>",
+                unsafe_allow_html=True
+            )
+            sl.markdown("<hr>",unsafe_allow_html=True)
             sl.text_area(
                 label="Dark/Darkness Prefixes",
                 label_visibility='visible',
@@ -445,6 +481,12 @@ def main():
                 key="widget_dance_prefixes_dark",
                 height=300
             )
+            num_dance_prefixes = len(sl.session_state["dance_prefixes_dark"].split("\n"))
+            sl.markdown(
+                "<div>Dark/Darkness Prefixes: " + str(num_dance_prefixes) + ".</div>",
+                unsafe_allow_html=True
+            )
+            sl.markdown("<hr>",unsafe_allow_html=True)
             sl.text_area(
                 label="Icy/Cold Prefixes",
                 label_visibility='visible',
@@ -454,8 +496,13 @@ def main():
                 key="widget_dance_prefixes_ice",
                 height=300
             )
+            num_dance_prefixes = len(sl.session_state["dance_prefixes_ice"].split("\n"))
+            sl.markdown(
+                "<div>Icy/Cold Prefixes: " + str(num_dance_prefixes) + ".</div><br>",
+                unsafe_allow_html=True
+            )
             if sl.button(
-                label="Restore Defaults",
+                label="Restore All Dance Defaults",
                 key="widget_reset_dances"
             ):
                 from pages.util.util import load_dance_names
