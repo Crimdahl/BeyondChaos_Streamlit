@@ -861,9 +861,36 @@ def main():
         # Populate the Changelog tab
         #
         with tabs[2].expander(
-                label='Version 0.3.1.3: Bug fixes.',
-                expanded=False,
+                label='Version 0.3.2.0: Update to BCCE 5.0.2.',
+                expanded=False
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>The relicmyhat code will combine the equipment and relic menus, showing item descriptions for '
+                'both. Furthermore, it will let you view equipment information in a shop by pressing Y. (Original '
+                'authors: GrayShadows and darknil, respectively)</li>'
+                '<li>Alphabetized lores. (Original Author: SilentEnigma)</li>'
+                '<li>Combo skills no longer fail to retarget after a target dies.</li>'
+                '<li>Equipment descriptions no longer halt when entering the submenu. (Original Author: '
+                'SilentEnigma)</li>'
+                '<li>Added "Null" and "Fail" messages to make "Miss" more informative. (Original Author: '
+                'Bropedio)</li>'
+                '<li>Fix the equipment/rage immunity stacking exploit. (Original Author: Assassin17)</li>'
+                '<li>Fix a bug with cursedencounters</li>'
+                '<li>Fixed EspAtk-J to not ignore death immunity.</li>'
+                '<li>Random superball animations no longer appear as a result of triggering SOS Summon '
+                'without an Esper equipped.</li>'
+                '<li>Freebie does not proc off of Tools</li>'
+                '<li>Restrict Astral and Reverse assignments to enemies</li>'
+                '<li>"Early" bosses will no longer inherit junction effects when using treaffect.</li>'
+                '<li>The main junction routine will no longer crash when it sees a left-handed guest character.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
 
+        with tabs[2].expander(
+                label='Version 0.3.1.3: Bug fixes.',
+                expanded=False
         ):
             sl.markdown(
                 "<ul>"
@@ -875,8 +902,7 @@ def main():
 
         with tabs[2].expander(
                 label='Version 0.3.1.2: Cosmetic adjustments to customizations.',
-                expanded=False,
-
+                expanded=False
         ):
             sl.markdown(
                 "<ul>"
@@ -887,8 +913,7 @@ def main():
 
         with tabs[2].expander(
                 label='Version 0.3.1.1: Bumped version. Improved the About tab.',
-                expanded=False,
-
+                expanded=False
         ):
             sl.markdown(
                 "<ul>"
@@ -904,8 +929,7 @@ def main():
 
         with tabs[2].expander(
                 label='Version 0.3.1.0: Added additional customization. BCCE 5.0.1 merger.',
-                expanded=False,
-
+                expanded=False
         ):
             sl.markdown(
                 "<ul>"
@@ -920,8 +944,7 @@ def main():
 
         with tabs[2].expander(
                 label='Version 0.3.0.0: Merging with upcoming BCCE 5.0.',
-                expanded=False,
-
+                expanded=False
         ):
             sl.markdown(
                 "<ul>"
@@ -961,8 +984,7 @@ def main():
 
         with tabs[2].expander(
                 label='Version 0.2.3.0: Added Passwords and Playlist customizations.',
-                expanded=False,
-
+                expanded=False
         ):
             sl.markdown(
                 "<ul>"
@@ -978,8 +1000,7 @@ def main():
 
         with tabs[2].expander(
                 label='Version 0.2.2.3: Added penultima flag.',
-                expanded=False,
-
+                expanded=False
         ):
             sl.markdown(
                 "<ul>"
@@ -991,8 +1012,7 @@ def main():
 
         with tabs[2].expander(
                 label='Version 0.2.2.2: Added Guaranteed Hidon Drop.',
-                expanded=False,
-
+                expanded=False
         ):
             sl.markdown(
                 "<ul>"
@@ -1004,8 +1024,7 @@ def main():
 
         with tabs[2].expander(
                 label='Version 0.2.2.1: Tweaked cursedencounters.',
-                expanded=False,
-
+                expanded=False
         ):
             sl.markdown(
                 "<ul>"
@@ -1017,8 +1036,7 @@ def main():
 
         with tabs[2].expander(
                 label='Version 0.2.2.0: Ported over espercutegf code.',
-                expanded=False,
-
+                expanded=False
         ):
             sl.markdown(
                 "<ul>"
@@ -1030,8 +1048,7 @@ def main():
 
         with tabs[2].expander(
                 label='Version 0.2.1.0: Added character sprite category customization support.',
-                expanded=False,
-
+                expanded=False
         ):
             sl.markdown(
                 "<ul>"
@@ -1043,8 +1060,7 @@ def main():
 
         with tabs[2].expander(
                 label='Version 0.2.0.1: Fixed gpboost code.',
-                expanded=False,
-
+                expanded=False
         ):
             sl.markdown(
                 "<ul>"
@@ -1055,8 +1071,7 @@ def main():
 
         with tabs[2].expander(
                 label='Version 0.2.0.0: Added validation to the Welcome and Flags screens.',
-                expanded=False,
-
+                expanded=False
         ):
             sl.markdown(
                 "<ul>"
@@ -1072,8 +1087,7 @@ def main():
 
         with tabs[2].expander(
                 label='Version 0.1.2.10: Re-enabled thescenarionottaken.',
-                expanded=False,
-
+                expanded=False
         ):
             sl.markdown(
                 "<ul>"
@@ -1086,8 +1100,7 @@ def main():
 
         with tabs[2].expander(
                 label='Version 0.1.2.9: Hid thescenarionottaken. The flag is currently broken.',
-                expanded=False,
-
+                expanded=False
         ):
             sl.markdown(
                 "<ul>"
@@ -1101,8 +1114,7 @@ def main():
 
         with tabs[2].expander(
                 label='Version 0.1.2.8: Disabled manually editing Active Flags.',
-                expanded=False,
-
+                expanded=False
         ):
             sl.markdown(
                 "<ul>"
@@ -1116,8 +1128,7 @@ def main():
 
         with tabs[2].expander(
                 label='Version 0.1.2.7: Adjusted music and sprites text on the welcome screen.',
-                expanded=False,
-
+                expanded=False
         ):
             sl.markdown(
                 "<ul>"
@@ -1130,8 +1141,7 @@ def main():
 
         with tabs[2].expander(
                 label='Version 0.1.2.6: Capped batch generation at 10.',
-                expanded=False,
-
+                expanded=False
         ):
             sl.markdown(
                 "<ul>"
@@ -1143,8 +1153,7 @@ def main():
 
         with tabs[2].expander(
                 label='Version 0.1.2.5: Improved generation exception handling.',
-                expanded=False,
-
+                expanded=False
         ):
             sl.markdown(
                 "<ul>"
@@ -1160,8 +1169,7 @@ def main():
 
         with tabs[2].expander(
                 label='Version 0.1.2.4: Improved Community tab dark mode compatibility. Added BCB Discord link.',
-                expanded=False,
-
+                expanded=False
         ):
             sl.markdown(
                 "<ul>"
@@ -1176,8 +1184,7 @@ def main():
 
         with tabs[2].expander(
             label='Version 0.1.2.3: Improved the Community tab on the About Screen',
-            expanded=False,
-
+            expanded=False
         ):
             sl.markdown(
                 "<ul>"
@@ -1190,8 +1197,7 @@ def main():
 
         with tabs[2].expander(
             label='Version 0.1.2.2: Added the "About" Screen',
-            expanded=False,
-
+            expanded=False
         ):
             sl.markdown(
                 "<ul>"
@@ -1210,8 +1216,7 @@ def main():
             )
         with tabs[2].expander(
             label='Version 0.1.2.1: Added removeflashing flag customization.',
-            expanded=False,
-
+            expanded=False
         ):
             sl.markdown(
                 "<ul>"
@@ -1222,8 +1227,7 @@ def main():
             )
         with tabs[2].expander(
             label='Version 0.1.2.0: Fixed makeover flag.',
-            expanded=False,
-
+            expanded=False
         ):
             sl.markdown(
                 "<ul>"
@@ -1235,8 +1239,7 @@ def main():
             )
         with tabs[2].expander(
             label='Version 0.1.1.4: Added support for SFC rom files.',
-            expanded=False,
-
+            expanded=False
         ):
             sl.markdown(
                 "<ul>"
@@ -1248,8 +1251,7 @@ def main():
             )
         with tabs[2].expander(
             label='Version 0.1.1.3: Customized browser tab names and favicon.',
-            expanded=False,
-
+            expanded=False
         ):
             sl.markdown(
                 "<ul>"
@@ -1261,8 +1263,7 @@ def main():
             )
         with tabs[2].expander(
             label='Version 0.1.1.1: Fixed a display issue on the Flags screen when using dark mode.',
-            expanded=False,
-
+            expanded=False
         ):
             sl.markdown(
                 "<ul>"
@@ -1273,8 +1274,7 @@ def main():
             )
         with tabs[2].expander(
             label='Version 0.1.1.0: Fixed file pathing issues. Uploaded rom files now persist.',
-            expanded=False,
-
+            expanded=False
         ):
             sl.markdown(
                 "<ul>"
@@ -1287,8 +1287,7 @@ def main():
             )
         with tabs[2].expander(
             label='Version 0.1.0.1: Fixed file import issues.',
-            expanded=False,
-
+            expanded=False
         ):
             sl.markdown(
                 "<ul>"
