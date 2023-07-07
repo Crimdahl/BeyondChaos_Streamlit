@@ -861,6 +861,18 @@ def main():
         # Populate the Changelog tab
         #
         with tabs[2].expander(
+                label='Version 0.3.2.2: Auction house bug fix.',
+                expanded=False
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>Fixed a code conflict that would result in softlocks or crashes when attempting to '
+                'use the auction house.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
                 label='Version 0.3.2.1: Web bug fix.',
                 expanded=False
         ):
