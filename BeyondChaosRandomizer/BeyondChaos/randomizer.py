@@ -4740,7 +4740,6 @@ def manage_cursed_encounters(formations: List[Formation], fsets: List[FormationS
 
     salt_formations = [id for id in salt_formations if id not in event_formations]
 
-
     for fset in fsets:
         if Options_.is_flag_active("cursedencounters"):  # code that applies FC flag to allow 16 encounters in all zones
             if fset.setid < 252 or fset.setid in good_event_fsets:  # only do regular enemies, don't do sets that can risk Zone Eater or get event encounters
@@ -4750,8 +4749,9 @@ def manage_cursed_encounters(formations: List[Formation], fsets: List[FormationS
                         fset.sixteen_pack = True
                     for i, v in enumerate(fset.formids):
                         if fset.formids[i] in salt_formations:
-                            fset.formids[
-                                i] -= 4  # any encounter that could turn into an event encounter, reduce by 4 so it can't
+                            while fset.formids[i] in event_formations or fset.formids[i] in salt_formations:
+                                fset.formids[i] -= 1  # any encounter that could turn into an
+                                            # event encounter, keep reducing until it's not a salt or event formation
                             fset.sixteen_pack = True
 
 

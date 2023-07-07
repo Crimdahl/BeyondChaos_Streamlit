@@ -861,6 +861,19 @@ def main():
         # Populate the Changelog tab
         #
         with tabs[2].expander(
+                label='Version 0.3.1.3: Bug fixes.',
+                expanded=False,
+
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>Adjusted cursedencounter code to ensure that undesirable event formations do not show up.</li>'
+                '<li>Bug fix for musicrandomizer using the wrong path for songs.txt on gui and console.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
                 label='Version 0.3.1.2: Cosmetic adjustments to customizations.',
                 expanded=False,
 
