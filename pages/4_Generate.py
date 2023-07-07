@@ -262,7 +262,7 @@ def main():
 
             gen_error = ""
             if not len(sl.session_state["selected_flags"]) > 0 \
-                    or sl.session_state["sprite_replacements_error"]\
+                    or ("sprite_replacements_error_" in sl.session_state.keys() and sl.session_state["sprite_replacements_error"])\
                     or ("female_names_error" in sl.session_state.keys() and sl.session_state["female_names_error"])\
                     or ("male_names_error" in sl.session_state.keys() and sl.session_state["male_names_error"])\
                     or ("moogle_names_error" in sl.session_state.keys() and sl.session_state["moogle_names_error"])\
