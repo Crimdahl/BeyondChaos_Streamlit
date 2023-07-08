@@ -861,6 +861,19 @@ def main():
         # Populate the Changelog tab
         #
         with tabs[2].expander(
+                label='Version 0.3.2.3: Temporarily disabled Informative Miss',
+                expanded=False
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>The Informative Miss patch is causing an issue where monster counterattacks, including '
+                'phase changes, are not working properly. The patch has been disabled while we work on a '
+                'fix.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
                 label='Version 0.3.2.2: Auction house bug fix.',
                 expanded=False
         ):
