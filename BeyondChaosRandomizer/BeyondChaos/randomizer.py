@@ -6078,7 +6078,7 @@ def randomize(connection: Pipe = None, **kwargs) -> str:
         mp_color_digits(outfile_rom_buffer)
         alphabetized_lores(outfile_rom_buffer)
         description_disruption(outfile_rom_buffer)
-        informative_miss(outfile_rom_buffer)
+        # informative_miss(outfile_rom_buffer)
         manage_doom_gaze(outfile_rom_buffer)
 
         if Options_.is_flag_active('relicmyhat'):
