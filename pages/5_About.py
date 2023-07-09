@@ -861,6 +861,32 @@ def main():
         # Populate the Changelog tab
         #
         with tabs[2].expander(
+                label='Version 0.3.2.5: Updated to BCCE 5.0.3',
+                expanded=False
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>Bug fixes for Junction flags and Informative Miss.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
+                label='Version 0.3.2.4: Re-enabled Informative Miss',
+                expanded=False
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>The issue causing Informative Miss to interfere with monster counterattacks and phase changes '
+                'has been corrected. (Thanks, Abyssonym!)</li>'
+                '<li>The patches for alphabetized lores and new item descriptions have been updated to fix a '
+                'conflict that broke scrolling down in the equipment effects in Myself086\'s '
+                'patch. (Thanks, Abyssonym!)</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
                 label='Version 0.3.2.3: Temporarily disabled Informative Miss',
                 expanded=False
         ):

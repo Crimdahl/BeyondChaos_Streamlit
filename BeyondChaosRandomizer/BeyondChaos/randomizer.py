@@ -13,7 +13,7 @@ from random import Random
 import BeyondChaosRandomizer.BeyondChaos.character as character
 import BeyondChaosRandomizer.BeyondChaos.locationrandomizer as locationrandomizer
 import BeyondChaosRandomizer.BeyondChaos.options as options
-from BeyondChaosRandomizer.BeyondChaos.monsterrandomizer import MonsterBlock, early_bosses
+from BeyondChaosRandomizer.BeyondChaos.monsterrandomizer import MonsterBlock, early_bosses, solo_bosses
 from BeyondChaosRandomizer.BeyondChaos.randomizers.characterstats import CharacterStats
 from BeyondChaosRandomizer.BeyondChaos.ancient import manage_ancient
 from BeyondChaosRandomizer.BeyondChaos.appearance import manage_character_appearance, manage_coral
@@ -75,7 +75,7 @@ from BeyondChaosRandomizer.BeyondChaos.utils import (COMMAND_TABLE, LOCATION_TAB
 from BeyondChaosRandomizer.BeyondChaos.wor import manage_wor_recruitment, manage_wor_skip
 from BeyondChaosRandomizer.BeyondChaos.remonsterate.remonsterate import remonsterate
 
-VERSION = "CE-5.0.2"
+VERSION = "CE-5.0.3"
 BETA = False
 VERSION_ROMAN = "IV"
 if BETA:
@@ -5041,12 +5041,13 @@ def junction_everything(jm: JunctionManager, outfile_rom_buffer: BytesIO):
                     outfile_rom_buffer.seek(equip_address)
                     outfile_rom_buffer.write(bytes([new_equip]))
 
+    banned_bosses = set(early_bosses + solo_bosses)
     if Options_.is_flag_active('effectster'):
         monsters = get_monsters()
         jm.reseed('premonster')
         valid_monsters = []
         for m in monsters:
-            if m.id in early_bosses:
+            if m.id in banned_bosses:
                 continue
             if m.id not in jm.monster_tags:
                 continue
@@ -5062,7 +5063,7 @@ def junction_everything(jm: JunctionManager, outfile_rom_buffer: BytesIO):
     if Options_.is_flag_active('treaffect'):
         monsters = get_monsters()
         for m in monsters:
-            if m.id not in early_bosses:
+            if m.id not in banned_bosses:
                 continue
             for item in m.steals + m.drops:
                 if item is None:
@@ -6078,7 +6079,7 @@ def randomize(connection: Pipe = None, **kwargs) -> str:
         mp_color_digits(outfile_rom_buffer)
         alphabetized_lores(outfile_rom_buffer)
         description_disruption(outfile_rom_buffer)
-        # informative_miss(outfile_rom_buffer)
+        informative_miss(outfile_rom_buffer)
         manage_doom_gaze(outfile_rom_buffer)
 
         if Options_.is_flag_active('relicmyhat'):
