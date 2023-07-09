@@ -861,6 +861,17 @@ def main():
         # Populate the Changelog tab
         #
         with tabs[2].expander(
+                label='Version 0.3.2.5: Updated to BCCE 5.0.3',
+                expanded=False
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>Bug fixes for Junction flags and Informative Miss.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
                 label='Version 0.3.2.4: Re-enabled Informative Miss',
                 expanded=False
         ):
