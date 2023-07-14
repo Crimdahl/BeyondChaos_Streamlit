@@ -861,7 +861,7 @@ def main():
         # Populate the Changelog tab
         #
         with tabs[2].expander(
-                label='Version 0.3.2.5: Updated to BCCE 5.0.4',
+                label='Version 0.3.2.6: Updated to BCCE 5.0.4',
                 expanded=False
         ):
             sl.markdown(
