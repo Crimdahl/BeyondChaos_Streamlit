@@ -861,6 +861,23 @@ def main():
         # Populate the Changelog tab
         #
         with tabs[2].expander(
+                label='Version 0.3.2.5: Updated to BCCE 5.0.4',
+                expanded=False
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>Fixed auction house softlock</li>'
+                '<li>Fixed Lete River camera bug</li>'
+                '<li>Made relic spell learning possible for mementomori</li>'
+                '<li>Prevented moogle charm effect from being possible for innate relics on mementomori during '
+                'dearestmolulu</li>'
+                '<li>Prevent moogle charm from rolling on guest characters during dearestmolulu</li>'
+                '<li>Added Flyaway bug fix</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
                 label='Version 0.3.2.5: Updated to BCCE 5.0.3',
                 expanded=False
         ):

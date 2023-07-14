@@ -479,7 +479,7 @@ class RandomSpellSub(Substitution):
              0x20, 0xC1, 0x19,  # JSR $19C1
              0x20, 0x51, 0x29,  # JSR $2951
              0x4C, 0x5F, 0x17,
-             ])
+            ])
         return template
 
     def get_wild(self):
