@@ -55,7 +55,8 @@ from BeyondChaosRandomizer.BeyondChaos.patches import (allergic_dog, banon_life3
                                                         nicer_poison, fix_xzone, imp_skimp, hidden_relic, y_equip_relics,
                                                         fix_gogo_portrait, vanish_doom, stacking_immunities, mp_color_digits,
                                                         can_always_access_esper_menu, alphabetized_lores, description_disruption,
-                                                        informative_miss, improved_equipment_menus, verify_randomtools_patches)
+                                                        informative_miss, improved_equipment_menus, verify_randomtools_patches,
+                                                        fix_flyaway)
 from BeyondChaosRandomizer.BeyondChaos.shoprandomizer import (get_shops, buy_owned_breakable_tools)
 from BeyondChaosRandomizer.BeyondChaos.sillyclowns import randomize_passwords, randomize_poem
 from BeyondChaosRandomizer.BeyondChaos.skillrandomizer import (SpellBlock, CommandBlock, SpellSub, ComboSpellSub,
@@ -75,7 +76,7 @@ from BeyondChaosRandomizer.BeyondChaos.utils import (COMMAND_TABLE, LOCATION_TAB
 from BeyondChaosRandomizer.BeyondChaos.wor import manage_wor_recruitment, manage_wor_skip
 from BeyondChaosRandomizer.BeyondChaos.remonsterate.remonsterate import remonsterate
 
-VERSION = "CE-5.0.3"
+VERSION = "CE-5.0.4"
 BETA = False
 VERSION_ROMAN = "IV"
 if BETA:
@@ -2184,6 +2185,7 @@ def manage_balance(newslots: bool = True):
     evade_mblock(outfile_rom_buffer)
     fix_xzone(outfile_rom_buffer)
     imp_skimp(outfile_rom_buffer)
+    fix_flyaway(outfile_rom_buffer)
 
     manage_rng()
     if newslots:
@@ -2559,8 +2561,9 @@ def manage_equipment(items: List[ItemBlock]) -> List[ItemBlock]:
                     equipid = equipitem.itemid
                     if (equipitem.has_disabling_status and (0xE <= c.id <= 0xF or c.id > 0x1B)):
                         equipid = 0xFF
-                    elif equipitem.prevent_encounters and c.id in [0x1C, 0x1D]:
-                        equipid = 0xFF
+                    elif Options_.is_flag_active("dearestmolulu") and equipitem.prevent_encounters and c.id in [14, 16, 17]:
+                            #don't give moogle charm to Banon, or Guest Ghosts during dearestmolulu
+                            equipid = 0xFF
                     else:
                         if (equiptype not in ["weapon", "shield"] and random.randint(1, 100) == 100):
                             equipid = random.randint(0, 0xFF)
@@ -5551,7 +5554,11 @@ def randomize(connection: Pipe = None, **kwargs) -> str:
                         raise ValueError
                     except ValueError:
                         pipe_print("The supplied value was not a valid option. Please try again.")
-            hidden_relic(outfile_rom_buffer, amount)
+            feature_exclusion_list = []
+            if Options_.is_flag_active('dearestmolulu'):
+                feature_exclusion_list.append("no enc.")
+            hidden_relic(outfile_rom_buffer, amount, feature_exclusion_list)
+
 
         # This needs to be before manage_monster_appearance or some of the monster
         # palettes will be messed up.

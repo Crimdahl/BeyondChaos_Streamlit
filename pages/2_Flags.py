@@ -234,7 +234,7 @@ def main():
         )
 
         global flag_categories
-        flag_categories = {"Flags": 0, "Sprite": 0, "Sprite Categories": 0, "Aesthetic": 0,
+        flag_categories = {"Core": 0, "Sprite": 0, "Sprite Categories": 0, "Aesthetic": 0,
                            "Battle": 0, "Field": 0, "Characters": 0, "Gamebreaking": 0, "Experimental": 0}
 
         for flag in SORTED_FLAGS:

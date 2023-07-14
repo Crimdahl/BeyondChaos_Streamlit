@@ -262,7 +262,7 @@ def main():
         sl.title("Beyond Chaos: Web Edition")
         sl.markdown(
             '<p style="font-size: 14px; margin-top: -20px;font-family: Arial;">'
-                'Version ' + VERSION + " (based on BCCE 5.0.3)"
+                'Version ' + VERSION + " (based on BCCE 5.0.4)"
             '</p>',
             unsafe_allow_html=True)
 
