@@ -5,9 +5,10 @@ from pages.util.util import initialize_states, img_to_html
 def set_stylesheet():
     sl.markdown(
         '<style>'
-        # '   *{'
-        # '       font-family: "Arial";'
-        # '   }'
+        '   section div.block-container{'
+        '       padding-top: 3rem;'
+        '       padding-bottom: 1rem;'
+        '   }'
         '   .streamlit-expanderHeader:first-child:first-child p{'
         '       font-size: 16px;'
         '       font-weight: bold;'
@@ -847,6 +848,22 @@ def main():
         #
         # Populate the Changelog tab
         #
+        with tabs[2].expander(
+                label='Version 0.3.3.3: CSS Formatting modifications for better 1080p viewing',
+                expanded=False
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>Reduced top and bottom padding app-wide</li>'
+                '<li>On the remonsterate screen: Shrunk the left column. Wxpanded the left column. '
+                'Floated the Folder and Image drop-down selectors.</li>'
+                '<li>Fixed a bug where leaving and going back to the Remonsterate screen could show the wrong sprite '
+                'being rendered because the drop-downs do not remember the selection. Maybe I\'ll give the drop-downs '
+                'memory later.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
         with tabs[2].expander(
                 label='Version 0.3.3.2: Corrected remonsterate sprite file names',
                 expanded=False

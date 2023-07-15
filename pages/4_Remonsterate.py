@@ -6,9 +6,10 @@ from pages.util.util import initialize_states, img_to_html
 def set_stylesheet():
     sl.markdown(
         '<style>'
-        # '   *{'
-        # '       font-family: "Arial";'
-        # '   }'
+        '   section div.block-container{'
+        '       padding-top: 3rem;'
+        '       padding-bottom: 1rem;'
+        '   }'
         '   div[data-testid="stText"]{'
         '       font-family: "Source Sans Pro", sans-serif;'
         '   }'
@@ -23,14 +24,37 @@ def set_stylesheet():
         '       border-top: 1px solid black;'
         '       overflow-x: hidden;'
         '       overflow-y: auto;'
-        '       height: 68vh;'
+        '       height: 75vh;'
         '   }'
         '   div[data-testid="column"]:nth-child(1){'
         '       border-right: 1px solid black;'
+        '       flex: 1 1 calc(25% - 1rem);'
+        '   }'
+        '   div[data-testid="column"]:nth-child(1) p{'
+        '       margin-right: 25px;'
         '   }'
         '   div[data-testid="column"]:nth-child(2){'
         '       margin-left: -16px;'
         '       padding-left: 16px;'
+        '   }'
+        '   div[data-testid="column"]:nth-child(2) div:nth-child(1) div[data-testid="stVerticalBlock"]:nth-child(1){'
+        # '       background-color: white;'
+        '       flex-direction: row;'
+        '       flex-wrap: wrap;'
+        '   }'
+        '   div[data-testid="column"]:nth-child(2) div.element-container:nth-child(3){'
+        '       width: 55% !important;'
+        '       float: left;'
+        '   }'
+        '   div[data-testid="column"]:nth-child(2) div.element-container:nth-child(3) div.stSelectbox{'
+        '       width: 100% !important;'
+        '   }'
+        '   div[data-testid="column"]:nth-child(2) div.element-container:nth-child(4){'
+        '       width: 40% !important;'
+        '       float: right;'
+        '   }'
+        '   div[data-testid="column"]:nth-child(2) div.element-container:nth-child(4) div.stSelectbox{'
+        '       width: 100% !important;'
         '   }'
         '   div[data-testid="stImage"]{'
         '       background-color: white;'
@@ -92,8 +116,7 @@ def main():
                 'Below are a list of games and sprites that are used with the Remonsterate flag. To prevent a monster '
                 'from showing up in-game, simply remove the entry from the list.<br><br>'
                 'Want to contribute additional sprites? '
-                'Join our official Discord server!'
-                    '&emsp;'
+                'Join our official Discord server!<br>'
                     '<a href="https://discord.gg/ZCHZp7qxws">'
                         '<img class="social" src=' + img_to_html("images/ico_discord.png") + '> https://discord.gg/ZCHZp7qxws'
                     '</a>'
@@ -142,8 +165,8 @@ def main():
                 key="remonsterate_sprite_display_file",
                 on_change=load_remonsterate_image
             )
-            if not "remonsterate_image" in sl.session_state.keys():
-                load_remonsterate_image()
+
+            load_remonsterate_image()
             try:
                 sl.image(
                     image=sl.session_state["remonsterate_image"]

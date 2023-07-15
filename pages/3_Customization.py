@@ -6,9 +6,10 @@ sprite_replacement_changes = []
 def set_stylesheet():
     sl.markdown(
         '<style>'
-        # '   *{'
-        # '       font-family: "Arial";'
-        # '   }'
+        '   section div.block-container{'
+        '       padding-top: 3rem;'
+        '       padding-bottom: 1rem;'
+        '   }'
         '   div[data-testid="stText"]{'
         '       font-family: "Source Sans Pro", sans-serif;'
         '   }'
