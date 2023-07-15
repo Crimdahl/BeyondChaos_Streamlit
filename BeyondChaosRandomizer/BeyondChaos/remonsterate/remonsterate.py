@@ -904,7 +904,13 @@ def remonsterate(connection: Pipe, **kwargs):
     randomize_connection = connection
     images = []
     try:
-        for line in open(os.path.join(file_paths, images_tags_filename)):
+        if kwargs.get("web_custom_images_and_tags", None):
+            lines = kwargs.get("web_custom_images_and_tags").split("\n")
+        else:
+            with open(os.path.join(file_paths, images_tags_filename)) as file:
+                lines = file.readlines()
+
+        for line in lines:
             if '#' in line:
                 line, comment = line.split('#', 1)
             line = line.strip()

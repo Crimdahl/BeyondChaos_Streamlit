@@ -1,8 +1,9 @@
 import streamlit as sl
+import os
 from json import loads
 from pages.util.util import initialize_states, DEFAULT_PRESETS, load_custom_sprite_replacements_from_csv
 
-VERSION = "0.3.2.6"
+VERSION = "0.3.3.0"
 
 
 def set_stylesheet():
@@ -132,6 +133,14 @@ def process_import():
                         sl.session_state[key] = 1
                         continue
                     sl.session_state[key] = int(value)
+                elif key == "remonsterate_folders":
+                    results = {}
+                    for path in value:
+                        folder, sprite = path.split("\\")
+                        if folder not in results.keys():
+                            results[folder] = []
+                        results[folder].append(os.path.splitext(sprite)[0])
+                    sl.session_state["remonsterate_folders"] = results
                 else:
                     # The key is a flag. We need to validate is has a correct value
                     try:

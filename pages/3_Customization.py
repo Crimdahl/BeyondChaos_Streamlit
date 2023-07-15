@@ -1,5 +1,5 @@
 import streamlit as sl
-from pages.util.util import initialize_states, validate_sprite_replacements, load_default_sprite_replacements_from_csv
+from pages.util.util import initialize_states, validate_sprite_replacements
 
 sprite_replacement_changes = []
 
@@ -113,8 +113,6 @@ def main():
     )
     set_stylesheet()
     sl.title("Customization")
-    sl.markdown('<p style="font-size: 14px; margin-top: -20px;">WIP - more customizations to come!</p>',
-                unsafe_allow_html=True)
 
     try:
         if "initialized" not in sl.session_state.keys():
