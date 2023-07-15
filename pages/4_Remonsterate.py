@@ -46,8 +46,8 @@ def set_stylesheet():
 
 
 def update_remonsterate_sprites(folder):
-    sl.session_state["remonsterate_folders"][folder] = sl.session_state["widget_" + folder + "_sprites"].split("\n")
-    print(str(sl.session_state["remonsterate_folders"][folder]))
+    sl.session_state["remonsterate_folders"][folder] = \
+        sl.session_state["widget_" + folder + "_sprites"].strip("\n").split("\n")
 
 
 def load_remonsterate_image():
@@ -56,19 +56,21 @@ def load_remonsterate_image():
     remonsterate_sprite_base_path = os.path.join(os.getcwd(),
                                                  "BeyondChaosRandomizer", "BeyondChaos", "remonsterate", "sprites")
     try:
-        sl.session_state["remonsterate_image"] = Image.open(
+        image = Image.open(
             os.path.join(remonsterate_sprite_base_path,
                          sl.session_state["remonsterate_sprite_display_folder"],
                          sl.session_state["remonsterate_sprite_display_file"]) + ".png"
         )
+        sl.session_state["remonsterate_image"] = image.resize((image.width * 3, image.height * 3))
     except FileNotFoundError:
         try:
-            sl.session_state["remonsterate_image"] = Image.open(
+            image = Image.open(
                 os.path.join(remonsterate_sprite_base_path,
                              sl.session_state["remonsterate_sprite_display_folder"],
                              sl.session_state["remonsterate_folders"]
                                 [sl.session_state["remonsterate_sprite_display_folder"]][0]) + ".png"
             )
+            sl.session_state["remonsterate_image"] = image.resize((image.width * 3, image.height * 3))
         except FileNotFoundError:
             sl.session_state["remonsterate_image"] = None
 
@@ -123,7 +125,8 @@ def main():
             sl.markdown(
                 'Select an image folder and then select an image to display a sprite.<br>'
                 'Note that although many of the sprites have solid-colored backgrounds, the SNES sprite processing '
-                'renders these backgrounds transparent when sprites are drawn in battle.',
+                'renders these backgrounds transparent when sprites are drawn in battle. Additionally, images shown '
+                'here are at triple their in-game size, for easier viewing.',
                 unsafe_allow_html=True
             )
             sl.selectbox(
