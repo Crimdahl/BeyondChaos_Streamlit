@@ -5868,7 +5868,8 @@ def randomize(connection: Pipe = None, **kwargs) -> str:
                         "outfile_rom_buffer": outfile_rom_buffer,
                         "seed": (seed + attempt_number),
                         "rom_type": "1.0",
-                        "list_of_monsters": get_monsters(outfile_rom_buffer)
+                        "list_of_monsters": get_monsters(outfile_rom_buffer),
+                        "web_custom_images_and_tags": kwargs.get("web_custom_images_and_tags", None)
                     }
                     remonsterate_process = Process(
                         target=remonsterate,

@@ -283,6 +283,41 @@ def convert_sprite_replacements_to_csv(data: DataFrame):
     return csv_output
 
 
+def read_remonsterate_paths(folder=None):
+    remonsterate_sprite_base_path = os.path.join(os.getcwd(),
+                                                 "BeyondChaosRandomizer", "BeyondChaos", "remonsterate", "sprites")
+    if "remonsterate_folders" in sl.session_state.keys():
+        results = sl.session_state["remonsterate_folders"]
+    else:
+        results = {}
+
+    for root, dirs, files in os.walk(remonsterate_sprite_base_path):
+        if not root == remonsterate_sprite_base_path:
+            if not folder or (folder and os.path.basename(root) == folder):
+                results[os.path.basename(root)] = [os.path.splitext(file)[0] for file in files]
+
+    sl.session_state["remonsterate_folders"] = results
+
+
+def prepare_images_and_tags_file():
+    results = ""
+    for folder in sl.session_state["remonsterate_folders"].keys():
+        for sprite in sl.session_state["remonsterate_folders"][folder]:
+            results += str(os.path.join(folder,sprite)) + ".png" + "\n"
+
+    results.strip()
+    return results
+
+
+def save_images_and_tags():
+    results = []
+    for folder in sl.session_state["remonsterate_folders"].keys():
+        for sprite in sl.session_state["remonsterate_folders"][folder]:
+            results.append(str(os.path.join(folder,sprite)) + ".png")
+
+    return results
+
+
 def initialize_states():
     config = ConfigParser()
     config.read(os.path.join(os.getcwd(), "config.ini"))
@@ -315,6 +350,8 @@ def initialize_states():
     load_coral_names()
     load_dance_names()
     load_monster_attack_names()
+    read_remonsterate_paths()
+    # load_remonsterate_images()
     sl.session_state["sprite_replacements_error"] = None
     sl.session_state["batch"] = 1
     sl.session_state["seed"] = 0
