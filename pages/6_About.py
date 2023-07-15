@@ -848,6 +848,17 @@ def main():
         # Populate the Changelog tab
         #
         with tabs[2].expander(
+                label='Version 0.3.3.2: Corrected remonsterate sprite file names',
+                expanded=False
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>Corrected sprite names with ".PNG" to be ".png"</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
                 label='Version 0.3.3.1: Remonsterate screen refinement',
                 expanded=False
         ):

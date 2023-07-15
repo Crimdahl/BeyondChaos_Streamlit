@@ -99,7 +99,6 @@ def process_export():
                 elif key == "dance_suffixes":
                     export_data["dance_names"] = convert_dance_names_to_string().split("\n")
                 elif key == "remonsterate_folders":
-                    print("Hello")
                     export_data["remonsterate_folders"] = save_images_and_tags()
                 else:
                     export_data[key] = value
