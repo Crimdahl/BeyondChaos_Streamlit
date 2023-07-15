@@ -848,6 +848,18 @@ def main():
         # Populate the Changelog tab
         #
         with tabs[2].expander(
+                label='Version 0.3.3.1: Remonsterate screen refinement',
+                expanded=False
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>Sprites are now displayed at triple size.</li>'
+                '<li>Empty lines in the sprite lists are now ignored.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
                 label='Version 0.3.3.0: Added Remonsterate Customization',
                 expanded=False
         ):
