@@ -294,9 +294,9 @@ def read_remonsterate_paths(folder=None):
     for root, dirs, files in os.walk(remonsterate_sprite_base_path):
         if not root == remonsterate_sprite_base_path:
             if not folder or (folder and os.path.basename(root) == folder):
-                results[os.path.basename(root)] = [os.path.splitext(file)[0] for file in files]
+                results[os.path.basename(root)] = sorted([os.path.splitext(file)[0] for file in files])
 
-    sl.session_state["remonsterate_folders"] = results
+    sl.session_state["remonsterate_folders"] = {key: value for key, value in sorted(results.items())}
 
 
 def prepare_images_and_tags_file():
