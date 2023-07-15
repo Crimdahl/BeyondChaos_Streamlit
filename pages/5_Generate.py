@@ -44,9 +44,10 @@ def set_stylesheet():
         '       flex-direction: column-reverse;'
         '       display: flex;'
         '   }'
-        # '   *{'
-        # '       font-family: "Arial";'
-        # '   }'
+        '   section div.block-container{'
+        '       padding-top: 3rem;'
+        '       padding-bottom: 1rem;'
+        '   }'
         '</style>',
         unsafe_allow_html=True
     )

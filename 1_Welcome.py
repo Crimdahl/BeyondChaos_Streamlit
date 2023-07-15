@@ -9,9 +9,10 @@ VERSION = "0.3.3.2"
 def set_stylesheet():
     sl.markdown(
         '<style>'
-        # '   *{'
-        # '       font-family: "Arial";'
-        # '   }'
+        '   section div.block-container{'
+        '       padding-top: 3rem;'
+        '       padding-bottom: 1rem;'
+        '   }'
         '   .streamlit-expanderHeader:first-child:first-child p{'
         '       font-size: 16px;'
         '       font-weight: bold;'

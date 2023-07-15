@@ -29,9 +29,10 @@ def set_stylesheet():
         # '   .stApp {'
         # '       background-color: white;'
         # '   }'
-        # '   *{'
-        # '       font-family: "Arial";'
-        # '   }'
+        '   section div.block-container{'
+        '       padding-top: 3rem;'
+        '       padding-bottom: 1rem;'
+        '   }'
         # Setting the expander header text style
         '   .streamlit-expanderHeader:first-child:first-child p{'
         '       font-size: 16px;'
