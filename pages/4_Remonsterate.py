@@ -1,6 +1,6 @@
 import streamlit as sl
 import os
-from pages.util.util import initialize_states
+from pages.util.util import initialize_states, img_to_html
 
 
 def set_stylesheet():
@@ -34,6 +34,11 @@ def set_stylesheet():
         '   }'
         '   div[data-testid="stImage"]{'
         '       background-color: white;'
+        '   }'
+        '   img.social{'
+        #'       background-color: white;'
+        '       width: 25px;'
+        '       height: 25px;'
         '   }'
         '</style>',
         unsafe_allow_html=True
@@ -82,9 +87,15 @@ def main():
         with col1:
             sl.header("Sprites")
             sl.markdown(
-                'Below are a list of games and sprites that are used with the Remonsterate flag.<br>'
-                'To prevent a monster from showing up in-game, simply remove the entry from the list.<br>'
-                'Use the panel to the right to display a monster\'s sprite.',
+                'Below are a list of games and sprites that are used with the Remonsterate flag. To prevent a monster '
+                'from showing up in-game, simply remove the entry from the list.<br><br>'
+                'Want to contribute additional sprites? '
+                'Join our official Discord server!'
+                    '&emsp;'
+                    '<a href="https://discord.gg/ZCHZp7qxws">'
+                        '<img class="social" src=' + img_to_html("images/ico_discord.png") + '> https://discord.gg/ZCHZp7qxws'
+                    '</a>'
+                '',
                 unsafe_allow_html=True
             )
             for folder, sprites in sl.session_state["remonsterate_folders"].items():

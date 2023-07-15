@@ -1,7 +1,5 @@
 import streamlit as sl
-import base64
-from pathlib import Path
-from pages.util.util import initialize_states
+from pages.util.util import initialize_states, img_to_html
 
 
 def set_stylesheet():
@@ -46,17 +44,6 @@ def set_stylesheet():
     )
 
 
-def img_to_bytes(img_path):
-    img_bytes = Path(img_path).read_bytes()
-    encoded = base64.b64encode(img_bytes).decode()
-    return encoded
-
-
-def img_to_html(img_path):
-    img_html = "'data:image/png;base64,{}'".format(
-      img_to_bytes(img_path)
-    )
-    return img_html
 
 
 def main():
@@ -860,6 +847,18 @@ def main():
         #
         # Populate the Changelog tab
         #
+        with tabs[2].expander(
+                label='Version 0.3.3.0: Added Remonsterate Customization',
+                expanded=False
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>Added Remonsterate screen containing a list of monster sprites and a sprite display. Values '
+                'can be removed from the sprites list to make it where certain sprites do not appear in-game.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
         with tabs[2].expander(
                 label='Version 0.3.2.6: Updated to BCCE 5.0.4',
                 expanded=False

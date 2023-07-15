@@ -1,5 +1,7 @@
 import streamlit as sl
 import os
+import base64
+from pathlib import Path
 from configparser import ConfigParser
 from pandas import DataFrame
 
@@ -316,6 +318,19 @@ def save_images_and_tags():
             results.append(str(os.path.join(folder,sprite)) + ".png")
 
     return results
+
+
+def img_to_bytes(img_path):
+    img_bytes = Path(img_path).read_bytes()
+    encoded = base64.b64encode(img_bytes).decode()
+    return encoded
+
+
+def img_to_html(img_path):
+    img_html = "'data:image/png;base64,{}'".format(
+      img_to_bytes(img_path)
+    )
+    return img_html
 
 
 def initialize_states():
