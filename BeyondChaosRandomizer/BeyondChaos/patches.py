@@ -1,5 +1,6 @@
 from io import BytesIO
 import os
+import math
 
 from BeyondChaosRandomizer.BeyondChaos.bcg_junction import (write_patch as jm_write_patch,
                                                             tblpath as jm_tblpath,
