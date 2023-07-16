@@ -849,6 +849,19 @@ def main():
         # Populate the Changelog tab
         #
         with tabs[2].expander(
+                label='Version 0.3.3.5: Fixed error importing JSON settings.',
+                expanded=False
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>The JSON settings import process assumed backslashes between directories, which was '
+                'only applicable for Windows. Since Streamlit runs on an OS using forward slashes, the import '
+                'process was throwing an error.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
                 label='Version 0.3.3.4: Fixed missing import for Python\'s Math Module',
                 expanded=False
         ):
