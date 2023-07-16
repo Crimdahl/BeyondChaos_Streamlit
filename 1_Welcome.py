@@ -3,7 +3,7 @@ import os
 from json import loads
 from pages.util.util import initialize_states, DEFAULT_PRESETS, load_custom_sprite_replacements_from_csv
 
-VERSION = "0.3.3.4"
+VERSION = "0.3.3.5"
 
 
 def set_stylesheet():
@@ -137,7 +137,7 @@ def process_import():
                 elif key == "remonsterate_folders":
                     results = {}
                     for path in value:
-                        folder, sprite = path.split("\\")
+                        folder, sprite = path.split(os.path.sep)
                         if folder not in results.keys():
                             results[folder] = []
                         results[folder].append(os.path.splitext(sprite)[0])
