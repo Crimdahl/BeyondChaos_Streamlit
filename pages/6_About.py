@@ -849,6 +849,20 @@ def main():
         # Populate the Changelog tab
         #
         with tabs[2].expander(
+                label='Version 0.3.3.6: Bug Fixes, Mass Effect options.',
+                expanded=False
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>Fix ghosting when recruiting Gogo in none Zone Eater areas when not using mimetime.</li>'
+                '<li>Fixed a camera bug on the lete river with scenarionottaken.</li>'
+                '<li>Add fix to item description bug and labelling to show what items do more clearly.</li>'
+                '<li>Added different levels of masseffect code options.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
                 label='Version 0.3.3.5: Fixed error importing JSON settings.',
                 expanded=False
         ):
