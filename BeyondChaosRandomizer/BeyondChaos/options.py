@@ -95,7 +95,8 @@ class Options:
         try:
             for flag in self.active_flags:
                 if flag.name.lower() == flag_name.lower():
-                    return flag.value
+                    if not isinstance(flag.value, bool):
+                        return flag.value
         except KeyError:
             return None
 
@@ -589,11 +590,12 @@ NORMAL_FLAGS = [
          inputtype="boolean"),
     Flag(name='randomboost',
          description="RANDOM BOOST MODE",
-         long_description="Prompts for a multiplier, increasing the range of randomization. (0=uniform randomness)",
+         long_description="Increases the strength of randomization for chests, steals, drops, skills, and "
+                          "Esper spells. ( -1 = Off. 0 or 255 = uniform distribution )",
          category="field",
          inputtype="integer",
-         default_value="0",
-         minimum_value=0,
+         default_value="-1",
+         minimum_value=-1,
          maximum_value=255),
     Flag(name='relicmyhat',
          description="COMBINED EQUIPMENT MENUS",

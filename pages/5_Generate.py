@@ -8,7 +8,7 @@ from io import BytesIO
 from multiprocessing import Process, Pipe
 from zipfile import ZipFile
 from pages.util.util import (initialize_states, convert_sprite_replacements_to_csv, convert_dance_names_to_string,
-                              save_images_and_tags, prepare_images_and_tags_file)
+                              save_images_and_tags, prepare_images_and_tags_file, validate_generation_data)
 
 try:
     from BeyondChaosRandomizer.BeyondChaos.utils import WELL_KNOWN_ROM_HASHES
@@ -96,7 +96,7 @@ def process_export():
                            "songs", "coral_names", "monster_attack_names"]:
                     export_data[key] = str(value).strip().split("\n")
                 elif key == "sprite_replacements":
-                    export_data[key] = convert_sprite_replacements_to_csv(sl.session_state["sprite_replacements"]).split("\n")
+                    export_data[key] = convert_sprite_replacements_to_csv().split("\n")
                 elif key == "dance_suffixes":
                     export_data["dance_names"] = convert_dance_names_to_string().split("\n")
                 elif key == "remonsterate_folders":
@@ -114,6 +114,7 @@ def generate_game():
         starting_seed = int(time())
     sl.session_state["output_files"] = []
     try:
+        validate_generation_data()
         for iteration in range(batch_count):
             sl.session_state["status"] = ""
             bundle = f"{VERSION}" + "|" + \
@@ -134,7 +135,7 @@ def generate_game():
                                 + sl.session_state["passwords_bottom"],
                 "web_custom_coral_names": sl.session_state["coral_names"],
                 "web_custom_playlist": sl.session_state["songs"],
-                "web_custom_sprite_replacements": convert_sprite_replacements_to_csv(sl.session_state["sprite_replacements"]),
+                "web_custom_sprite_replacements": convert_sprite_replacements_to_csv(),
                 "web_custom_dance_names": convert_dance_names_to_string(),
                 "web_custom_monster_attack_names": sl.session_state["monster_attack_names"].split("\n"),
                 "web_custom_images_and_tags": prepare_images_and_tags_file()
@@ -211,7 +212,7 @@ def main():
 
         if sl.button(
             label="Export Settings as JSON",
-            disabled=sl.session_state["lock"]
+            disabled="lock" not in sl.session_state.keys() or sl.session_state["lock"]
         ):
             export_data = process_export()
             if export_data and len(export_data) > 0:
@@ -220,7 +221,7 @@ def main():
                     data=dumps(export_data),
                     file_name="BeyondChaos_Settings_" + str(time()) + ".json",
                     mime="application/json",
-                    disabled=sl.session_state["lock"]
+                    disabled="lock" not in sl.session_state.keys() or sl.session_state["lock"]
                 )
 
         sl.file_uploader(
@@ -257,7 +258,7 @@ def main():
                             min_value=0,
                             step=1,
                             key="seed",
-                            disabled=sl.session_state["lock"])
+                            disabled="lock" not in sl.session_state.keys() or sl.session_state["lock"])
 
             sl.number_input(label="Number of randomized ROMs to create",
                             min_value=1,
@@ -265,7 +266,7 @@ def main():
                             step=1,
                             value=1,
                             key="batch",
-                            disabled=sl.session_state["lock"])
+                            disabled="lock" not in sl.session_state.keys() or sl.session_state["lock"])
 
             gen_error = ""
             if not len(sl.session_state["selected_flags"]) > 0 \
@@ -293,8 +294,8 @@ def main():
 
             sl.button(label="Generate!",
                       on_click=lock_gui,
-                      disabled=sl.session_state["lock"]
-                               or not gen_error == "",
+                      disabled=("lock" not in sl.session_state.keys() or sl.session_state["lock"])
+                            or not gen_error == "",
                       key="generate_button")
 
             if not gen_error == "":
@@ -310,7 +311,7 @@ def main():
         else:
             sl.session_state["status_control"] = sl.text("")
 
-        if sl.session_state["lock"]:
+        if "lock" in sl.session_state.keys() and sl.session_state["lock"]:
             # Hide the file uploader. We cannot disable that without losing the file.
             sl.markdown(
                 '<style>'
@@ -359,10 +360,9 @@ def main():
                                              "-" + str(first_output_seed) + ".zip",
                                    mime="application/zip",
                                    key="output_romfile",
-                                   disabled=sl.session_state["lock"]
+                                   disabled="lock" not in sl.session_state.keys() or sl.session_state["lock"]
                                    )
     except KeyError as e:
-        raise e
         initialize_states()
         sl.experimental_rerun()
 

@@ -3,7 +3,7 @@ import os
 from json import loads
 from pages.util.util import initialize_states, DEFAULT_PRESETS, load_custom_sprite_replacements_from_csv
 
-VERSION = "0.3.3.6"
+VERSION = "0.3.3.7"
 
 
 def set_stylesheet():
@@ -272,7 +272,7 @@ def main():
         sl.title("Beyond Chaos: Web Edition")
         sl.markdown(
             '<p style="font-size: 14px; margin-top: -20px;font-family: Arial;">'
-                'Version ' + VERSION + " (based on BCCE 5.0.4)"
+                'Version ' + VERSION + " (based on BCCE 5.0.5)"
             '</p>',
             unsafe_allow_html=True)
 

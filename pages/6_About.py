@@ -45,8 +45,6 @@ def set_stylesheet():
     )
 
 
-
-
 def main():
     sl.set_page_config(
         layout="wide",
@@ -849,6 +847,19 @@ def main():
         # Populate the Changelog tab
         #
         with tabs[2].expander(
+                label='Version 0.3.3.7: Bug Fixes.',
+                expanded=False
+        ):
+            sl.markdown(
+                "<ul>"
+                '<li>Fixed procs/breaks/uses being incorrect on item descriptions.</li>'
+                '<li>Mementomori can no longer roll auto-stop, auto-confuse, and command changers.</li>'
+                '<li>Updated randomboost description.</li>'
+                "</ul><br>",
+                unsafe_allow_html=True
+            )
+
+        with tabs[2].expander(
                 label='Version 0.3.3.6: Bug Fixes, Mass Effect options.',
                 expanded=False
         ):
@@ -1458,6 +1469,10 @@ def main():
         #
         tabs[3].markdown(
             "<ul>"
+            '<li>Junctioning flags may occasionally error on generation. Just try again until it gets fixed.</li>'
+            '<li>A character with the VIP junction will cause a game over if killed, even if that character is '
+            'immediately revived via Life 3.</li>'
+            '<li>Scrolling Lores with L and R does not function properly..</li>'
             '<li>Remonsterate occasionally fails to randomize the monster sprites. It will automatically retry, '
             'but occasionally it can take multiple Remonsterate passes.</li>'
             '<li>If the first Dance spell used in a battle is a spell with multiple repetitions, such as '
