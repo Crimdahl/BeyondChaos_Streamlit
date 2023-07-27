@@ -76,7 +76,7 @@ from BeyondChaosRandomizer.BeyondChaos.utils import (COMMAND_TABLE, LOCATION_TAB
 from BeyondChaosRandomizer.BeyondChaos.wor import manage_wor_recruitment, manage_wor_skip
 from BeyondChaosRandomizer.BeyondChaos.remonsterate.remonsterate import remonsterate
 
-VERSION = "CE-5.0.4"
+VERSION = "CE-5.0.5"
 BETA = False
 VERSION_ROMAN = "IV"
 if BETA:
@@ -5554,7 +5554,7 @@ def randomize(connection: Pipe = None, **kwargs) -> str:
                         raise ValueError
                     except ValueError:
                         pipe_print("The supplied value was not a valid option. Please try again.")
-            feature_exclusion_list = []
+            feature_exclusion_list = ["Auto stop", "Muddle", "Command Changer"]
             if Options_.is_flag_active('dearestmolulu'):
                 feature_exclusion_list.append("no enc.")
             hidden_relic(outfile_rom_buffer, amount, feature_exclusion_list)
@@ -6083,7 +6083,7 @@ def randomize(connection: Pipe = None, **kwargs) -> str:
         name_swd_techs(outfile_rom_buffer)
         fix_flash_and_bioblaster(outfile_rom_buffer)
         title_gfx(outfile_rom_buffer)
-        improved_party_gear(outfile_rom_buffer)
+        improved_party_gear(outfile_rom_buffer,myself_locations["NAME_TABLE"],myself_locations["NAME_TABLE_BANK"])
         mp_color_digits(outfile_rom_buffer)
         alphabetized_lores(outfile_rom_buffer)
         description_disruption(outfile_rom_buffer)
@@ -6164,12 +6164,12 @@ def randomize(connection: Pipe = None, **kwargs) -> str:
         rewrite_checksum()
         verify_randomtools_patches(outfile_rom_buffer)
 
-        if not application or application in ["console", "gui"]:
+        if not application == "web" and kwargs.get("generate_output_rom", True):
             with open(outfile_rom_path, 'wb+') as f:
                 f.write(outfile_rom_buffer.getvalue())
             outfile_rom_buffer.close()
 
-        if not application == "tester":
+        if kwargs.get("generate_output_rom", True):
             pipe_print("\nWriting log...")
 
             for character in sorted(characters, key=lambda c: c.id):
@@ -6192,7 +6192,7 @@ def randomize(connection: Pipe = None, **kwargs) -> str:
                 log_chests()
             log_item_mutations()
 
-            if not application or application in ["console", "gui"]:
+            if not application == "web":
                 with open(outlog, 'w+') as f:
                     f.write(get_logstring(
                         ["characters", "stats", "aesthetics", "commands", "blitz inputs", "magitek", "slots", "dances", "espers",
