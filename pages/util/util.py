@@ -157,16 +157,20 @@ def load_dance_names(dances=None):
 
 
 def convert_dance_names_to_string():
-    dance_names = ""
-    session_state_list = ["dance_suffixes", "dance_prefixes_wind", "dance_prefixes_forest",
-                          "dance_prefixes_desert", "dance_prefixes_love", "dance_prefixes_earth",
-                          "dance_prefixes_water", "dance_prefixes_dark", "dance_prefixes_ice"]
-    for state in session_state_list:
-        dance_names += sl.session_state[state]
-        dance_names += "\n*****\n"
+    try:
+        dance_names = ""
+        session_state_list = ["dance_suffixes", "dance_prefixes_wind", "dance_prefixes_forest",
+                              "dance_prefixes_desert", "dance_prefixes_love", "dance_prefixes_earth",
+                              "dance_prefixes_water", "dance_prefixes_dark", "dance_prefixes_ice"]
+        for state in session_state_list:
+            dance_names += sl.session_state[state]
+            dance_names += "\n*****\n"
 
-    dance_names = dance_names.strip("\n*****\n")
-    return dance_names
+        dance_names = dance_names.strip("\n*****\n")
+        return dance_names
+    except KeyError:
+        load_dance_names()
+        return convert_dance_names_to_string()
 
 
 def load_monster_attack_names():
@@ -265,7 +269,13 @@ def validate_sprite_replacements(data: DataFrame):
         sl.session_state["sprite_replacements_error"] = None
 
 
-def convert_sprite_replacements_to_csv(data: DataFrame):
+def convert_sprite_replacements_to_csv():
+    try:
+        data = sl.session_state["sprite_replacements"]
+    except KeyError:
+        load_default_sprite_replacements_from_csv()
+        data = sl.session_state["sprite_replacements"]
+
     csv_output = ""
     validate_sprite_replacements(data)
     for index, row in data.iterrows():
@@ -302,6 +312,9 @@ def read_remonsterate_paths(folder=None):
 
 
 def prepare_images_and_tags_file():
+    if "remonsterate_folders" not in sl.session_state.keys():
+        read_remonsterate_paths()
+
     results = ""
     for folder in sl.session_state["remonsterate_folders"].keys():
         for sprite in sl.session_state["remonsterate_folders"][folder]:
@@ -331,6 +344,33 @@ def img_to_html(img_path):
       img_to_bytes(img_path)
     )
     return img_html
+
+
+def validate_generation_data():
+    # Throws KeyError if input_rom_data is missing - should never happen because generation is disallowed until
+    #   a ROM is uploaded.
+    sl.session_state["input_rom_data"]
+
+    # Go over each session state key expected by generation. If the key does not exist, load defaults.
+    if "moogle names" not in sl.session_state.keys():
+        load_moogle_character_names()
+    if "male_names" not in sl.session_state.keys():
+        load_male_character_names()
+    if "female_names" not in sl.session_state.keys():
+        load_female_character_names()
+    if "passwords_top" not in sl.session_state.keys() or\
+        "passwords_middle" not in sl.session_state.keys() or\
+        "passwords_bottom" not in sl.session_state.keys():
+        load_passwords()
+    if "coral_names" not in sl.session_state.keys():
+        load_coral_names()
+    if "songs" not in sl.session_state.keys():
+        load_song_playlist()
+    if "monster_attack_names" not in sl.session_state.keys():
+        load_monster_attack_names()
+    # sprite_replacements has safety checks in convert_sprite_replacements_to_csv
+    # dance_names has safety checks in convert_dance_names_to_string
+    # remonsterate_folders has safety checks in prepare_images_and_tags_file
 
 
 def initialize_states():
