@@ -208,7 +208,7 @@ def main():
     try:
         if "initialized" not in sl.session_state.keys():
             initialize_states()
-            sl.experimental_rerun()
+            sl.rerun()
 
         if sl.button(
             label="Export Settings as JSON",
@@ -331,7 +331,7 @@ def main():
             )
             generate_game()
             # Reload the controls to unlock them
-            sl.experimental_rerun()
+            sl.rerun()
 
         if "output_files" in sl.session_state.keys() and sl.session_state["output_files"] and \
                 len(sl.session_state["output_files"]) > 0:
@@ -364,7 +364,7 @@ def main():
                                    )
     except KeyError as e:
         initialize_states()
-        sl.experimental_rerun()
+        sl.rerun()
 
 
 if __name__ == "__main__":

@@ -5,8 +5,6 @@ import zipfile
 import sys
 from multiprocessing import Pipe, Process
 from pages.util.util import initialize_states
-from streamlit.elements.utils import _shown_default_value_warning
-_shown_default_value_warning = False
 
 sys.path.append("BeyondChaosRandomizer/BeyondChaos")
 
@@ -77,9 +75,9 @@ def set_stylesheet():
     sl.markdown(
         '<style>'
         # stApp contains all of the content for the app. Probably use it like the HTML element.
-        '.stApp {'
-        'background-color: white;'
-        '}'
+        '//.stApp {'
+        '//background-color: white;'
+        '//}'
         # Setting the expander header text style
         '.streamlit-expanderHeader:first-child:first-child p{'
         'font-size: 18px;'
@@ -265,9 +263,12 @@ def main():
     sl.markdown('<p style="font-size: 14px; margin-top: -20px;">Based on Beyond Chaos ' + VERSION + '</p>',
                 unsafe_allow_html=True)
 
+    print("THIS CODE SECTION RAN")
+
     if "initialized" not in sl.session_state.keys():
         initialize_states()
-        sl.experimental_rerun()
+        sl.rerun()
+    print(str(sl.session_state['initialized']))
 
     with sl.expander(label="Flag Selection", expanded=True):
         sl.selectbox(
@@ -298,40 +299,44 @@ def main():
 
         update_active_flags()
 
-        for i, tab in enumerate(flag_categories):
-            for flag in SORTED_FLAGS:
-                if str.lower(flag.category) == str.lower(tab):
-                    if flag.inputtype == "boolean" and not flag.name in ["bingoboingo"]:
-                        tabs[i].checkbox(label=flag.name + " - " + flag.long_description,
-                                         value=sl.session_state[flag.name],
-                                         # on_change=update_active_flags,
-                                         key=flag.name,
-                                         disabled="lock" in sl.session_state.keys() and sl.session_state["lock"])
-                    elif flag.inputtype == "combobox":
-                        tabs[i].selectbox(label=flag.name + " - " + flag.long_description,
-                                          options=flag.choices,
-                                          index=int(flag.choices.index(sl.session_state[flag.name])),
-                                          # on_change=update_active_flags,
-                                          key=flag.name,
-                                          disabled="lock" in sl.session_state.keys() and sl.session_state["lock"])
-                    elif flag.inputtype == "float2":
-                        tabs[i].number_input(label=flag.name + " - " + flag.long_description,
-                                             min_value=0.00,
-                                             value=float(sl.session_state[flag.name]),
-                                             step=0.01,
+        try:
+            for i, tab in enumerate(flag_categories):
+                for flag in SORTED_FLAGS:
+                    if str.lower(flag.category) == str.lower(tab):
+                        if flag.inputtype == "boolean" and not flag.name in ["bingoboingo"]:
+                            tabs[i].checkbox(label=flag.name + " - " + flag.long_description,
+                                             value=sl.session_state[flag.name],
                                              # on_change=update_active_flags,
                                              key=flag.name,
                                              disabled="lock" in sl.session_state.keys() and sl.session_state["lock"])
-                    elif flag.inputtype == "integer":
-                        tabs[i].number_input(label=flag.name + " - " + flag.long_description,
-                                             min_value=0,
-                                             step=1,
-                                             value=int(sl.session_state[flag.name]),
-                                             # on_change=update_active_flags,
-                                             key=flag.name,
-                                             disabled="lock" in sl.session_state.keys() and sl.session_state["lock"])
+                        elif flag.inputtype == "combobox":
+                            tabs[i].selectbox(label=flag.name + " - " + flag.long_description,
+                                              options=flag.choices,
+                                              index=int(flag.choices.index(sl.session_state[flag.name])),
+                                              # on_change=update_active_flags,
+                                              key=flag.name,
+                                              disabled="lock" in sl.session_state.keys() and sl.session_state["lock"])
+                        elif flag.inputtype == "float2":
+                            tabs[i].number_input(label=flag.name + " - " + flag.long_description,
+                                                 min_value=0.00,
+                                                 value=float(sl.session_state[flag.name]),
+                                                 step=0.01,
+                                                 # on_change=update_active_flags,
+                                                 key=flag.name,
+                                                 disabled="lock" in sl.session_state.keys() and sl.session_state["lock"])
+                        elif flag.inputtype == "integer":
+                            tabs[i].number_input(label=flag.name + " - " + flag.long_description,
+                                                 min_value=flag.minimum_value,
+                                                 step=1,
+                                                 value=int(sl.session_state[flag.name]),
+                                                 # on_change=update_active_flags,
+                                                 key=flag.name,
+                                                 disabled="lock" in sl.session_state.keys() and sl.session_state["lock"])
+        except KeyError:
+            initialize_states()
+            sl.rerun()
 
-    with sl.expander(label="Input and Output", expanded=True):
+    with (sl.expander(label="Input and Output", expanded=True)):
         global input_rom_data
         input_rom_data = sl.file_uploader(
             label="ROM File",
@@ -432,7 +437,9 @@ def main():
         if "output_files" not in sl.session_state.keys():
             sl.session_state["output_files"] = []
 
-        if "output_files" in sl.session_state.keys() and len(sl.session_state["output_files"]) > 0:
+        if "output_files" in sl.session_state.keys() and \
+                sl.session_state["output_files"] and \
+                len(sl.session_state["output_files"]) > 0:
             first_output_seed = ""
             with io.BytesIO() as buffer:
                 with zipfile.ZipFile(buffer, "w") as output_zip:

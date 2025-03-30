@@ -203,7 +203,7 @@ def main():
     try:
         if "initialized" not in sl.session_state.keys():
             initialize_states()
-            sl.experimental_rerun()
+            sl.rerun()
 
         modes = []
         for mode in ALL_MODES:
@@ -390,7 +390,7 @@ def main():
                      disabled=True)
     except KeyError as e:
         initialize_states()
-        sl.experimental_rerun()
+        sl.rerun()
 
 
 if __name__ == "__main__":
