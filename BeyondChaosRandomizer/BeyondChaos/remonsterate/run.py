@@ -1,10 +1,11 @@
 import tkinter, os
 from tkinter import ttk
 from tkinter import messagebox
-from remonsterate.remonsterate import remonsterate, VERSION
+from remonsterate import remonsterate, VERSION
 from sys import argv, stdout
 from traceback import format_exc
 from time import time, sleep
+
 
 class RemonstrateGUI(tkinter.Frame):
     def __init__(self, master):

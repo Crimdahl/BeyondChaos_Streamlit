@@ -141,7 +141,7 @@ def main():
                     ):
                         from pages.util.util import read_remonsterate_paths
                         read_remonsterate_paths(folder)
-                        sl.experimental_rerun()
+                        sl.rerun()
 
         with col2:
             sl.header("Sprite Display")
@@ -176,7 +176,7 @@ def main():
 
     except KeyError as e:
         initialize_states()
-        sl.experimental_rerun()
+        sl.rerun()
 
 
 if __name__ == "__main__":

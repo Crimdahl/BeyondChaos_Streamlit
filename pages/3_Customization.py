@@ -3,6 +3,7 @@ from pages.util.util import initialize_states, validate_sprite_replacements
 
 sprite_replacement_changes = []
 
+
 def set_stylesheet():
     sl.markdown(
         '<style>'
@@ -118,7 +119,7 @@ def main():
     try:
         if "initialized" not in sl.session_state.keys():
             initialize_states()
-            sl.experimental_rerun()
+            sl.rerun()
 
         with sl.expander(label="Female Character Names", expanded=False):
             sl.text("List of names for female characters.\nAll characters can still be renamed on acquisition "
@@ -156,7 +157,7 @@ def main():
             ):
                 from pages.util.util import load_female_character_names
                 load_female_character_names()
-                sl.experimental_rerun()
+                sl.rerun()
 
         with sl.expander(label="Male Character Names", expanded=False):
             sl.text("List of names for male characters.\nAll characters can still be renamed on acquisition "
@@ -195,7 +196,7 @@ def main():
             ):
                 from pages.util.util import load_male_character_names
                 load_male_character_names()
-                sl.experimental_rerun()
+                sl.rerun()
 
         with sl.expander(label="Moogle Character Names", expanded=False):
             sl.markdown(
@@ -242,7 +243,7 @@ def main():
             ):
                 from pages.util.util import load_moogle_character_names
                 load_moogle_character_names()
-                sl.experimental_rerun()
+                sl.rerun()
 
         with sl.expander(label="South Figaro Passwords (Experimental)", expanded=False):
             sl.text("List of passwords that can appear in Locke's scenario.")
@@ -285,7 +286,7 @@ def main():
             ):
                 from pages.util.util import load_passwords
                 load_passwords()
-                sl.experimental_rerun()
+                sl.rerun()
 
         with sl.expander(label="Coral Names (Experimental)", expanded=False):
             sl.text("List of replacement names for the coral in Hidon's cave.")
@@ -308,7 +309,7 @@ def main():
             ):
                 from pages.util.util import load_coral_names
                 load_coral_names()
-                sl.experimental_rerun()
+                sl.rerun()
 
         with sl.expander(label="Monster Attack Names (Experimental)", expanded=False):
             sl.markdown(
@@ -338,7 +339,7 @@ def main():
             ):
                 from pages.util.util import load_monster_attack_names
                 load_monster_attack_names()
-                sl.experimental_rerun()
+                sl.rerun()
 
         with sl.expander(label="Dance Names (Experimental)", expanded=False):
             sl.markdown(
@@ -506,7 +507,7 @@ def main():
             ):
                 from pages.util.util import load_dance_names
                 load_dance_names()
-                sl.experimental_rerun()
+                sl.rerun()
 
         with sl.expander(
             label="Character Sprite Replacements (Experimental)",
@@ -567,7 +568,7 @@ def main():
             ):
                 from pages.util.util import load_default_sprite_replacements_from_csv
                 load_default_sprite_replacements_from_csv()
-                sl.experimental_rerun()
+                sl.rerun()
 
             if "sprite_replacements_error" in sl.session_state.keys() and sl.session_state[
                     "sprite_replacements_error"]:
@@ -594,11 +595,11 @@ def main():
             ):
                 from pages.util.util import load_song_playlist
                 load_song_playlist()
-                sl.experimental_rerun()
+                sl.rerun()
 
     except KeyError as e:
         initialize_states()
-        sl.experimental_rerun()
+        sl.rerun()
 
 
 if __name__ == "__main__":

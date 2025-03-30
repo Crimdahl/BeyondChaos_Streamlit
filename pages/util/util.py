@@ -383,6 +383,7 @@ def initialize_states():
                 sl.session_state["branch"] = config.get(section="version", option="branch")
 
     for flag in SORTED_FLAGS:
+        print("Initializing " + str(flag.name))
         if flag.inputtype == "boolean":
             sl.session_state[flag.name] = False
         elif flag.inputtype == "integer":

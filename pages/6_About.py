@@ -56,7 +56,7 @@ def main():
 
     if "initialized" not in sl.session_state.keys():
         initialize_states()
-        sl.experimental_rerun()
+        sl.rerun()
 
     try:
         tabs = sl.tabs(
@@ -1504,7 +1504,7 @@ def main():
 
     except KeyError:
         initialize_states()
-        sl.experimental_rerun()
+        sl.rerun()
 
 
 if __name__ == "__main__":
