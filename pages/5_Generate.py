@@ -187,6 +187,8 @@ def generate_game():
         if "output_files" in sl.session_state.keys() and len(sl.session_state["output_files"]) > 0:
             sl.session_state["status"] = "Randomization Complete"
         sl.session_state["status_control"].text(sl.session_state["status"])
+    except Exception as e:
+        raise e
     finally:
         sl.session_state["lock"] = False
 
