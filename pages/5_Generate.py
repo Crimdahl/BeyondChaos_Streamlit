@@ -116,6 +116,7 @@ def generate_game():
         sl.session_state["output_files"] = []
         validate_generation_data()
         for iteration in range(batch_count):
+            print(str(iteration))
             sl.session_state["status"] = ""
             bundle = f"{VERSION}" + "|" + \
                      str.lower(sl.session_state["gamemode"]) + "|" + \
@@ -162,6 +163,7 @@ def generate_game():
                         item = None
                     if item:
                         if isinstance(item, str):
+                            print(str(item))
                             # Status update
                             if str(item).startswith("Traceback"):
                                 sl.session_state["status"] = item
@@ -170,6 +172,7 @@ def generate_game():
                             sl.session_state["status"] += "\n" + item
                             sl.session_state["status_control"].text(sl.session_state["status"])
                         elif isinstance(item, dict):
+                            print(str(item))
                             # Return values
                             sl.session_state["output_files"].append({
                                 "output_rom_data": item["ord"],
@@ -178,6 +181,7 @@ def generate_game():
                             })
                             break
                         elif isinstance(item, Exception):
+                            print(str(item))
                             sl.session_state["status"] = "The randomization failed with the following exception: " + \
                                 str(item)
                             break
@@ -188,6 +192,7 @@ def generate_game():
             sl.session_state["status"] = "Randomization Complete"
         sl.session_state["status_control"].text(sl.session_state["status"])
     except Exception as e:
+        print(str(e))
         raise e
     finally:
         sl.session_state["lock"] = False
