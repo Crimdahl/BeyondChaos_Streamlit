@@ -1,2 +1,2 @@
 [server]
-folderWatchBlacklist = ["data", "logs", ".git", "node_modules", ".venv", "BeyondChaosRandomizer"]
+folderWatchBlacklist = ["/.venv", "./vscode", "/BeyondChaosRandomizer"]
