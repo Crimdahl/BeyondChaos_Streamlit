@@ -318,7 +318,6 @@ def main():
             sl.session_state["status_control"] = sl.text("")
 
         if "lock" in sl.session_state.keys() and sl.session_state["lock"]:
-            sl.session_state["lock"] = False
             # Hide the file uploader. We cannot disable that without losing the file.
             sl.markdown(
                 '<style>'

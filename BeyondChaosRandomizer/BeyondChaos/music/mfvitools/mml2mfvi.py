@@ -64,7 +64,7 @@ def mlog(msg):
     
 class Drum:
     def __init__(self, st):
-        s = re.findall('(.)(.[+-]?)\\1=\s*([0-9]?)([a-gr^])([+-]?)\s*(.*)', st)
+        s = re.findall(r'(.)(.[+-]?)\\1=\s*([0-9]?)([a-gr^])([+-]?)\s*(.*)', st)
         if s: s = s[0]
         mlog("{} -> {}".format(st, s))
         if len(s) >= 6:
@@ -72,8 +72,8 @@ class Drum:
             self.key = s[1]
             self.octave = int(s[2]) if s[2] else 5
             self.note = s[3] + s[4]
-            s5 = re.sub('\s*', '', s[5]).lower()
-            params = re.findall("\|[0-9a-f]|@0x[0-9a-f][0-9a-f]|%?[^|0-9][0-9,]*", s5)
+            s5 = re.sub(r'\s*', '', s[5]).lower()
+            params = re.findall(r"\|[0-9a-f]|@0x[0-9a-f][0-9a-f]|%?[^|0-9][0-9,]*", s5)
             par = {}
             for p in params:
                 if p[0] == "@" and len(p) >= 5:
@@ -83,8 +83,8 @@ class Drum:
                 if p[0] == '|' and len(p) >= 2:
                     par['@0'] = str(int(p[1], 16) + 32)
                 else:
-                    pre = re.sub('[0-9]+', '0', p)
-                    suf = re.sub('%?[^0-9]', '', p, 1)
+                    pre = re.sub(r'[0-9]+', '0', p)
+                    suf = re.sub(r'%?[^0-9]', '', p, 1)
                     if pre in equiv_tbl:
                         pre = equiv_tbl[pre]
                     par[pre] = suf
@@ -347,7 +347,7 @@ def mml_to_akao(mml, fileid='mml', sfxmode=False, variant=None, inst_only=False)
                 line = "#WAVE " + line
                 uline = line.upper()
             if uline.startswith("#WAVE") and len(line) > 5:
-                line = re.sub('[^x\da-fA-F]', ' ', line[5:])
+                line = re.sub(r'[^x\da-fA-F]', ' ', line[5:])
                 tokens = line.split()
                 if len(tokens) < 2: continue
                 numbers = []
@@ -432,15 +432,15 @@ def mml_to_akao_main(mml, ignore='', fileid='mml'):
     
     for i, line in enumerate(mml):
         while True:
-            r = re.search("'(.*?)'", line)
+            r = re.search(r"'(.*?)'", line)
             if not r: break
             mx = r.group(1)
             #
-            m = re.search("([^+\-*]+)", mx).group(1)
+            m = re.search(r"([^+\-*]+)", mx).group(1)
             tweaks = {}
             tweak_text = ""
             while True:
-                twx = re.search("([+\-*])([%a-z]+)([0-9.,]+)", mx)
+                twx = re.search(r"([+\-*])([%a-z]+)([0-9.,]+)", mx)
                 if not twx: break
                 tweak_text += twx.group(0)
                 cmd = twx.group(2) + ''.join([c for c in twx.group(3) if c == ','])
@@ -530,7 +530,7 @@ def mml_to_akao_main(mml, ignore='', fileid='mml'):
                 except Exception:
                     c = "\\" + c
                     s = re.sub(re.escape(c)+".*?"+re.escape(c), "", s)
-            for c in ["~", "/", "`", "\?", "_"]:
+            for c in ["~", "/", "`", r"\?", "_"]:
                 s = re.sub(c, '', s)
             d = Drum(s.strip())
             if d.delim:

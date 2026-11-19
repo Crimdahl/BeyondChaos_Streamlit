@@ -156,9 +156,9 @@ class BrrSample:
             extratext = text[4].strip()
         except IndexError:
             extratext = ""
-        extratext = re.sub("\{.*\}", "", extratext)
-        coarsetune = re.search("\[[0-9+-]+\]", extratext)
-        extratext = re.sub("\[.*\]", "", extratext)
+        extratext = re.sub(r"\{.*\}", "", extratext)
+        coarsetune = re.search(r"\[[0-9+-]+\]", extratext)
+        extratext = re.sub(r"\[.*\]", "", extratext)
         self.name = extratext.strip()
         if not self.name:
             self.name = self.filename
