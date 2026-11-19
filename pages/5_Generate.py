@@ -86,8 +86,8 @@ def process_export():
     ]
     export_data = {}
     for key, value in sorted(sl.session_state.items()):
-        if "error" in key:
-            skip_keys.append(key)
+        if "error" in str(key):
+            skip_keys.append(str(key))
         elif key not in skip_keys:
             if isinstance(value, str) or isinstance(value, int) or isinstance(value, float) or \
                     isinstance(value, DataFrame) or isinstance(value, dict):
@@ -363,7 +363,10 @@ def main():
                                    disabled="lock" not in sl.session_state.keys() or sl.session_state["lock"]
                                    )
     except KeyError as e:
-        initialize_states()
+        if "initialized" not in sl.session_state.keys():
+            initialize_states()
+        else:
+            raise e
         sl.rerun()
 
 

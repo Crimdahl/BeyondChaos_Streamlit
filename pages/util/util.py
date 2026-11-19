@@ -189,6 +189,7 @@ def load_default_sprite_replacements_from_csv():
     sprite_data = []
     with open(os.path.join(os.getcwd(),
                            "BeyondChaosRandomizer", "BeyondChaos", "custom", "spritereplacements.txt")) as spritefile:
+        # Ignore the pylance error
         spritereplacements = [SpriteReplacement(*line.strip().split(',')) for line in spritefile.readlines()]
 
     for replacement in spritereplacements:
@@ -383,7 +384,6 @@ def initialize_states():
                 sl.session_state["branch"] = config.get(section="version", option="branch")
 
     for flag in SORTED_FLAGS:
-        print("Initializing " + str(flag.name))
         if flag.inputtype == "boolean":
             sl.session_state[flag.name] = False
         elif flag.inputtype == "integer":

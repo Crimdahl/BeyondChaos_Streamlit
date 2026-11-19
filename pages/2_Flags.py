@@ -49,14 +49,14 @@ def set_stylesheet():
         '       flex-direction: column-reverse;'
         '       display: flex;'
         '   }'
-        '   div[role="tablist"]{'
-        '       gap: 0;'
-        '   }'
-        '   button[role="tab"]{'
-        '       border: 1px solid lightgrey;'
-        '       padding: 0 1rem 0 1rem;'
-        '       border-radius: 10px 10px 0 0;'
-        '   }'
+        # '   div[role="tablist"]{'
+        # '       gap: 0;'
+        # '   }'
+        # '   button[role="tab"]{'
+        # '       border: 1px solid lightgrey;'
+        # '       padding: 0 1rem 0 1rem;'
+        # '       border-radius: 10px 10px 0 0;'
+        # '   }'
         '</style>',
         unsafe_allow_html=True
     )
@@ -107,6 +107,7 @@ def clear_selected_flags(clear_preset=False):
     sl.session_state["flagstring"] = ""
     if clear_preset:
         sl.session_state["preset"] = "None"
+        sl.session_state["gamemode"] = "Normal"
 
 
 def update_active_flags():
@@ -141,7 +142,6 @@ def update_active_flags():
 
 
 def apply_flag_preset(flagset=None):
-    sl.session_state["preset"] = sl.session_state["widget_preset"]
     if flagset:
         selected_presets = flagset
     elif not sl.session_state["preset"] == "None":
@@ -160,6 +160,7 @@ def apply_flag_preset(flagset=None):
                 preset_flag_name = preset_flag
             if flag.name == preset_flag_name:
                 if ":" in preset_flag:
+                    # TODO: Add validation check to ensure a valid option is supplied
                     if flag.inputtype == "combobox":
                         sl.session_state[flag.name] = str(preset_flag[str(preset_flag).index(":") + 1:]).title()
                     elif flag.inputtype == "integer":
@@ -177,19 +178,8 @@ def apply_flag_preset(flagset=None):
 
     update_active_flags()
 
-
 def apply_flagstring():
-    sl.session_state["flagstring"] = sl.session_state["widget_flagstring"]
     apply_flag_preset(sl.session_state["flagstring"].replace(" ", "").split(","))
-
-
-def update_flag(flag_name):
-    sl.session_state[flag_name] = sl.session_state["widget_" + flag_name]
-
-
-def update_game_mode():
-    sl.session_state["gamemode"] = sl.session_state["widget_gamemode"]
-
 
 def main():
     sl.set_page_config(
@@ -213,19 +203,21 @@ def main():
         sl.selectbox(
             label="Flag Presets",
             options=DEFAULT_PRESETS.keys(),
-            index=list(DEFAULT_PRESETS.keys()).index(sl.session_state["preset"])
-            if "preset" in sl.session_state.keys() else 0,
+            # index=list(DEFAULT_PRESETS.keys()).index(sl.session_state["preset"])
+            # if "preset" in sl.session_state.keys() else 0,
             on_change=apply_flag_preset,
-            key="widget_preset",
-            disabled=False
+            key="preset",
+            disabled=False,
+            persist_state="session"
         )
 
-        sl.selectbox(label="Game Mode",
-                     options=modes,
-                     key="widget_gamemode",
-                     index=modes.index(sl.session_state["gamemode"]),
-                     disabled=False,
-                     on_change=update_game_mode)
+        sl.selectbox(
+            label="Game Mode",
+            options=modes,
+            key="gamemode",
+            disabled=False,
+            persist_state="session"
+        )
 
         sl.button(
             label="Clear Flags",
@@ -243,7 +235,7 @@ def main():
                 if str(flag.category).lower() == category.lower().replace(" ", ""):
                     flag_categories[category] = flag_categories[category] + 1
 
-        tabs = sl.tabs(flag_categories)
+        tabs = sl.tabs(list(flag_categories.keys()))
 
         update_active_flags()
 
@@ -255,83 +247,40 @@ def main():
                 if str(flag.category).lower() == str(tab).lower().replace(" ", ""):
                     try:
                         if flag.inputtype == "boolean" and flag.name not in ["bingoboingo"]:
-                            try:
-                                tabs[i].checkbox(label=flag.name + " - " + flag.long_description,
-                                                 value=sl.session_state[flag.name],
-                                                 key="widget_" + flag.name,
-                                                 disabled=False,
-                                                 on_change=update_flag,
-                                                 args=(flag.name,))
-                            except ValueError as ex:
-                                tabs[i].checkbox(label=flag.name + " - " + flag.long_description,
-                                                 value=False,
-                                                 key="widget_" + flag.name,
-                                                 disabled=False,
-                                                 on_change=update_flag,
-                                                 args=(flag.name,))
-                                raise ex
+                            tabs[i].checkbox(label=flag.name + " - " + flag.long_description,
+                                                key=flag.name,
+                                                disabled=False,
+                                                args=(flag.name,),
+                                                persist_state="session"
+                            )
                         elif flag.inputtype == "combobox":
-                            try:
-                                tabs[i].selectbox(label=flag.name + " - " + flag.long_description,
-                                                  index=int(flag.choices.index(sl.session_state[flag.name])),
-                                                  options=flag.choices,
-                                                  key="widget_" + flag.name,
-                                                  disabled=False,
-                                                  on_change=update_flag,
-                                                  args=(flag.name,))
-                            except ValueError as ex:
-                                tabs[i].selectbox(label=flag.name + " - " + flag.long_description,
-                                                  index=int(flag.default_index),
-                                                  options=flag.choices,
-                                                  key="widget_" + flag.name,
-                                                  disabled=False,
-                                                  on_change=update_flag,
-                                                  args=(flag.name,))
-                                raise ex
+                            tabs[i].selectbox(label=flag.name + " - " + flag.long_description,
+                                                options=flag.choices,
+                                                key=flag.name,
+                                                disabled=False,
+                                                args=(flag.name,),
+                                                persist_state="session"
+                            )
                         elif flag.inputtype == "float2":
-                            try:
-                                tabs[i].number_input(label=flag.name + " - " + flag.long_description,
-                                                     value=float(sl.session_state[flag.name]),
-                                                     min_value=float(flag.minimum_value),
-                                                     max_value=float(flag.maximum_value),
-                                                     step=0.01,
-                                                     key="widget_" + flag.name,
-                                                     disabled=False,
-                                                     on_change=update_flag,
-                                                     args=(flag.name,))
-                            except ValueError as ex:
-                                tabs[i].number_input(label=flag.name + " - " + flag.long_description,
-                                                     value=float(flag.default_value),
-                                                     min_value=float(flag.minimum_value),
-                                                     max_value=float(flag.maximum_value),
-                                                     step=0.01,
-                                                     key="widget_" + flag.name,
-                                                     disabled=False,
-                                                     on_change=update_flag,
-                                                     args=(flag.name,))
-                                raise ex
+                            tabs[i].number_input(label=flag.name + " - " + flag.long_description,
+                                                    min_value=float(flag.minimum_value),
+                                                    max_value=float(flag.maximum_value),
+                                                    step=0.01,
+                                                    key=flag.name,
+                                                    disabled=False,
+                                                    args=(flag.name,),
+                                                persist_state="session"
+                            )
                         elif flag.inputtype == "integer":
-                            try:
-                                tabs[i].number_input(label=flag.name + " - " + flag.long_description,
-                                                     value=int(sl.session_state[flag.name]),
-                                                     min_value=int(flag.minimum_value),
-                                                     max_value=int(flag.maximum_value),
-                                                     step=1,
-                                                     key="widget_" + flag.name,
-                                                     disabled=False,
-                                                     on_change=update_flag,
-                                                     args=(flag.name,))
-                            except ValueError as ex:
-                                tabs[i].number_input(label=flag.name + " - " + flag.long_description,
-                                                     value=int(flag.default_value),
-                                                     min_value=int(flag.minimum_value),
-                                                     max_value=int(flag.maximum_value),
-                                                     step=1,
-                                                     key="widget_" + flag.name,
-                                                     disabled=False,
-                                                     on_change=update_flag,
-                                                     args=(flag.name,))
-                                raise ex
+                            tabs[i].number_input(label=flag.name + " - " + flag.long_description,
+                                                    min_value=int(flag.minimum_value),
+                                                    max_value=int(flag.maximum_value),
+                                                    step=1,
+                                                    key=flag.name,
+                                                    disabled=False,
+                                                    args=(flag.name,),
+                                                persist_state="session"
+                            )
                     except ValueError:
                         if "flag_errors" not in sl.session_state.keys() or not sl.session_state["flag_errors"]:
                             sl.session_state['flag_errors'] = 'One or more flags had an invalid value:<br><ul>'
@@ -383,13 +332,18 @@ def main():
                 unsafe_allow_html=True
             )
 
-        sl.text_area("Active Flags",
-                     value=str.lower(", ".join(sl.session_state["selected_flags"])),
-                     on_change=apply_flagstring,
-                     key="widget_flagstring",
-                     disabled=True)
+        sl.text_area(
+            "Active Flags",
+            on_change=apply_flagstring,
+            key="flagstring",
+            disabled=False,
+            persist_state="session"
+        )
     except KeyError as e:
-        initialize_states()
+        if "initialized" not in sl.session_state.keys():
+            initialize_states()
+        else:
+            raise e
         sl.rerun()
 
 

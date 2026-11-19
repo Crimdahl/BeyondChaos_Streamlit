@@ -175,7 +175,10 @@ def main():
                 sl.text("Something went wrong displaying the image.")
 
     except KeyError as e:
-        initialize_states()
+        if "initialized" not in sl.session_state.keys():
+            initialize_states()
+        else:
+            raise e
         sl.rerun()
 
 
