@@ -40,7 +40,7 @@ DEFAULT_PRESETS = ({
         "alasdraco", "capslockoff", "partyparty", "makeover", "johnnyachaotic", "notawaiter", "dancingmaduin:chaos",
         "bsiab", "mementomori:random",
         "mimetime", "randombosses", "electricboogaloo", "questionablecontent", "dancelessons", "remonsterate",
-        "swdtechspeed:random", "masseffect", "allcombos", "supernatural", "randomboost:2", "thescenarionottaken"
+        "swdtechspeed:random", "masseffect:med", "allcombos", "supernatural", "randomboost:2", "thescenarionottaken"
     ],
     'KAN Race - Easy': [
         "b", "c", "d", "e", "f", "g", "i", "j", "k", "m", "n", "o", "p", "q", "r", "s", "t", "w", "y", "z",
@@ -414,3 +414,5 @@ def initialize_states():
     sl.session_state["gamemode"] = "Normal"
     sl.session_state["export_file_data"] = {}
     sl.session_state["lock"] = False
+    sl.session_state["preset_feedback"] = ""
+    sl.session_state['preset_feedback_color'] = "green"

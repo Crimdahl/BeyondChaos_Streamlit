@@ -1048,7 +1048,7 @@ class Window(QMainWindow):
             elif mode == "chaoticplayer":
                 self.GamePresets['Chaotic Player'] = (
                     "b c d e f g h i j k m n o p q r s t u w y z makeover partyparty dancelessons electricboogaloo "
-                    "masseffect randombosses dancingmaduin:chaos swdtechspeed:random alasdraco capslockoff "
+                    "masseffect:med randombosses dancingmaduin:chaos swdtechspeed:random alasdraco capslockoff "
                     "johnnyachaotic notawaiter remonsterate bsiab mimetime questionablecontent randomboost:2 "
                     "allcombos supernatural mementomori:random thescenarionottaken relicmyhat"
                 )

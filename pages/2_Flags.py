@@ -142,6 +142,8 @@ def update_active_flags():
 
 
 def apply_flag_preset(flagset=None):
+    sl.session_state['preset_feedback'] = ""
+
     if flagset:
         selected_presets = flagset
     elif not sl.session_state["preset"] == "None":
@@ -156,20 +158,68 @@ def apply_flag_preset(flagset=None):
         for flag in SORTED_FLAGS:
             try:
                 preset_flag_name = preset_flag[:str(preset_flag).index(":")]
+                flag_value = preset_flag[str(preset_flag).index(":") + 1:]
             except ValueError:
                 preset_flag_name = preset_flag
+                flag_value = True
             if flag.name == preset_flag_name:
-                if ":" in preset_flag:
-                    # TODO: Add validation check to ensure a valid option is supplied
-                    if flag.inputtype == "combobox":
-                        sl.session_state[flag.name] = str(preset_flag[str(preset_flag).index(":") + 1:]).title()
+                try:
+                    if ":" in preset_flag:
+                        # TODO: Add validation check to ensure a valid option is supplied
+                        if flag.inputtype == "combobox":
+                            if str(flag_value).title() not in flag.choices:
+                                print(str(str(flag_value).title()))
+                                raise ValueError
+                            sl.session_state[flag.name] = str(preset_flag[str(preset_flag).index(":") + 1:]).title()
+                        elif flag.inputtype == "integer":
+                            if int(flag_value) < flag.minimum_value or int(flag_value) > flag.maximum_value:
+                                raise ValueError
+                            sl.session_state[flag.name] = int(preset_flag[str(preset_flag).index(":") + 1:])
+                        elif flag.inputtype == "float2":
+                            if float(flag_value) < flag.minimum_value or float(flag_value) > flag.maximum_value:
+                                raise ValueError
+                            sl.session_state[flag.name] = float(preset_flag[str(preset_flag).index(":") + 1:])
+                    else:
+                        if not flag.inputtype == "boolean":
+                            raise ValueError
+                        sl.session_state[flag.name] = flag_value
+                except ValueError:
+                    if "preset_feedback" not in sl.session_state.keys() or not sl.session_state["preset_feedback"]:
+                        sl.session_state['preset_feedback'] = 'One or more flags had an invalid value:<br><ul>'
+                        sl.session_state['preset_feedback_color'] = "red"
+                    if flag.inputtype == "boolean":
+                        sl.session_state['preset_feedback'] += \
+                            '<li>' + \
+                            str(flag.name) + \
+                            ' was not added because it was expecting a value and ' \
+                            'did not receive one.</li>'
+                    elif flag.inputtype == "combobox":
+                        sl.session_state['preset_feedback'] += \
+                            '<li>' + \
+                            str(flag.name) + \
+                            ' was not added because it received an invalid value.</li>'
                     elif flag.inputtype == "integer":
-                        sl.session_state[flag.name] = int(preset_flag[str(preset_flag).index(":") + 1:])
+                        if int(flag_value) < flag.minimum_value:
+                            sl.session_state['preset_feedback'] += \
+                                '<li>' + \
+                                str(flag.name) + \
+                                ' was not added because was supplied a value too low.</li>'
+                        if int(flag_value) < flag.maximum_value:
+                            sl.session_state['preset_feedback'] += \
+                                '<li>' + \
+                                str(flag.name) + \
+                                ' was not added because was supplied a value too high.</li>'
                     elif flag.inputtype == "float2":
-                        sl.session_state[flag.name] = float(preset_flag[str(preset_flag).index(":") + 1:])
-                else:
-                    sl.session_state[flag.name] = True
-                continue
+                        if float(flag_value) < flag.minimum_value:
+                            sl.session_state['preset_feedback'] += \
+                                '<li>' + \
+                                str(flag.name) + \
+                                ' was not added because was supplied a value too low.</li>'
+                        if float(flag_value) < flag.maximum_value:
+                            sl.session_state['preset_feedback'] += \
+                                '<li>' + \
+                                str(flag.name) + \
+                                ' was not added because was supplied a value too high.</li>'                
 
     if "KAN" in sl.session_state["preset"]:
         sl.session_state["gamemode"] = "Katn"
@@ -177,6 +227,13 @@ def apply_flag_preset(flagset=None):
         sl.session_state["gamemode"] = "Normal"
 
     update_active_flags()
+
+    if "preset_feedback" not in sl.session_state.keys() or not sl.session_state["preset_feedback"]:
+        sl.session_state['preset_feedback'] = 'Preset applied.<br><br>'
+        sl.session_state['preset_feedback_color'] = "green"
+    else:
+        sl.session_state['preset_feedback'] += "</ul></div>"
+        
 
 def apply_flagstring():
     apply_flag_preset(sl.session_state["flagstring"].replace(" ", "").split(","))
@@ -217,6 +274,11 @@ def main():
             key="gamemode",
             disabled=False,
             persist_state="session"
+        )
+
+        sl.markdown(
+            "<div style='color:" + sl.session_state["preset_feedback_color"] + ";'>" + sl.session_state["preset_feedback"],
+            unsafe_allow_html=True
         )
 
         sl.button(
