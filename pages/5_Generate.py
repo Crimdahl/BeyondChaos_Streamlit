@@ -107,13 +107,13 @@ def process_export():
 
 
 def generate_game():
-    batch_count = sl.session_state["batch"]
-    starting_seed = sl.session_state["seed"]
-    if not starting_seed:
-        from time import time
-        starting_seed = int(time())
-    sl.session_state["output_files"] = []
     try:
+        batch_count = sl.session_state["batch"]
+        starting_seed = sl.session_state["seed"]
+        if not starting_seed:
+            from time import time
+            starting_seed = int(time())
+        sl.session_state["output_files"] = []
         validate_generation_data()
         for iteration in range(batch_count):
             sl.session_state["status"] = ""
@@ -258,7 +258,9 @@ def main():
                             min_value=0,
                             step=1,
                             key="seed",
-                            disabled="lock" not in sl.session_state.keys() or sl.session_state["lock"])
+                            disabled="lock" not in sl.session_state.keys() or sl.session_state["lock"],
+                            persist_state="session"
+            )
 
             sl.number_input(label="Number of randomized ROMs to create",
                             min_value=1,
@@ -266,7 +268,9 @@ def main():
                             step=1,
                             value=1,
                             key="batch",
-                            disabled="lock" not in sl.session_state.keys() or sl.session_state["lock"])
+                            disabled="lock" not in sl.session_state.keys() or sl.session_state["lock"],
+                            persist_state="session"
+            )
 
             gen_error = ""
             if not len(sl.session_state["selected_flags"]) > 0 \
