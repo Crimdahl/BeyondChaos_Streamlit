@@ -308,7 +308,7 @@ def manage_ancient(Options_, outfile_rom_buffer: BytesIO, infile_rom_buffer: Byt
     tower_msg_sub.set_location(0xA03A7)
     tower_msg_sub.write(outfile_rom_buffer)
 
-    from locationrandomizer import NPCBlock, EventBlock
+    from .locationrandomizer import NPCBlock, EventBlock
     falcon = get_location(0xb)
     save_point = NPCBlock(pointer=None, locid=falcon.locid)
     attributes = {
