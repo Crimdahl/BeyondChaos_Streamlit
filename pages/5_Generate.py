@@ -275,15 +275,14 @@ def main():
             )
 
             gen_error = ""
-            if not len(sl.session_state["selected_flags"]) > 0 \
-                    or ("sprite_replacements_error_" in sl.session_state.keys() and sl.session_state["sprite_replacements_error"])\
-                    or ("female_names_error" in sl.session_state.keys() and sl.session_state["female_names_error"])\
-                    or ("male_names_error" in sl.session_state.keys() and sl.session_state["male_names_error"])\
-                    or ("moogle_names_error" in sl.session_state.keys() and sl.session_state["moogle_names_error"])\
-                    or ("dance_suffixes_error" in sl.session_state.keys() and sl.session_state["dance_suffixes_error"]):
+            if ("sprite_replacements_error_" in sl.session_state.keys() and sl.session_state["sprite_replacements_error"]) or \
+                    ("female_names_error" in sl.session_state.keys() and sl.session_state["female_names_error"]) or \
+                    ("male_names_error" in sl.session_state.keys() and sl.session_state["male_names_error"]) or \
+                    ("moogle_names_error" in sl.session_state.keys() and sl.session_state["moogle_names_error"]) or \
+                    ("dance_suffixes_error" in sl.session_state.keys() and sl.session_state["dance_suffixes_error"]):
                 gen_error = "A game cannot yet be generated for the following reasons:<ul>"
-                if "selected_flags" not in sl.session_state.keys() or not len(sl.session_state["selected_flags"]) > 0:
-                    gen_error += "<li>No flags have been selected.</li>"
+                # if "selected_flags" not in sl.session_state.keys() or not len(sl.session_state["selected_flags"]) > 0:
+                #     gen_error += "<li>No flags have been selected.</li>"
                 if "female_names_error" in sl.session_state.keys() and sl.session_state["female_names_error"]:
                     gen_error += "<li>The customization page requires additional female names.</li>"
                 if "male_names_error" in sl.session_state.keys() and sl.session_state["male_names_error"]:
