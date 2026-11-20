@@ -3,7 +3,7 @@ import os
 import base64
 from pathlib import Path
 from configparser import ConfigParser
-from pandas import DataFrame
+from pandas import DataFrame, isna
 
 try:
     from BeyondChaosRandomizer.BeyondChaos.options import NORMAL_FLAGS, MAKEOVER_MODIFIER_FLAGS, get_makeover_groups
@@ -254,7 +254,7 @@ def validate_sprite_replacements(data: DataFrame):
                         'replacements table did not have a ' \
                         'value for ' + str(key) + '. ' + str(key) + ' is required.</li>'
             if key in ["Filename", "Portrait Filename"]:
-                if value and not str(value).endswith(".bin"):
+                if not isna(value) and not str(value).endswith(".bin"):
                     row_error += '<li>Row ' + str(index) + ' of ' + str(len(data.index) - 1) + ' in the sprite ' \
                         'replacements table did not have ' \
                         'a valid file extension for ' + str(key) + '. ' + str(key) + ' values must end in ".bin".</lu>'
@@ -273,7 +273,7 @@ def validate_sprite_replacements(data: DataFrame):
 def convert_sprite_replacements_to_csv():
     try:
         data = sl.session_state["sprite_replacements"]
-    except KeyError:
+    except KeyError as e:
         load_default_sprite_replacements_from_csv()
         data = sl.session_state["sprite_replacements"]
 
